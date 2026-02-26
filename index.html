@@ -1,0 +1,204 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XX选煤班组人员安全信息智能交互平台</title>
+    <style>
+        :root {
+            --yb-blue: #0056b3;
+            --yb-light-blue: #e6f7ff;
+            --yb-dark: #001529;
+            --yb-cyan: #00e5ff;
+            --text-main: #333;
+            --bg-gray: #f4f7f9;
+        }
+
+        body { margin: 0; font-family: "Segoe UI", "PingFang SC", sans-serif; background: var(--bg-gray); color: var(--text-main); overflow-x: hidden; }
+
+        /* 统一页眉 */
+        .header { background: #fff; height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .logo-area { display: flex; align-items: center; font-size: 20px; font-weight: bold; color: var(--yb-blue); }
+        .user-auth { display: flex; align-items: center; gap: 20px; }
+        .user-info { font-size: 14px; color: #666; }
+        .btn-center { background: var(--yb-blue); color: white; padding: 6px 18px; border-radius: 4px; border: none; cursor: pointer; text-decoration: none; font-size: 14px; }
+
+        /* Banner 区域 + 大屏主入口 */
+        .banner {
+            background: linear-gradient(135deg, #001529 0%, #004e92 100%);
+            height: 380px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: white; text-align: center; position: relative;
+        }
+        .banner h1 { font-size: 42px; margin-bottom: 10px; letter-spacing: 2px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .banner p { font-size: 18px; opacity: 0.8; margin-bottom: 30px; }
+
+        /* 大屏入口按钮特效 */
+        .big-screen-btn {
+            background: rgba(0, 229, 255, 0.15);
+            border: 1px solid var(--yb-cyan);
+            color: var(--yb-cyan);
+            padding: 12px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+            text-decoration: none;
+        }
+        .big-screen-btn:hover {
+            background: var(--yb-cyan);
+            color: var(--yb-dark);
+            box-shadow: 0 0 30px var(--yb-cyan);
+            transform: scale(1.05);
+        }
+
+        /* 数据汇总栏 */
+        .stats-bar { max-width: 1200px; margin: -50px auto 30px; background: white; border-radius: 12px; display: flex; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); justify-content: space-around; position: relative; z-index: 10; }
+        .stat-item { text-align: center; border-right: 1px solid #eee; flex: 1; }
+        .stat-item:last-child { border-right: none; }
+        .stat-val { font-size: 26px; font-weight: bold; color: var(--yb-blue); display: block; }
+        .stat-label { font-size: 14px; color: #999; margin-top: 5px; }
+
+        /* 分类切换导航 */
+        .filter-nav { max-width: 1200px; margin: 20px auto; display: flex; gap: 15px; }
+        .filter-item {
+            padding: 8px 25px; background: #fff; border-radius: 20px; cursor: pointer;
+            font-size: 15px; border: 1px solid #ddd; transition: 0.3s;
+        }
+        .filter-item.active { background: var(--yb-blue); color: white; border-color: var(--yb-blue); }
+
+        /* 应用矩阵布局 */
+        .container { max-width: 1200px; margin: 0 auto 60px; }
+        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+
+        .app-card {
+            background: white; border-radius: 12px; padding: 30px 20px; text-align: center;
+            transition: 0.4s; cursor: pointer; border: 1px solid #eee; text-decoration: none; color: inherit;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .app-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); border-color: var(--yb-blue); }
+
+        /* 大屏磁贴专用样式 */
+        .app-card.special {
+            background: linear-gradient(135deg, #001529 0%, #003a8c 100%);
+            color: white; border: none;
+        }
+        .app-card.special .app-desc { color: rgba(255,255,255,0.7); }
+
+        .app-icon { font-size: 42px; margin-bottom: 15px; }
+        .app-name { font-weight: bold; font-size: 18px; margin-bottom: 10px; }
+        .app-desc { font-size: 13px; color: #888; line-height: 1.5; }
+
+        .footer { background: var(--yb-dark); color: #888; text-align: center; padding: 40px 0; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo-area">XX选煤班组人员安全智能交互平台</div>
+        <div class="user-auth">
+            <span class="user-info">当前用户：B选煤中心 - 王班长</span>
+            <a href="#" class="btn-center">用户中心</a>
+            <a href="#" style="font-size: 13px; color:#999; text-decoration:none;">安全注销</a>
+        </div>
+    </header>
+
+    <section class="banner">
+        <h1>智慧选煤 · 安全联控</h1>
+        <p>基于"1+5+1"体系的班组安全智能化管理门户</p>
+        <a href="可视化大屏.html" class="big-screen-btn">
+            进入可视化指挥大屏
+        </a>
+    </section>
+
+    <section class="stats-bar">
+        <div class="stat-item"><span class="stat-val">542 天</span><span class="stat-label">安全运行</span></div>
+        <div class="stat-item"><span class="stat-val">100%</span><span class="stat-label">班前会开展率</span></div>
+        <div class="stat-item"><span class="stat-val">3 条</span><span class="stat-label">待处理预警</span></div>
+        <div class="stat-item"><span class="stat-val">96 分</span><span class="stat-label">本月安全积分</span></div>
+    </section>
+
+    <div class="container">
+        <div class="filter-nav">
+            <div class="filter-item active" onclick="filterApps('all', this)">全部应用</div>
+            <div class="filter-item" onclick="filterApps('core', this)">管理枢纽</div>
+            <div class="filter-item" onclick="filterApps('business', this)">重点业务</div>
+            <div class="filter-item" onclick="filterApps('eval', this)">考核落实</div>
+        </div>
+
+        <div class="app-grid" id="appGrid">
+            <a href="可视化大屏.html" class="app-card special" data-cat="core">
+                <span class="app-icon">📊</span>
+                <span class="app-name">全域感知大屏</span>
+                <span class="app-desc">实时监测生产安全、人员动态及风险分布</span>
+            </a>
+
+            <a href="00班组智能会议系统/班前会系统页面/01-主界面.html" class="app-card" data-cat="core">
+                <span class="app-icon">📅</span>
+                <span class="app-name">智能会议管理</span>
+                <span class="app-desc">班前会标准化流程管控与自动记录</span>
+            </a>
+
+            <a href="01班组智能学习地图系统/01-主界面.html" class="app-card" data-cat="business">
+                <span class="app-icon">🗺️</span>
+                <span class="app-name">智能学习地图</span>
+                <span class="app-desc">岗位素质图谱与技能双述训练</span>
+            </a>
+
+            <a href="02班组AI知识库管理系统/01-主界面.html" class="app-card" data-cat="business">
+                <span class="app-icon">🤖</span>
+                <span class="app-name">AI 知识库</span>
+                <span class="app-desc">安全规程问答与语义精准检索</span>
+            </a>
+
+            <a href="03班组职工安全档案管理系统/01-主界面.html" class="app-card" data-cat="business">
+                <span class="app-icon">👤</span>
+                <span class="app-name">职工安全档案</span>
+                <span class="app-desc">"一人一档"安全履历数字化管理</span>
+            </a>
+
+            <a href="04班组职工安全动态信息管理系统/01-主界面.html" class="app-card" data-cat="business">
+                <span class="app-icon">💓</span>
+                <span class="app-name">动态信息监测</span>
+                <span class="app-desc">身心健康评估与人因风险预控</span>
+            </a>
+
+            <a href="05班组安全账户积分管理系统/01-主界面.html" class="app-card" data-cat="eval">
+                <span class="app-icon">🪙</span>
+                <span class="app-name">安全账户积分</span>
+                <span class="app-desc">行为量化正向激励与积分激励</span>
+            </a>
+
+            <a href="06班组安全生产责任制考核管理系统/01-主界面.html" class="app-card" data-cat="eval">
+                <span class="app-icon">⚖️</span>
+                <span class="app-name">责任制考核</span>
+                <span class="app-desc">全员岗位安全考核与绩效联动</span>
+            </a>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>XX选煤分公司 · 班组人员安全信息智能交互平台</p>
+        <p>© 2026 技术支持</p>
+    </footer>
+
+    <script>
+        function filterApps(category, element) {
+            // 切换按钮状态
+            document.querySelectorAll('.filter-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+
+            // 过滤卡片
+            const cards = document.querySelectorAll('.app-card');
+            cards.forEach(card => {
+                if (category === 'all' || card.getAttribute('data-cat') === category) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
