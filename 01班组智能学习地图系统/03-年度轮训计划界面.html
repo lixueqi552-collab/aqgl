@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>年度轮训计划 - 智能学习地图</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+        }
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .plan-item {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 12px;
+        }
+        .plan-item.completed {
+            border-left: 4px solid var(--success-color);
+        }
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../index.html"><i class="bi bi-book"></i> 智能学习地图</a>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-muted">张明 | 重介操作工</span>
+                    <button class="btn btn-primary">个人中心</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <h2>年度轮训计划</h2>
+            <p class="text-muted">2026年度轮训计划制定与跟踪</p>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <h3 class="text-primary">65%</h3>
+                        <p class="mb-0">总体完成度</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <h3 class="text-success">3/4</h3>
+                        <p class="mb-0">已完成模块</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <h3>48h</h3>
+                        <p class="mb-0">已学习时长</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <h3>92分</h3>
+                        <p class="mb-0">平均成绩</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>轮训模块</h4>
+                <div v-for="module in modules" :key="module.id" 
+                     class="plan-item" 
+                     :class="{ completed: module.status === 'completed' }">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5>{{ module.title }}</h5>
+                            <p class="mb-2 text-muted">{{ module.description }}</p>
+                            <div class="d-flex gap-3">
+                                <small><i class="bi bi-clock"></i> {{ module.duration }}</small>
+                                <small><i class="bi bi-calendar"></i> {{ module.period }}</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="mb-2">
+                                <span class="badge" :class="getStatusBadge(module.status)">
+                                    {{ getStatusText(module.status) }}
+                                </span>
+                            </div>
+                            <button class="btn btn-sm btn-primary" @click="startModule(module)">
+                                {{ module.status === 'completed' ? '回顾学习' : '开始学习' }}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-3" v-if="module.progress > 0">
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar" :class="module.status === 'completed' ? 'bg-success' : 'bg-primary'" 
+                                 :style="{ width: module.progress + '%' }"></div>
+                        </div>
+                        <small class="text-muted mt-1">进度: {{ module.progress }}%</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>待完成提醒</h4>
+                <div v-for="reminder in reminders" :key="reminder.id" class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i> {{ reminder.message }}
+                    <button class="btn btn-sm btn-primary float-end" @click="handleReminder(reminder)">
+                        立即处理
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    modules: [
+                        {
+                            id: 1,
+                            title: '设备安全操作',
+                            description: '涵盖重介旋流器、皮带机、压滤机等设备安全操作规程',
+                            duration: '12小时',
+                            period: '2026-01-01 ~ 2026-01-31',
+                            status: 'completed',
+                            progress: 100
+                        },
+                        {
+                            id: 2,
+                            title: '有限空间作业安全',
+                            description: '有限空间作业安全规程、防护措施、应急处置',
+                            duration: '10小时',
+                            period: '2026-02-01 ~ 2026-02-28',
+                            status: 'completed',
+                            progress: 100
+                        },
+                        {
+                            id: 3,
+                            title: '职业健康防护',
+                            description: '粉尘治理、劳动防护用品正确使用、职业健康体检',
+                            duration: '8小时',
+                            period: '2026-03-01 ~ 2026-03-31',
+                            status: 'completed',
+                            progress: 100
+                        },
+                        {
+                            id: 4,
+                            title: '应急处置能力',
+                            description: '火灾、设备故障、粉尘超标等应急处置流程',
+                            duration: '14小时',
+                            period: '2026-04-01 ~ 2026-04-30',
+                            status: 'in-progress',
+                            progress: 65
+                        }
+                    ],
+                    reminders: [
+                        {
+                            id: 1,
+                            message: '应急处置能力模块将于4月30日截止，请及时完成剩余学习内容'
+                        }
+                    ]
+                };
+            },
+            methods: {
+                getStatusBadge(status) {
+                    switch(status) {
+                        case 'completed': return 'bg-success';
+                        case 'in-progress': return 'bg-primary';
+                        default: return 'bg-secondary';
+                    }
+                },
+                getStatusText(status) {
+                    switch(status) {
+                        case 'completed': return '已完成';
+                        case 'in-progress': return '进行中';
+                        default: return '未开始';
+                    }
+                },
+                startModule(module) {
+                    alert('开始学习：' + module.title);
+                },
+                handleReminder(reminder) {
+                    alert('处理提醒：' + reminder.message);
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

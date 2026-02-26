@@ -1,0 +1,614 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>档案详情 - 职工安全档案</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-danger {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .badge-info {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .profile-position {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .profile-status {
+            display: flex;
+            gap: 12px;
+        }
+
+        .archive-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        .archive-tab {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: white;
+            color: var(--text-color);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .archive-tab:hover {
+            background: var(--bg-color);
+        }
+
+        .archive-tab.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .archive-content {
+            min-height: 300px;
+        }
+
+        .archive-section {
+            margin-bottom: 24px;
+        }
+
+        .archive-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-color);
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="01-主界面.html">
+                    <i class="bi bi-person-badge me-2"></i>
+                    班组职工安全档案管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">档案首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="02-职工列表界面.html">职工列表</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="03-档案详情界面.html">档案详情</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="04-基本信息档案界面.html">基本信息档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="05-安全行为档案界面.html">安全行为档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="06-培训考核档案界面.html">培训考核档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="07-健康状态档案界面.html">健康状态档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="08-奖惩积分档案界面.html">奖惩积分档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="14-档案统计界面.html">档案统计</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="15-报表导出界面.html">报表导出</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-档案分类管理（管理员）.html">档案分类管理</a></li>
+                                <li><a class="dropdown-item" href="基础设置-权限管理（管理员）.html">权限管理</a></li>
+                                <li><a class="dropdown-item" href="基础设置-提醒规则配置（管理员）.html">提醒规则配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            管理员
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">档案详情</h1>
+                <p class="page-subtitle">查看职工安全档案详细信息</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="main-content">
+                    <div class="card">
+                        <div class="profile-header">
+                            <div class="profile-avatar">张</div>
+                            <div class="profile-info">
+                                <div class="profile-name">张三</div>
+                                <div class="profile-position">重介操作工 · A选煤中心</div>
+                                <div class="profile-status">
+                                    <span class="badge badge-success">档案完整</span>
+                                    <span class="badge badge-info">在岗</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-outline-primary" @click="editProfile">
+                                    <i class="bi bi-pencil me-1"></i>编辑
+                                </button>
+                                <button class="btn btn-outline-primary" @click="printProfile">
+                                    <i class="bi bi-printer me-1"></i>打印
+                                </button>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+                            <div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">工号</div>
+                                <div style="font-size: 14px; font-weight: 500;">XB001</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">入职日期</div>
+                                <div style="font-size: 14px; font-weight: 500;">2023-05-15</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">安全积分</div>
+                                <div style="font-size: 14px; font-weight: 500; color: var(--success-color);">1250分</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">最后更新</div>
+                                <div style="font-size: 14px; font-weight: 500;">2026-01-22</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="archive-tabs">
+                            <div class="archive-tab active" @click="switchTab('basic')">基本信息</div>
+                            <div class="archive-tab" @click="switchTab('behavior')">安全行为</div>
+                            <div class="archive-tab" @click="switchTab('training')">培训考核</div>
+                            <div class="archive-tab" @click="switchTab('health')">健康状态</div>
+                            <div class="archive-tab" @click="switchTab('reward')">奖惩积分</div>
+                        </div>
+
+                        <div class="archive-content" v-if="currentTab === 'basic'">
+                            <div class="archive-section">
+                                <div class="archive-section-title">个人基本信息</div>
+                                <div class="info-row">
+                                    <span class="info-label">姓名</span>
+                                    <span class="info-value">张三</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">性别</span>
+                                    <span class="info-value">男</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">出生日期</span>
+                                    <span class="info-value">1990-03-15</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">身份证号</span>
+                                    <span class="info-value">610***********1234</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">联系电话</span>
+                                    <span class="info-value">138****5678</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">家庭住址</span>
+                                    <span class="info-value">陕西省某市某区</span>
+                                </div>
+                            </div>
+
+                            <div class="archive-section">
+                                <div class="archive-section-title">工作信息</div>
+                                <div class="info-row">
+                                    <span class="info-label">工号</span>
+                                    <span class="info-value">XB001</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">岗位</span>
+                                    <span class="info-value">重介操作工</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">部门</span>
+                                    <span class="info-value">A选煤中心</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">入职日期</span>
+                                    <span class="info-value">2023-05-15</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">工作年限</span>
+                                    <span class="info-value">2年8个月</span>
+                                </div>
+                            </div>
+
+                            <div class="archive-section">
+                                <div class="archive-section-title">资质证书</div>
+                                <div class="info-row">
+                                    <span class="info-label">安全培训合格证</span>
+                                    <span class="info-value" style="color: var(--success-color);">有效期至 2027-05-15</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">特种作业操作证</span>
+                                    <span class="info-value" style="color: var(--success-color);">有效期至 2026-11-20</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">职业健康证</span>
+                                    <span class="info-value" style="color: var(--warning-color);">有效期至 2026-03-10</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="archive-content" v-if="currentTab === 'behavior'">
+                            <div class="archive-section">
+                                <div class="archive-section-title">安全行为记录</div>
+                                <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 12px;">
+                                    <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">发现重介浓度异常并及时上报</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">2026-01-22 · 奖励 +50分</div>
+                                </div>
+                                <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 12px;">
+                                    <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">参加安全知识竞赛获奖</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">2026-01-15 · 奖励 +30分</div>
+                                </div>
+                                <div style="padding: 12px; border: 1px solid var(--danger-color); border-radius: 8px; background: var(--danger-color); background-opacity: 0.1;">
+                                    <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">未按规定佩戴安全帽</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">2026-01-10 · 扣分 -20分</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="archive-content" v-if="currentTab === 'training'">
+                            <div class="archive-section">
+                                <div class="archive-section-title">培训记录</div>
+                                <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 12px;">
+                                    <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">重介旋流器安全操作规程培训</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">2026-01-20 · 4学时 · 成绩：95分</div>
+                                </div>
+                                <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 12px;">
+                                    <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">新员工入职安全培训</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">2023-05-15 · 8学时 · 成绩：98分</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="archive-content" v-if="currentTab === 'health'">
+                            <div class="archive-section">
+                                <div class="archive-section-title">健康状态</div>
+                                <div class="info-row">
+                                    <span class="info-label">最近体检日期</span>
+                                    <span class="info-value">2025-12-15</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">体检结果</span>
+                                    <span class="info-value" style="color: var(--success-color);">合格</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">职业病检查</span>
+                                    <span class="info-value" style="color: var(--success-color);">无异常</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="archive-content" v-if="currentTab === 'reward'">
+                            <div class="archive-section">
+                                <div class="archive-section-title">积分统计</div>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px;">
+                                    <div style="text-align: center; padding: 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                        <div style="font-size: 24px; font-weight: 700; color: var(--primary-color);">1250</div>
+                                        <div style="font-size: 12px; color: var(--text-secondary);">当前积分</div>
+                                    </div>
+                                    <div style="text-align: center; padding: 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                        <div style="font-size: 24px; font-weight: 700; color: var(--success-color);">+380</div>
+                                        <div style="font-size: 12px; color: var(--text-secondary);">本月获得</div>
+                                    </div>
+                                    <div style="text-align: center; padding: 16px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                        <div style="font-size: 24px; font-weight: 700; color: var(--danger-color);">-20</div>
+                                        <div style="font-size: 12px; color: var(--text-secondary);">本月扣除</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="card">
+                        <h3 class="card-title">快速操作</h3>
+                        <div style="display: grid; gap: 8px;">
+                            <button class="btn btn-outline-primary" @click="editProfile">
+                                <i class="bi bi-pencil me-1"></i>编辑档案
+                            </button>
+                            <button class="btn btn-outline-primary" @click="updateRecord">
+                                <i class="bi bi-plus-circle me-1"></i>新增记录
+                            </button>
+                            <button class="btn btn-outline-primary" @click="printProfile">
+                                <i class="bi bi-printer me-1"></i>打印档案
+                            </button>
+                            <button class="btn btn-outline-primary" @click="exportData">
+                                <i class="bi bi-download me-1"></i>导出数据
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">档案状态</h3>
+                        <div class="info-row">
+                            <span class="info-label">基本信息</span>
+                            <span class="info-value" style="color: var(--success-color);">完整</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">安全行为</span>
+                            <span class="info-value" style="color: var(--success-color);">完整</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">培训考核</span>
+                            <span class="info-value" style="color: var(--success-color);">完整</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">健康状态</span>
+                            <span class="info-value" style="color: var(--success-color);">完整</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">奖惩积分</span>
+                            <span class="info-value" style="color: var(--success-color);">完整</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">资质提醒</h3>
+                        <div style="padding: 12px; border: 1px solid var(--warning-color); border-radius: 8px; background: #FEF3C7;">
+                            <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">职业健康证即将到期</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">有效期至 2026-03-10</div>
+                            <div style="font-size: 12px; color: var(--warning-color); margin-top: 4px;">剩余46天</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    currentTab: 'basic'
+                }
+            },
+            methods: {
+                switchTab(tab) {
+                    this.currentTab = tab;
+                },
+                editProfile() {
+                    alert('编辑档案');
+                },
+                updateRecord() {
+                    alert('新增记录');
+                },
+                printProfile() {
+                    alert('打印档案');
+                },
+                exportData() {
+                    alert('导出数据');
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

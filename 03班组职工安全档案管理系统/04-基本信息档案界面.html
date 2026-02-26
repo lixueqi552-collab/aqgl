@@ -1,0 +1,516 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基本信息档案 - 职工安全档案</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+
+        .form-control {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+        }
+
+        .form-select {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-outline-secondary {
+            background: white;
+            border-color: var(--border-color);
+            color: var(--text-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-secondary:hover {
+            background: var(--bg-color);
+        }
+
+        .certificate-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .certificate-info {
+            flex: 1;
+        }
+
+        .certificate-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .certificate-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .certificate-status {
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .certificate-status.valid {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .certificate-status.warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .certificate-status.expired {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="01-主界面.html">
+                    <i class="bi bi-person-badge me-2"></i>
+                    班组职工安全档案管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">档案首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="02-职工列表界面.html">职工列表</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="03-档案详情界面.html">档案详情</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="04-基本信息档案界面.html">基本信息档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="05-安全行为档案界面.html">安全行为档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="06-培训考核档案界面.html">培训考核档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="07-健康状态档案界面.html">健康状态档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="08-奖惩积分档案界面.html">奖惩积分档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="14-档案统计界面.html">档案统计</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="15-报表导出界面.html">报表导出</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-档案分类管理（管理员）.html">档案分类管理</a></li>
+                                <li><a class="dropdown-item" href="基础设置-权限管理（管理员）.html">权限管理</a></li>
+                                <li><a class="dropdown-item" href="基础设置-提醒规则配置（管理员）.html">提醒规则配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            管理员
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">基本信息档案</h1>
+                <p class="page-subtitle">编辑职工基本信息档案</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="main-content">
+                    <div class="card">
+                        <h3 class="card-title">个人基本信息</h3>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                            <div class="form-group">
+                                <label class="form-label">姓名</label>
+                                <input type="text" class="form-control" v-model="form.name" placeholder="请输入姓名">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">工号</label>
+                                <input type="text" class="form-control" v-model="form.workNo" placeholder="请输入工号">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">性别</label>
+                                <select class="form-select" v-model="form.gender">
+                                    <option value="">请选择性别</option>
+                                    <option value="男">男</option>
+                                    <option value="女">女</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">出生日期</label>
+                                <input type="date" class="form-control" v-model="form.birthDate">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">身份证号</label>
+                                <input type="text" class="form-control" v-model="form.idCard" placeholder="请输入身份证号">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">联系电话</label>
+                                <input type="text" class="form-control" v-model="form.phone" placeholder="请输入联系电话">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">民族</label>
+                                <select class="form-select" v-model="form.nation">
+                                    <option value="">请选择民族</option>
+                                    <option value="汉族">汉族</option>
+                                    <option value="回族">回族</option>
+                                    <option value="蒙古族">蒙古族</option>
+                                    <option value="满族">满族</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">政治面貌</label>
+                                <select class="form-select" v-model="form.politics">
+                                    <option value="">请选择政治面貌</option>
+                                    <option value="中共党员">中共党员</option>
+                                    <option value="共青团员">共青团员</option>
+                                    <option value="群众">群众</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">家庭住址</label>
+                            <input type="text" class="form-control" v-model="form.address" placeholder="请输入家庭住址">
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">工作信息</h3>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                            <div class="form-group">
+                                <label class="form-label">岗位</label>
+                                <select class="form-select" v-model="form.position">
+                                    <option value="">请选择岗位</option>
+                                    <option value="重介操作工">重介操作工</option>
+                                    <option value="破碎机维护工">破碎机维护工</option>
+                                    <option value="筛分操作工">筛分操作工</option>
+                                    <option value="压滤操作工">压滤操作工</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">部门</label>
+                                <select class="form-select" v-model="form.department">
+                                    <option value="">请选择部门</option>
+                                    <option value="A选煤中心">A选煤中心</option>
+                                    <option value="B选煤中心">B选煤中心</option>
+                                    <option value="C选煤中心">C选煤中心</option>
+                                    <option value="D选煤中心">D选煤中心</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">入职日期</label>
+                                <input type="date" class="form-control" v-model="form.joinDate">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">工作年限</label>
+                                <input type="text" class="form-control" v-model="form.workYears" placeholder="请输入工作年限" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 class="card-title" style="margin-bottom: 0;">资质证书</h3>
+                            <button class="btn btn-outline-primary" @click="addCertificate">
+                                <i class="bi bi-plus-lg me-1"></i>添加证书
+                            </button>
+                        </div>
+                        <div class="certificate-item" v-for="(cert, index) in certificates" :key="index">
+                            <div class="certificate-info">
+                                <div class="certificate-name">{{ cert.name }}</div>
+                                <div class="certificate-date">有效期至 {{ cert.expiryDate }}</div>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <span class="certificate-status" :class="cert.statusClass">{{ cert.statusText }}</span>
+                                <button class="btn btn-outline-secondary btn-sm" @click="editCertificate(index)">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm" @click="deleteCertificate(index)">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                        <button class="btn btn-outline-secondary" @click="resetForm">重置</button>
+                        <button class="btn btn-primary" @click="saveForm">
+                            <i class="bi bi-check-lg me-1"></i>保存
+                        </button>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="card">
+                        <h3 class="card-title">快速操作</h3>
+                        <div style="display: grid; gap: 8px;">
+                            <button class="btn btn-outline-primary" @click="goToDetail">
+                                <i class="bi bi-arrow-left me-1"></i>返回详情
+                            </button>
+                            <button class="btn btn-outline-primary" @click="addCertificate">
+                                <i class="bi bi-card-heading me-1"></i>添加证书
+                            </button>
+                            <button class="btn btn-outline-primary" @click="printProfile">
+                                <i class="bi bi-printer me-1"></i>打印档案
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">证书状态统计</h3>
+                        <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 12px;">
+                            <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">有效证书</div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--success-color);">2份</div>
+                        </div>
+                        <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 12px;">
+                            <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">即将到期</div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--warning-color);">1份</div>
+                        </div>
+                        <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">已过期</div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--danger-color);">0份</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">填写说明</h3>
+                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                            <p>1. 请准确填写职工基本信息，确保真实有效。</p>
+                            <p>2. 身份证号、联系电话等敏感信息需严格保密。</p>
+                            <p>3. 资质证书到期前30天系统会自动提醒。</p>
+                            <p>4. 修改后需点击保存按钮提交更改。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    form: {
+                        name: '张三',
+                        workNo: 'XB001',
+                        gender: '男',
+                        birthDate: '1990-03-15',
+                        idCard: '610***********1234',
+                        phone: '138****5678',
+                        nation: '汉族',
+                        politics: '群众',
+                        address: '陕西省某市某区',
+                        position: '重介操作工',
+                        department: 'A选煤中心',
+                        joinDate: '2023-05-15',
+                        workYears: '2年8个月'
+                    },
+                    certificates: [
+                        { name: '安全培训合格证', expiryDate: '2027-05-15', statusClass: 'valid', statusText: '有效' },
+                        { name: '特种作业操作证', expiryDate: '2026-11-20', statusClass: 'valid', statusText: '有效' },
+                        { name: '职业健康证', expiryDate: '2026-03-10', statusClass: 'warning', statusText: '即将到期' }
+                    ]
+                }
+            },
+            methods: {
+                saveForm() {
+                    alert('保存成功');
+                },
+                resetForm() {
+                    if (confirm('确定重置所有更改吗？')) {
+                        alert('已重置');
+                    }
+                },
+                addCertificate() {
+                    alert('添加证书');
+                },
+                editCertificate(index) {
+                    alert('编辑证书: ' + index);
+                },
+                deleteCertificate(index) {
+                    if (confirm('确定删除此证书吗？')) {
+                        this.certificates.splice(index, 1);
+                    }
+                },
+                goToDetail() {
+                    window.location.href = '03-档案详情界面.html';
+                },
+                printProfile() {
+                    alert('打印档案');
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

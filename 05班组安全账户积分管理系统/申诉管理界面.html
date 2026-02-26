@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>申诉管理 - 安全积分</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid var(--border-color);
+            padding: 12px;
+            font-weight: 600;
+            color: var(--text-color);
+            background: var(--bg-color);
+        }
+
+        .table tbody td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background: var(--bg-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-danger {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .badge-info {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .badge-primary {
+            background: #E0E7FF;
+            color: #3730A3;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            color: var(--text-color);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 4px;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .appeal-info {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .appeal-reason {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            .filter-bar {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../00班组智能会议系统/原型页面/交互平台首页.html">
+                    <i class="bi bi-star me-2"></i>
+                    班组安全账户积分管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">积分首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分规则界面.html">积分规则</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分明细界面.html">积分明细</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分兑换界面.html">积分兑换</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分排名界面.html">积分排名</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-积分规则配置（管理员）.html">积分规则配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-兑换规则配置（管理员）.html">兑换规则配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-排名规则配置（管理员）.html">排名规则配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            张三
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">申诉管理</h1>
+                <p class="page-subtitle">查看和管理积分申诉</p>
+            </div>
+
+            <div class="card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div style="display: flex; gap: 16px; align-items: center;">
+                        <div>
+                            <span style="font-size: 14px; color: var(--text-secondary);">待处理：</span>
+                            <span style="font-size: 20px; font-weight: 700; color: var(--warning-color);">3</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 14px; color: var(--text-secondary);">处理中：</span>
+                            <span style="font-size: 20px; font-weight: 700; color: var(--primary-color);">2</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 14px; color: var(--text-secondary);">已完成：</span>
+                            <span style="font-size: 20px; font-weight: 700; color: var(--success-color);">5</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" @click="showAppealModal = true">
+                        <i class="bi bi-plus-lg me-1"></i>提交申诉
+                    </button>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="filter-item">
+                        <label class="form-label">状态</label>
+                        <select class="form-select" v-model="filters.status">
+                            <option value="all">全部状态</option>
+                            <option value="待处理">待处理</option>
+                            <option value="处理中">处理中</option>
+                            <option value="已完成">已完成</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="form-label">申诉类型</label>
+                        <select class="form-select" v-model="filters.type">
+                            <option value="all">全部类型</option>
+                            <option value="积分扣分">积分扣分</option>
+                            <option value="积分公示">积分公示</option>
+                            <option value="排名争议">排名争议</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="form-label">时间范围</label>
+                        <select class="form-select" v-model="filters.timeRange">
+                            <option value="all">全部时间</option>
+                            <option value="week">本周</option>
+                            <option value="month">本月</option>
+                            <option value="quarter">本季度</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>申诉编号</th>
+                                <th>申诉时间</th>
+                                <th>申诉人</th>
+                                <th>申诉类型</th>
+                                <th>申诉事项</th>
+                                <th>申诉理由</th>
+                                <th>状态</th>
+                                <th>处理结果</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(appeal, index) in filteredAppeals" :key="index">
+                                <td>
+                                    <span style="font-family: monospace; font-weight: 500;">{{ appeal.appealId }}</span>
+                                </td>
+                                <td>
+                                    <div>{{ appeal.time }}</div>
+                                    <div class="appeal-info">{{ appeal.date }}</div>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 500;">{{ appeal.appellant }}</div>
+                                    <div class="appeal-info">{{ appeal.employeeId }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge badge-info">{{ appeal.type }}</span>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 500;">{{ appeal.matter }}</div>
+                                    <div class="appeal-info">{{ appeal.pointsChange }}</div>
+                                </td>
+                                <td>
+                                    <div class="appeal-reason" :title="appeal.reason">{{ appeal.reason }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge" :class="getStatusBadgeClass(appeal.status)">
+                                        {{ appeal.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span v-if="appeal.result" class="badge" :class="getResultBadgeClass(appeal.result)">
+                                        {{ appeal.result }}
+                                    </span>
+                                    <span v-else style="color: var(--text-secondary); font-size: 12px;">-</span>
+                                </td>
+                                <td>
+                                    <button class="action-btn" @click="viewDetail(appeal)" title="查看详情">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="action-btn" v-if="appeal.status === '待处理'" @click="withdrawAppeal(appeal)" title="撤回">
+                                        <i class="bi bi-x-circle"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="../index.html">上一页</a>
+                        </li>
+                        <li class="page-item active">
+                            <a class="page-link" href="../index.html">1</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="../index.html">2</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="../index.html">下一页</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">申诉流程说明</h3>
+                <div style="font-size: 14px; color: var(--text-secondary); line-height: 1.8;">
+                    <p><strong>1. 提交申诉：</strong>在公示期内，如对积分记录或公示结果有异议，可通过系统提交申诉，填写申诉事项、理由及上传佐证材料。</p>
+                    <p><strong>2. 流转对接：</strong>申诉提交后1个工作日内，系统自动推送至分公司安全积分考核仲裁室，同步抄送所在中心安全管理部门。</p>
+                    <p><strong>3. 调查处理：</strong>仲裁室按管理规定组织联合调查，调取相关模块数据核实情况。</p>
+                    <p><strong>4. 结果反馈：</strong>仲裁室在收到申诉后5个工作日内出具处理意见（情况复杂的可延长3个工作日），系统自动将处理结果推送至申诉人及所在班组。</p>
+                    <p><strong>5. 结果公示：</strong>处理结果公示3天，接受全员监督。</p>
+                    <p><strong>6. 闭环归档：</strong>申诉处理全过程记录自动归档至系统，形成完整申诉闭环，支持后续核查。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 提交申诉弹窗 -->
+        <div class="modal fade" :class="{ show: showAppealModal }" tabindex="-1" style="display: none;">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">提交申诉</h5>
+                        <button type="button" class="btn-close" @click="closeAppealModal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <label class="form-label">申诉类型</label>
+                                <select class="form-select" v-model="appealForm.type">
+                                    <option value="">请选择申诉类型</option>
+                                    <option value="积分扣分">积分扣分</option>
+                                    <option value="积分公示">积分公示</option>
+                                    <option value="排名争议">排名争议</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">申诉事项</label>
+                                <input type="text" class="form-control" v-model="appealForm.matter" placeholder="请输入申诉事项">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">涉及积分变动</label>
+                                <input type="text" class="form-control" v-model="appealForm.pointsChange" placeholder="如：-20分（未按规定佩戴安全帽）">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">申诉理由</label>
+                                <textarea class="form-control" rows="4" v-model="appealForm.reason" placeholder="请详细说明申诉理由"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">佐证材料</label>
+                                <input type="file" class="form-control" multiple>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                                    支持上传图片、视频、文档等佐证材料，单个文件不超过10MB
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="closeAppealModal">取消</button>
+                        <button type="button" class="btn btn-primary" @click="submitAppeal">提交申诉</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 查看详情弹窗 -->
+        <div class="modal fade" :class="{ show: showDetailModal }" tabindex="-1" style="display: none;">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">申诉详情</h5>
+                        <button type="button" class="btn-close" @click="closeDetailModal"></button>
+                    </div>
+                    <div class="modal-body" v-if="selectedAppeal">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">申诉编号</label>
+                                <div style="padding: 8px 12px; background: var(--bg-color); border-radius: 6px; font-family: monospace;">
+                                    {{ selectedAppeal.appealId }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">申诉时间</label>
+                                <div style="padding: 8px 12px; background: var(--bg-color); border-radius: 6px;">
+                                    {{ selectedAppeal.time }} {{ selectedAppeal.date }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">申诉人</label>
+                                <div style="padding: 8px 12px; background: var(--bg-color); border-radius: 6px;">
+                                    {{ selectedAppeal.appellant }}（{{ selectedAppeal.employeeId }}）
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">申诉类型</label>
+                                <div>
+                                    <span class="badge badge-info">{{ selectedAppeal.type }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">申诉事项</label>
+                            <div style="padding: 8px 12px; background: var(--bg-color); border-radius: 6px;">
+                                {{ selectedAppeal.matter }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">涉及积分变动</label>
+                            <div style="padding: 8px 12px; background: var(--bg-color); border-radius: 6px;">
+                                {{ selectedAppeal.pointsChange }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">申诉理由</label>
+                            <div style="padding: 12px; background: var(--bg-color); border-radius: 6px; line-height: 1.6;">
+                                {{ selectedAppeal.reason }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">处理状态</label>
+                            <div>
+                                <span class="badge" :class="getStatusBadgeClass(selectedAppeal.status)">
+                                    {{ selectedAppeal.status }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mb-3" v-if="selectedAppeal.result">
+                            <label class="form-label">处理结果</label>
+                            <div>
+                                <span class="badge" :class="getResultBadgeClass(selectedAppeal.result)">
+                                    {{ selectedAppeal.result }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mb-3" v-if="selectedAppeal.processResult">
+                            <label class="form-label">处理意见</label>
+                            <div style="padding: 12px; background: var(--bg-color); border-radius: 6px; line-height: 1.6;">
+                                {{ selectedAppeal.processResult }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="closeDetailModal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    filters: {
+                        status: 'all',
+                        type: 'all',
+                        timeRange: 'all'
+                    },
+                    showAppealModal: false,
+                    showDetailModal: false,
+                    selectedAppeal: null,
+                    appealForm: {
+                        type: '',
+                        matter: '',
+                        pointsChange: '',
+                        reason: ''
+                    },
+                    appeals: [
+                        { appealId: 'AP20260123001', time: '14:30', date: '2026-01-23', appellant: '张三', employeeId: 'XBB009', type: '积分扣分', matter: '未按规定佩戴安全帽', pointsChange: '-20分', reason: '当时正在进行设备调试，安全帽暂时摘下，并非违规操作', status: '待处理', result: '', processResult: '' },
+                        { appealId: 'AP20260122001', time: '10:20', date: '2026-01-22', appellant: '李四', employeeId: 'CJT002', type: '积分公示', matter: '积分排名异常', pointsChange: '排名下降3位', reason: '本月积分应该增加80分，但公示显示只增加了50分', status: '待处理', result: '', processResult: '' },
+                        { appealId: 'AP20260120001', time: '16:45', date: '2026-01-20', appellant: '王五', employeeId: 'XBB001', type: '积分扣分', matter: '违章操作', pointsChange: '-50分', reason: '设备故障导致操作失误，并非主观违章', status: '处理中', result: '', processResult: '正在调查中' },
+                        { appealId: 'AP20260115001', time: '09:15', date: '2026-01-15', appellant: '赵六', employeeId: 'YXAS003', type: '积分扣分', matter: '未参加安全培训', pointsChange: '-30分', reason: '当天因公外出，已提前请假并获得批准', status: '已完成', result: '申诉成功', processResult: '经核实，该员工当天因公外出且已提前请假，不扣分' },
+                        { appealId: 'AP20260110001', time: '11:30', date: '2026-01-10', appellant: '孙七', employeeId: 'YXSL004', type: '排名争议', matter: '积分排名不合理', pointsChange: '排名应该更高', reason: '我的积分和排名前3的员工相差不大，但排名差距较大', status: '已完成', result: '申诉驳回', processResult: '经核实，排名计算正确，驳回申诉' },
+                        { appealId: 'AP20260105001', time: '14:20', date: '2026-01-05', appellant: '周八', employeeId: 'XBB005', type: '积分扣分', matter: '未完成培训', pointsChange: '-30分', reason: '培训系统故障，无法完成培训', status: '待处理', result: '', processResult: '' },
+                        { appealId: 'AP20260103001', time: '10:10', date: '2026-01-03', appellant: '吴九', employeeId: 'CJT006', type: '积分公示', matter: '积分明细错误', pointsChange: '缺少积分记录', reason: '1月2日上报隐患应该获得50分，但积分明细中没有记录', status: '已完成', result: '申诉成功', processResult: '经核实，系统数据同步延迟，已补加积分' },
+                        { appealId: 'AP20260101001', time: '09:00', date: '2026-01-01', appellant: '郑十', employeeId: 'YXAS007', type: '积分扣分', matter: '违章操作', pointsChange: '-50分', reason: '操作规程描述不清晰，导致误解', status: '已完成', result: '申诉成功', processResult: '经核实，操作规程确实存在歧义，已扣分减半' },
+                        { appealId: 'AP20251228001', time: '15:30', date: '2025-12-28', appellant: '钱十一', employeeId: 'YXSL008', type: '积分扣分', matter: '未按规定佩戴防护用品', pointsChange: '-20分', reason: '防护用品损坏，正在等待更换', status: '已完成', result: '申诉驳回', processResult: '防护用品损坏应立即上报，不能作为违规理由' },
+                        { appealId: 'AP20251225001', time: '11:20', date: '2025-12-25', appellant: '张三', employeeId: 'XBB009', type: '积分扣分', matter: '未参加安全培训', pointsChange: '-30分', reason: '系统故障无法登录', status: '处理中', result: '', processResult: '正在调查中' }
+                    ]
+                }
+            },
+            computed: {
+                filteredAppeals() {
+                    return this.appeals.filter(appeal => {
+                        let match = true;
+                        if (this.filters.status !== 'all' && appeal.status !== this.filters.status) {
+                            match = false;
+                        }
+                        if (this.filters.type !== 'all' && appeal.type !== this.filters.type) {
+                            match = false;
+                        }
+                        return match;
+                    });
+                }
+            },
+            methods: {
+                getStatusBadgeClass(status) {
+                    switch (status) {
+                        case '待处理':
+                            return 'badge-warning';
+                        case '处理中':
+                            return 'badge-primary';
+                        case '已完成':
+                            return 'badge-success';
+                        default:
+                            return 'badge-info';
+                    }
+                },
+                getResultBadgeClass(result) {
+                    switch (result) {
+                        case '申诉成功':
+                            return 'badge-success';
+                        case '申诉驳回':
+                            return 'badge-danger';
+                        default:
+                            return 'badge-info';
+                    }
+                },
+                viewDetail(appeal) {
+                    this.selectedAppeal = appeal;
+                    this.showDetailModal = true;
+                },
+                closeDetailModal() {
+                    this.showDetailModal = false;
+                    this.selectedAppeal = null;
+                },
+                closeAppealModal() {
+                    this.showAppealModal = false;
+                    this.appealForm = {
+                        type: '',
+                        matter: '',
+                        pointsChange: '',
+                        reason: ''
+                    };
+                },
+                submitAppeal() {
+                    if (!this.appealForm.type || !this.appealForm.matter || !this.appealForm.reason) {
+                        alert('请填写完整的申诉信息');
+                        return;
+                    }
+                    alert('申诉已提交，将在1个工作日内推送至仲裁室');
+                    this.closeAppealModal();
+                },
+                withdrawAppeal(appeal) {
+                    if (confirm('确定要撤回此申诉吗？')) {
+                        alert('申诉已撤回');
+                    }
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

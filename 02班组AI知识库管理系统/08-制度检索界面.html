@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>制度检索 - AI知识库</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .search-btn {
+            padding: 12px 24px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .search-filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 13px;
+            background: white;
+        }
+
+        .search-result-item {
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-result-item:hover {
+            border-color: var(--primary-color);
+            background: #DBEAFE;
+        }
+
+        .result-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+        }
+
+        .result-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .result-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-info {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="01-主界面.html">
+                    <i class="bi bi-book me-2"></i>班组AI知识库管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">知识库首页</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                制度管理
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="03-制度列表界面.html">制度列表</a></li>
+                                <li><a class="dropdown-item" href="06-审核管理界面.html">审核管理</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                制度学习
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="12-制度学习界面.html">学习任务</a></li>
+                                <li><a class="dropdown-item" href="14-学习统计与分析界面.html">学习统计与分析</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="15-AI问答界面.html">AI问答</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-制度分类管理（管理员）.html">制度分类管理</a></li>
+                                <li><a class="dropdown-item" href="基础设置-审核流程配置（管理员）.html">审核流程配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-推送规则配置（管理员）.html">推送规则配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            管理员
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">制度检索</h1>
+                <p class="page-subtitle">检索安全制度和规程</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="main-content">
+                    <div class="card">
+                        <div class="search-box">
+                            <input type="text" class="search-input" v-model="searchKeyword" placeholder="输入关键词检索制度..." @keyup.enter="search">
+                            <button class="search-btn" @click="search">
+                                <i class="bi bi-search me-1"></i>检索
+                            </button>
+                        </div>
+                        <div class="search-filters">
+                            <div class="filter-item">
+                                <label style="font-size: 13px; color: var(--text-secondary);">制度类型：</label>
+                                <select class="filter-select" v-model="filterType">
+                                    <option value="">全部类型</option>
+                                    <option value="安全制度">安全制度</option>
+                                    <option value="工艺规程">工艺规程</option>
+                                    <option value="操作规程">操作规程</option>
+                                    <option value="应急预案">应急预案</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <label style="font-size: 13px; color: var(--text-secondary);">发布部门：</label>
+                                <select class="filter-select" v-model="filterDepartment">
+                                    <option value="">全部部门</option>
+                                    <option value="安全部">安全部</option>
+                                    <option value="设备部">设备部</option>
+                                    <option value="生产部">生产部</option>
+                                    <option value="技术部">技术部</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <label style="font-size: 13px; color: var(--text-secondary);">排序方式：</label>
+                                <select class="filter-select" v-model="sortBy">
+                                    <option value="relevance">相关度</option>
+                                    <option value="date">发布日期</option>
+                                    <option value="name">名称</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 16px; font-size: 13px; color: var(--text-secondary);">
+                            找到 <strong>{{ searchResults.length }}</strong> 个结果
+                        </div>
+                        <div class="search-result-item" v-for="(result, index) in searchResults" :key="index" @click="viewDetail(index)">
+                            <div class="result-title">{{ result.title }}</div>
+                            <div class="result-desc">{{ result.description }}</div>
+                            <div class="result-meta">
+                                <span><i class="bi bi-file-earmark-text me-1"></i>{{ result.type }}</span>
+                                <span><i class="bi bi-building me-1"></i>{{ result.department }}</span>
+                                <span><i class="bi bi-calendar me-1"></i>{{ result.publishDate }}</span>
+                            </div>
+                        </div>
+                        <div v-if="searchResults.length === 0" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                            <i class="bi bi-search" style="font-size: 48px; margin-bottom: 16px; display: block;"></i>
+                            <div style="font-size: 16px; margin-bottom: 8px;">未找到相关制度</div>
+                            <div style="font-size: 14px;">请尝试使用其他关键词检索</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="card">
+                        <h3 class="card-title">快速操作</h3>
+                        <div style="display: grid; gap: 8px;">
+                            <button class="btn btn-outline-primary" @click="goToList">
+                                <i class="bi bi-list me-1"></i>制度列表
+                            </button>
+                            <button class="btn btn-outline-primary" @click="goToUpload">
+                                <i class="bi bi-cloud-arrow-up me-1"></i>制度上传
+                            </button>
+                            <button class="btn btn-outline-primary" @click="goToAIChat">
+                                <i class="bi bi-robot me-1"></i>AI问答
+                            </button>
+                            <button class="btn btn-outline-primary" @click="goToLearning">
+                                <i class="bi bi-book me-1"></i>制度学习
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">热门检索</h3>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            <span class="badge badge-info" style="cursor: pointer;" @click="quickSearch('重介')">重介</span>
+                            <span class="badge badge-info" style="cursor: pointer;" @click="quickSearch('破碎机')">破碎机</span>
+                            <span class="badge badge-info" style="cursor: pointer;" @click="quickSearch('筛分')">筛分</span>
+                            <span class="badge badge-info" style="cursor: pointer;" @click="quickSearch('压滤')">压滤</span>
+                            <span class="badge badge-info" style="cursor: pointer;" @click="quickSearch('安全操作')">安全操作</span>
+                            <span class="badge badge-info" style="cursor: pointer;" @click="quickSearch('应急预案')">应急预案</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">检索统计</h3>
+                        <div class="info-row">
+                            <span class="info-label">今日检索</span>
+                            <span class="info-value">234次</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">本周检索</span>
+                            <span class="info-value">1,234次</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">制度总数</span>
+                            <span class="info-value">156份</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">可检索</span>
+                            <span class="info-value" style="color: var(--success-color);">135份</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">检索提示</h3>
+                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                            <p>1. 可以使用关键词、制度编号进行检索</p>
+                            <p>2. 支持模糊匹配和精确匹配</p>
+                            <p>3. 可以使用多个关键词组合检索</p>
+                            <p>4. 检索结果按相关度排序</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    searchKeyword: '',
+                    filterType: '',
+                    filterDepartment: '',
+                    sortBy: 'relevance',
+                    searchResults: [
+                        { title: '重介旋流器安全操作规程', description: '为确保重介旋流器安全、稳定运行，保障操作人员人身安全，特制定本操作规程。', type: '操作规程', department: '安全部', publishDate: '2026-01-23' },
+                        { title: '破碎机维护保养制度', description: '为规范破碎机设备的维护保养工作，确保设备安全运行，特制定本制度。', type: '安全制度', department: '设备部', publishDate: '2026-01-22' },
+                        { title: '筛分车间安全管理制度', description: '为加强筛分车间的安全管理，保障生产安全，特制定本制度。', type: '安全制度', department: '安全部', publishDate: '2026-01-21' },
+                        { title: '压滤机安全操作规程', description: '为确保压滤机安全运行，保障操作人员人身安全，特制定本操作规程。', type: '操作规程', department: '生产部', publishDate: '2026-01-20' },
+                        { title: '重介选煤工艺规程', description: '为规范重介选煤工艺操作，提高选煤效率，特制定本工艺规程。', type: '工艺规程', department: '技术部', publishDate: '2026-01-19' },
+                        { title: '火灾应急预案', description: '为有效预防和处置火灾事故，保障人员生命财产安全，特制定本应急预案。', type: '应急预案', department: '安全部', publishDate: '2026-01-18' }
+                    ]
+                }
+            },
+            methods: {
+                search() {
+                    if (!this.searchKeyword) {
+                        return;
+                    }
+                    alert('检索: ' + this.searchKeyword);
+                },
+                quickSearch(keyword) {
+                    this.searchKeyword = keyword;
+                    this.search();
+                },
+                viewDetail(index) {
+                    window.location.href = '04-制度详情界面.html';
+                },
+                goToList() {
+                    window.location.href = '03-制度列表界面.html';
+                },
+                goToUpload() {
+                    window.location.href = '02-制度上传界面.html';
+                },
+                goToAIChat() {
+                    window.location.href = '15-AI问答界面.html';
+                },
+                goToLearning() {
+                    window.location.href = '12-制度学习界面.html';
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

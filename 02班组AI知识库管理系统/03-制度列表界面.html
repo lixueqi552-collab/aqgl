@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>制度管理 - AI知识库</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid var(--border-color);
+            padding: 12px;
+            font-weight: 600;
+            color: var(--text-color);
+            background: var(--bg-color);
+        }
+
+        .table tbody td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background: var(--bg-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-danger {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .badge-info {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            color: var(--text-color);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 4px;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .form-control {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+        }
+
+        .form-select {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 24px;
+        }
+
+        .page-item .page-link {
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .page-item.active .page-link {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .page-item .page-link:hover {
+            background: var(--bg-color);
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="01-主界面.html">
+                    <i class="bi bi-book me-2"></i>
+                    班组AI知识库管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">知识库首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="03-制度列表界面.html">制度管理</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="04-制度详情界面.html">制度详情</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="05-版本对比界面.html">版本对比</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="06-审核管理界面.html">审核管理</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="09-制度阅读界面.html">制度阅读</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="12-制度学习界面.html">制度学习</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="13-在线测试界面.html">在线测试</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="15-AI问答界面.html">AI问答</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-制度分类管理（管理员）.html">制度分类管理</a></li>
+                                <li><a class="dropdown-item" href="基础设置-审核流程配置（管理员）.html">审核流程配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-推送规则配置（管理员）.html">推送规则配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            管理员
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">制度管理</h1>
+                <p class="page-subtitle">制度文档的统一管理平台</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="main-content">
+                    <div class="card">
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="list-tab" data-bs-toggle="tab" data-bs-target="#list" type="button" role="tab" aria-controls="list" aria-selected="true">
+                                    <i class="bi bi-list-ul me-1"></i>制度列表
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload" type="button" role="tab" aria-controls="upload" aria-selected="false">
+                                    <i class="bi bi-cloud-arrow-up me-1"></i>上传制度
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="search-tab" data-bs-toggle="tab" data-bs-target="#search" type="button" role="tab" aria-controls="search" aria-selected="false">
+                                    <i class="bi bi-search me-1"></i>制度检索
+                                </button>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="myTabContent">
+                            <!-- 制度列表标签页 -->
+                            <div class="tab-pane fade show active" id="list" role="tabpanel" aria-labelledby="list-tab">
+                                <div style="padding: 20px 0;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                        <div style="display: flex; gap: 12px;">
+                                            <input type="text" class="form-control" v-model="searchKeyword" placeholder="搜索制度名称" style="width: 250px;">
+                                            <select class="form-select" v-model="filterType" style="width: 150px;">
+                                                <option value="">全部类型</option>
+                                                <option value="安全制度">安全制度</option>
+                                                <option value="工艺规程">工艺规程</option>
+                                                <option value="操作规程">操作规程</option>
+                                                <option value="应急预案">应急预案</option>
+                                            </select>
+                                            <select class="form-select" v-model="filterStatus" style="width: 150px;">
+                                                <option value="">全部状态</option>
+                                                <option value="已发布">已发布</option>
+                                                <option value="待审核">待审核</option>
+                                                <option value="已失效">已失效</option>
+                                            </select>
+                                        </div>
+                                        <button class="btn btn-primary" @click="switchTab('upload')">
+                                            <i class="bi bi-plus-lg me-1"></i>上传制度
+                                        </button>
+                                    </div>
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>制度名称</th>
+                                                <th>类型</th>
+                                                <th>发布部门</th>
+                                                <th>发布日期</th>
+                                                <th>版本</th>
+                                                <th>状态</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(doc, index) in filteredDocs" :key="index">
+                                                <td>{{ doc.title }}</td>
+                                                <td>{{ doc.type }}</td>
+                                                <td>{{ doc.department }}</td>
+                                                <td>{{ doc.publishDate }}</td>
+                                                <td>V{{ doc.version }}</td>
+                                                <td>
+                                                    <span class="badge" :class="getStatusBadgeClass(doc.status)">{{ doc.status }}</span>
+                                                </td>
+                                                <td>
+                                                    <button class="action-btn" @click="viewDoc(index)">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <button class="action-btn" @click="editDoc(index)" v-if="doc.status === '待审核'">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                    <button class="action-btn" @click="deleteDoc(index)" v-if="doc.status === '待审核'">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="pagination">
+                                        <nav>
+                                            <ul class="pagination">
+                                                <li class="page-item" :class="{ active: currentPage === 1 }">
+                                                    <a class="page-link" href="#" @click.prevent="currentPage = 1">1</a>
+                                                </li>
+                                                <li class="page-item" :class="{ active: currentPage === 2 }">
+                                                    <a class="page-link" href="#" @click.prevent="currentPage = 2">2</a>
+                                                </li>
+                                                <li class="page-item" :class="{ active: currentPage === 3 }">
+                                                    <a class="page-link" href="#" @click.prevent="currentPage = 3">3</a>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 上传制度标签页 -->
+                            <div class="tab-pane fade" id="upload" role="tabpanel" aria-labelledby="upload-tab">
+                                <div style="padding: 20px 0;">
+                                    <div style="max-width: 800px; margin: 0 auto;">
+                                        <div class="mb-4">
+                                            <label class="form-label" style="font-weight: 600;">制度名称 <span style="color: var(--danger-color);">*</span></label>
+                                            <input type="text" class="form-control" v-model="uploadForm.title" placeholder="请输入制度名称">
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label" style="font-weight: 600;">制度类型 <span style="color: var(--danger-color);">*</span></label>
+                                            <select class="form-select" v-model="uploadForm.type">
+                                                <option value="">请选择制度类型</option>
+                                                <option value="安全制度">安全制度</option>
+                                                <option value="工艺规程">工艺规程</option>
+                                                <option value="操作规程">操作规程</option>
+                                                <option value="应急预案">应急预案</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label" style="font-weight: 600;">发布部门 <span style="color: var(--danger-color);">*</span></label>
+                                            <select class="form-select" v-model="uploadForm.department">
+                                                <option value="">请选择发布部门</option>
+                                                <option value="安全部">安全部</option>
+                                                <option value="设备部">设备部</option>
+                                                <option value="生产部">生产部</option>
+                                                <option value="技术部">技术部</option>
+                                                <option value="质量部">质量部</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label" style="font-weight: 600;">适用岗位</label>
+                                            <input type="text" class="form-control" v-model="uploadForm.positions" placeholder="请输入适用岗位，多个岗位用逗号分隔">
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label" style="font-weight: 600;">制度文件 <span style="color: var(--danger-color);">*</span></label>
+                                            <div style="border: 2px dashed var(--border-color); border-radius: 8px; padding: 40px; text-align: center; cursor: pointer;" @click="selectFile">
+                                                <i class="bi bi-cloud-arrow-up" style="font-size: 48px; color: var(--primary-color);"></i>
+                                                <p style="margin-top: 12px; color: var(--text-secondary);">
+                                                    点击或拖拽文件到此处上传
+                                                </p>
+                                                <p style="font-size: 12px; color: var(--text-secondary);">
+                                                    支持 PDF、Word、Excel 格式，文件大小不超过 10MB
+                                                </p>
+                                                <div v-if="uploadForm.fileName" style="margin-top: 12px; padding: 8px 12px; background: var(--bg-color); border-radius: 6px; display: inline-block;">
+                                                    <i class="bi bi-file-earmark me-1"></i>
+                                                    {{ uploadForm.fileName }}
+                                                    <i class="bi bi-x-circle ms-2" style="cursor: pointer; color: var(--danger-color);" @click.stop="removeFile"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label" style="font-weight: 600;">制度摘要</label>
+                                            <textarea class="form-control" v-model="uploadForm.summary" rows="4" placeholder="请输入制度摘要"></textarea>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label" style="font-weight: 600;">备注</label>
+                                            <textarea class="form-control" v-model="uploadForm.remark" rows="3" placeholder="请输入备注信息（选填）"></textarea>
+                                        </div>
+
+                                        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                                            <button class="btn btn-outline-primary" @click="resetUploadForm">
+                                                <i class="bi bi-arrow-counterclockwise me-1"></i>重置
+                                            </button>
+                                            <button class="btn btn-primary" @click="submitUpload">
+                                                <i class="bi bi-check-lg me-1"></i>提交审核
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 制度检索标签页 -->
+                            <div class="tab-pane fade" id="search" role="tabpanel" aria-labelledby="search-tab">
+                                <div style="padding: 20px 0;">
+                                    <div style="background: var(--bg-color); padding: 24px; border-radius: 12px; margin-bottom: 24px;">
+                                        <div style="display: flex; gap: 12px; align-items: flex-end;">
+                                            <div style="flex: 1;">
+                                                <label class="form-label" style="font-weight: 600;">关键词</label>
+                                                <input type="text" class="form-control" v-model="searchForm.keyword" placeholder="请输入关键词">
+                                            </div>
+                                            <div style="width: 200px;">
+                                                <label class="form-label" style="font-weight: 600;">制度类型</label>
+                                                <select class="form-select" v-model="searchForm.type">
+                                                    <option value="">全部类型</option>
+                                                    <option value="安全制度">安全制度</option>
+                                                    <option value="工艺规程">工艺规程</option>
+                                                    <option value="操作规程">操作规程</option>
+                                                    <option value="应急预案">应急预案</option>
+                                                </select>
+                                            </div>
+                                            <div style="width: 200px;">
+                                                <label class="form-label" style="font-weight: 600;">发布部门</label>
+                                                <select class="form-select" v-model="searchForm.department">
+                                                    <option value="">全部部门</option>
+                                                    <option value="安全部">安全部</option>
+                                                    <option value="设备部">设备部</option>
+                                                    <option value="生产部">生产部</option>
+                                                    <option value="技术部">技术部</option>
+                                                </select>
+                                            </div>
+                                            <div style="width: 200px;">
+                                                <label class="form-label" style="font-weight: 600;">时间范围</label>
+                                                <select class="form-select" v-model="searchForm.timeRange">
+                                                    <option value="">全部时间</option>
+                                                    <option value="7">最近7天</option>
+                                                    <option value="30">最近30天</option>
+                                                    <option value="90">最近3个月</option>
+                                                    <option value="365">最近1年</option>
+                                                </select>
+                                            </div>
+                                            <button class="btn btn-primary" @click="performSearch">
+                                                <i class="bi bi-search me-1"></i>搜索
+                                            </button>
+                                        </div>
+                                        <div style="margin-top: 16px;">
+                                            <label class="form-label" style="font-weight: 600;">高级检索</label>
+                                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                                                <label class="form-check" style="margin: 0;">
+                                                    <input class="form-check-input" type="checkbox" v-model="searchForm.exactMatch">
+                                                    <span class="form-check-label">精确匹配</span>
+                                                </label>
+                                                <label class="form-check" style="margin: 0;">
+                                                    <input class="form-check-input" type="checkbox" v-model="searchForm.includeContent">
+                                                    <span class="form-check-label">包含内容</span>
+                                                </label>
+                                                <label class="form-check" style="margin: 0;">
+                                                    <input class="form-check-input" type="checkbox" v-model="searchForm.onlyPublished">
+                                                    <span class="form-check-label">仅已发布</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div v-if="searchResults.length > 0">
+                                        <div style="margin-bottom: 16px;">
+                                            <span style="color: var(--text-secondary);">找到 <strong>{{ searchResults.length }}</strong> 条相关结果</span>
+                                        </div>
+                                        <div v-for="(result, index) in searchResults" :key="index" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 12px; cursor: pointer;" @click="viewDoc(result.originalIndex)">
+                                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                                <h5 style="margin: 0; font-weight: 600;">{{ result.title }}</h5>
+                                                <span class="badge" :class="getStatusBadgeClass(result.status)">{{ result.status }}</span>
+                                            </div>
+                                            <p style="margin: 0 0 8px 0; color: var(--text-secondary); font-size: 14px;">
+                                                <i class="bi bi-tag me-1"></i>{{ result.type }} | 
+                                                <i class="bi bi-building me-1"></i>{{ result.department }} | 
+                                                <i class="bi bi-calendar me-1"></i>{{ result.publishDate }}
+                                            </p>
+                                            <p style="margin: 0; color: var(--text-secondary); font-size: 13px;">
+                                                {{ result.summary }}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div v-else-if="searchPerformed" style="text-align: center; padding: 60px 20px;">
+                                        <i class="bi bi-search" style="font-size: 64px; color: var(--border-color);"></i>
+                                        <p style="margin-top: 16px; color: var(--text-secondary);">未找到相关制度</p>
+                                        <button class="btn btn-outline-primary" @click="resetSearchForm">
+                                            <i class="bi bi-arrow-counterclockwise me-1"></i>重新搜索
+                                        </button>
+                                    </div>
+
+                                    <div v-else style="text-align: center; padding: 60px 20px;">
+                                        <i class="bi bi-search" style="font-size: 64px; color: var(--border-color);"></i>
+                                        <p style="margin-top: 16px; color: var(--text-secondary);">请输入关键词开始检索</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="card">
+                        <h3 class="card-title">快速操作</h3>
+                        <div style="display: grid; gap: 8px;">
+                            <button class="btn btn-outline-primary" @click="switchTab('upload')">
+                                <i class="bi bi-cloud-arrow-up me-1"></i>上传制度
+                            </button>
+                            <button class="btn btn-outline-primary" @click="goToApproval">
+                                <i class="bi bi-check-circle me-1"></i>审核管理
+                            </button>
+                            <button class="btn btn-outline-primary" @click="switchTab('search')">
+                                <i class="bi bi-search me-1"></i>制度检索
+                            </button>
+                            <button class="btn btn-outline-primary" @click="exportData">
+                                <i class="bi bi-download me-1"></i>导出数据
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">制度统计</h3>
+                        <div class="info-row">
+                            <span class="info-label">制度总数</span>
+                            <span class="info-value">156份</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">已发布</span>
+                            <span class="info-value" style="color: var(--success-color);">135份</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">待审核</span>
+                            <span class="info-value" style="color: var(--warning-color);">12份</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">已失效</span>
+                            <span class="info-value" style="color: var(--danger-color);">9份</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">分类统计</h3>
+                        <div class="info-row">
+                            <span class="info-label">安全制度</span>
+                            <span class="info-value">45份</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">工艺规程</span>
+                            <span class="info-value">38份</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">操作规程</span>
+                            <span class="info-value">52份</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">应急预案</span>
+                            <span class="info-value">21份</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    searchKeyword: '',
+                    filterType: '',
+                    filterStatus: '',
+                    currentPage: 1,
+                    docs: [
+                        { title: '重介旋流器安全操作规程', type: '操作规程', department: '安全部', publishDate: '2026-01-23', version: '2.1', status: '已发布', summary: '规定了重介旋流器的安全操作流程和注意事项' },
+                        { title: '破碎机维护保养制度', type: '安全制度', department: '设备部', publishDate: '2026-01-22', version: '1.5', status: '已发布', summary: '破碎机设备的维护保养要求和周期' },
+                        { title: '筛分车间安全管理制度', type: '安全制度', department: '安全部', publishDate: '2026-01-21', version: '3.0', status: '待审核', summary: '筛分车间的安全管理制度和操作规范' },
+                        { title: '压滤机操作规程', type: '操作规程', department: '生产部', publishDate: '2026-01-20', version: '2.3', status: '已发布', summary: '压滤机的标准操作流程和安全要求' },
+                        { title: '重介选煤工艺规程', type: '工艺规程', department: '技术部', publishDate: '2026-01-19', version: '1.8', status: '已发布', summary: '重介选煤工艺的技术要求和操作标准' },
+                        { title: '火灾应急预案', type: '应急预案', department: '安全部', publishDate: '2026-01-18', version: '4.2', status: '已发布', summary: '火灾事故的应急响应流程和处置措施' }
+                    ],
+                    uploadForm: {
+                        title: '',
+                        type: '',
+                        department: '',
+                        positions: '',
+                        fileName: '',
+                        summary: '',
+                        remark: ''
+                    },
+                    searchForm: {
+                        keyword: '',
+                        type: '',
+                        department: '',
+                        timeRange: '',
+                        exactMatch: false,
+                        includeContent: false,
+                        onlyPublished: false
+                    },
+                    searchResults: [],
+                    searchPerformed: false
+                }
+            },
+            computed: {
+                filteredDocs() {
+                    return this.docs.filter(doc => {
+                        const matchKeyword = !this.searchKeyword || doc.title.includes(this.searchKeyword);
+                        const matchType = !this.filterType || doc.type === this.filterType;
+                        const matchStatus = !this.filterStatus || doc.status === this.filterStatus;
+                        return matchKeyword && matchType && matchStatus;
+                    });
+                }
+            },
+            methods: {
+                getStatusBadgeClass(status) {
+                    switch (status) {
+                        case '已发布':
+                            return 'badge-success';
+                        case '待审核':
+                            return 'badge-warning';
+                        case '已失效':
+                            return 'badge-danger';
+                        default:
+                            return 'badge-info';
+                    }
+                },
+                viewDoc(index) {
+                    alert('查看制度: ' + index);
+                },
+                editDoc(index) {
+                    alert('编辑制度: ' + index);
+                },
+                deleteDoc(index) {
+                    if (confirm('确定删除此制度吗？')) {
+                        alert('删除制度: ' + index);
+                    }
+                },
+                switchTab(tabName) {
+                    const tabElement = document.querySelector('#' + tabName + '-tab');
+                    if (tabElement) {
+                        tabElement.click();
+                    }
+                },
+                selectFile() {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = '.pdf,.doc,.docx,.xls,.xlsx';
+                    input.onchange = (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                            this.uploadForm.fileName = file.name;
+                        }
+                    };
+                    input.click();
+                },
+                removeFile() {
+                    this.uploadForm.fileName = '';
+                },
+                resetUploadForm() {
+                    this.uploadForm = {
+                        title: '',
+                        type: '',
+                        department: '',
+                        positions: '',
+                        fileName: '',
+                        summary: '',
+                        remark: ''
+                    };
+                },
+                submitUpload() {
+                    if (!this.uploadForm.title || !this.uploadForm.type || !this.uploadForm.department || !this.uploadForm.fileName) {
+                        alert('请填写必填项');
+                        return;
+                    }
+                    alert('制度已提交审核');
+                    this.resetUploadForm();
+                    this.switchTab('list');
+                },
+                performSearch() {
+                    this.searchPerformed = true;
+                    this.searchResults = this.docs.map((doc, index) => ({ ...doc, originalIndex: index })).filter(doc => {
+                        let matchKeyword = true;
+                        if (this.searchForm.keyword) {
+                            if (this.searchForm.exactMatch) {
+                                matchKeyword = doc.title === this.searchForm.keyword;
+                            } else {
+                                matchKeyword = doc.title.includes(this.searchForm.keyword);
+                            }
+                        }
+                        const matchType = !this.searchForm.type || doc.type === this.searchForm.type;
+                        const matchDepartment = !this.searchForm.department || doc.department === this.searchForm.department;
+                        const matchStatus = !this.searchForm.onlyPublished || doc.status === '已发布';
+                        return matchKeyword && matchType && matchDepartment && matchStatus;
+                    });
+                },
+                resetSearchForm() {
+                    this.searchForm = {
+                        keyword: '',
+                        type: '',
+                        department: '',
+                        timeRange: '',
+                        exactMatch: false,
+                        includeContent: false,
+                        onlyPublished: false
+                    };
+                    this.searchResults = [];
+                    this.searchPerformed = false;
+                },
+                goToApproval() {
+                    window.location.href = '06-审核管理界面.html';
+                },
+                exportData() {
+                    alert('导出数据');
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

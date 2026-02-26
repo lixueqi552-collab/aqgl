@@ -1,0 +1,507 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>制度详情 - AI知识库</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-danger {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .badge-info {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-outline-secondary {
+            background: white;
+            border-color: var(--border-color);
+            color: var(--text-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-secondary:hover {
+            background: var(--bg-color);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        .doc-preview {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 400px;
+        }
+
+        .doc-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .doc-preview-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .doc-preview-content {
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text-color);
+        }
+
+        .doc-preview-content h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 16px;
+            margin-bottom: 8px;
+        }
+
+        .doc-preview-content p {
+            margin-bottom: 12px;
+        }
+
+        .version-item {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .version-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .version-number {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .version-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .version-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="01-主界面.html">
+                    <i class="bi bi-book me-2"></i>班组AI知识库管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">知识库首页</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                制度管理
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="03-制度列表界面.html">制度列表</a></li>
+                                <li><a class="dropdown-item" href="06-审核管理界面.html">审核管理</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                制度学习
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="12-制度学习界面.html">学习任务</a></li>
+                                <li><a class="dropdown-item" href="14-学习统计与分析界面.html">学习统计与分析</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="15-AI问答界面.html">AI问答</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-制度分类管理（管理员）.html">制度分类管理</a></li>
+                                <li><a class="dropdown-item" href="基础设置-审核流程配置（管理员）.html">审核流程配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-推送规则配置（管理员）.html">推送规则配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            管理员
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">制度详情</h1>
+                <p class="page-subtitle">查看制度详细信息</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="main-content">
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                            <div>
+                                <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 8px;">重介旋流器安全操作规程</h2>
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                    <span class="badge badge-success">已发布</span>
+                                    <span class="badge badge-info">操作规程</span>
+                                    <span class="badge badge-info">V2.1</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-outline-primary" @click="startLearning">
+                                    <i class="bi bi-play-circle me-1"></i>开始学习
+                                </button>
+                                <button class="btn btn-outline-primary" @click="downloadDoc">
+                                    <i class="bi bi-download me-1"></i>下载
+                                </button>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
+                            <div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">发布部门</div>
+                                <div style="font-size: 14px; font-weight: 500;">安全部</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">发布日期</div>
+                                <div style="font-size: 14px; font-weight: 500;">2026-01-23</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">生效日期</div>
+                                <div style="font-size: 14px; font-weight: 500;">2026-01-25</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">适用岗位</div>
+                                <div style="font-size: 14px; font-weight: 500;">重介操作工、筛分操作工</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">阅读时长</div>
+                                <div style="font-size: 14px; font-weight: 500;">15分钟</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">学习人数</div>
+                                <div style="font-size: 14px; font-weight: 500;">45人</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">制度内容</h3>
+                        <div class="doc-preview">
+                            <div class="doc-preview-header">
+                                <div class="doc-preview-title">重介旋流器安全操作规程</div>
+                                <button class="btn btn-outline-secondary btn-sm" @click="compareVersion">
+                                    <i class="bi bi-git-compare me-1"></i>版本对比
+                                </button>
+                            </div>
+                            <div class="doc-preview-content">
+                                <h3>1. 总则</h3>
+                                <p>为确保重介旋流器安全、稳定运行，保障操作人员人身安全，特制定本操作规程。本规程适用于XX选煤分公司所有重介旋流器的操作与维护。</p>
+                                
+                                <h3>2. 操作前准备</h3>
+                                <p>2.1 操作人员必须经过专业培训，取得相应操作资格证书后方可上岗。</p>
+                                <p>2.2 操作前必须穿戴好劳动防护用品，包括安全帽、防护眼镜、防护手套等。</p>
+                                <p>2.3 检查设备各部位是否正常，发现问题及时上报处理。</p>
+                                
+                                <h3>3. 操作规程</h3>
+                                <p>3.1 启动设备前，必须确认设备周围无人员和障碍物。</p>
+                                <p>3.2 严格按照操作顺序启动设备，观察设备运行状态。</p>
+                                <p>3.3 运行过程中，严禁将手或其他物品伸入设备内部。</p>
+                                <p>3.4 发现异常情况，立即停机检查，严禁带病运行。</p>
+                                
+                                <h3>4. 应急处理</h3>
+                                <p>4.1 发生设备故障时，立即按下紧急停止按钮。</p>
+                                <p>4.2 发生人员伤害事故时，立即启动应急预案，组织救援。</p>
+                                <p>4.3 事故发生后，立即上报，配合调查处理。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="card">
+                        <h3 class="card-title">快速操作</h3>
+                        <div style="display: grid; gap: 8px;">
+                            <button class="btn btn-outline-primary" @click="startLearning">
+                                <i class="bi bi-play-circle me-1"></i>开始学习
+                            </button>
+                            <button class="btn btn-outline-primary" @click="takeTest">
+                                <i class="bi bi-pencil-square me-1"></i>参加测试
+                            </button>
+                            <button class="btn btn-outline-primary" @click="compareVersion">
+                                <i class="bi bi-git-compare me-1"></i>版本对比
+                            </button>
+                            <button class="btn btn-outline-primary" @click="downloadDoc">
+                                <i class="bi bi-download me-1"></i>下载文档
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">版本历史</h3>
+                        <div class="version-item">
+                            <div class="version-header">
+                                <span class="version-number">V2.1</span>
+                                <span class="version-date">2026-01-23</span>
+                            </div>
+                            <div class="version-desc">更新操作规程，增加应急处理内容</div>
+                        </div>
+                        <div class="version-item">
+                            <div class="version-header">
+                                <span class="version-number">V2.0</span>
+                                <span class="version-date">2025-06-15</span>
+                            </div>
+                            <div class="version-desc">全面修订操作规程，优化操作流程</div>
+                        </div>
+                        <div class="version-item">
+                            <div class="version-header">
+                                <span class="version-number">V1.5</span>
+                                <span class="version-date">2024-12-20</span>
+                            </div>
+                            <div class="version-desc">增加安全防护要求</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">学习统计</h3>
+                        <div class="info-row">
+                            <span class="info-label">总学习人数</span>
+                            <span class="info-value">45人</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">已完成学习</span>
+                            <span class="info-value" style="color: var(--success-color);">38人</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">学习中</span>
+                            <span class="info-value" style="color: var(--warning-color);">7人</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">测试通过率</span>
+                            <span class="info-value" style="color: var(--success-color);">89%</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">相关制度</h3>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <a href="#" style="font-size: 13px; color: var(--primary-color); text-decoration: none;">重介选煤工艺规程</a>
+                            <a href="#" style="font-size: 13px; color: var(--primary-color); text-decoration: none;">破碎机安全操作规程</a>
+                            <a href="#" style="font-size: 13px; color: var(--primary-color); text-decoration: none;">筛分车间安全管理制度</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {}
+            },
+            methods: {
+                startLearning() {
+                    window.location.href = '12-制度学习界面.html';
+                },
+                takeTest() {
+                    window.location.href = '13-在线测试界面.html';
+                },
+                compareVersion() {
+                    window.location.href = '05-版本对比界面.html';
+                },
+                downloadDoc() {
+                    alert('下载文档');
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

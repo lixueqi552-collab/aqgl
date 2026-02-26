@@ -1,0 +1,694 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隐患整改情况反馈 - XX选煤班组安全平台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --cta-color: #F97316;
+            --cta-hover: #EA580C;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 0 32px;
+            height: 64px;
+            flex-shrink: 0;
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .navbar-brand i {
+            font-size: 24px;
+        }
+
+        .navbar-nav {
+            gap: 8px;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(37, 99, 235, 0.05);
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .main-content {
+            padding: 24px 32px;
+            height: calc(100vh - 64px);
+            overflow: hidden;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--text-color);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            height: calc(100% - 80px);
+        }
+
+        .content-column {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .column-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .column-header i {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .column-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .hazard-list {
+            max-height: calc(100% - 100px);
+            overflow-y: auto;
+        }
+
+        .hazard-card {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .hazard-card:hover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .hazard-card.active {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .hazard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .hazard-id {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .hazard-level {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .hazard-level-high {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        .hazard-level-medium {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .hazard-level-low {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .hazard-description {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .hazard-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .hazard-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .hazard-status-completed {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .hazard-status-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .hazard-details {
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .hazard-details.show {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-color);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-control {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 14px;
+            transition: all 0.2s;
+            background-color: var(--bg-color);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-control:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        textarea.form-control {
+            resize: none;
+            min-height: 80px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-primary:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-success:focus-visible {
+            outline: 2px solid var(--success-color);
+            outline-offset: 2px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+
+        .btn-outline:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .footer-actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            padding: 16px 32px;
+            box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 16px;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-actions {
+                padding: 12px 16px;
+            }
+
+            .btn-primary, .btn-success, .btn-outline {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="01-主界面.html">
+                <i class="bi bi-shield-check"></i>
+                <span>XX选煤班组安全平台</span>
+            </a>
+            <div class="navbar-nav">
+                <a class="nav-link" href="../../index.html">班前会</a>
+                <a class="nav-link active" href="../../index.html">班后会</a>
+                <a class="nav-link" href="../../index.html">学习会</a>
+            </div>
+            <div class="user-info">
+                <img src="https://via.placeholder.com/36" alt="张班长的头像" class="user-avatar">
+                <span class="user-name">张班长</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <h1 class="page-title">隐患整改情况反馈</h1>
+
+        <div class="content-grid">
+            <div class="content-column">
+                <div class="column-header">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <span class="column-title">上一班未整改隐患</span>
+                </div>
+
+                <div class="hazard-list">
+                    <div class="hazard-card" onclick="toggleHazardDetails(1)">
+                        <div class="hazard-header">
+                            <span class="hazard-id">隐患编号：YB-20260115-001</span>
+                            <span class="hazard-level hazard-level-high">高风险</span>
+                        </div>
+                        <div class="hazard-description">2号破碎机轴承异响</div>
+                        <div class="hazard-meta">
+                            <span>发现时间：2026-01-15 14:30</span>
+                            <span>发现人：李安全员</span>
+                        </div>
+                        <div class="hazard-status hazard-status-pending">未整改</div>
+                        <div class="hazard-details" id="hazard-details-1">
+                            <div class="form-group">
+                                <label class="form-label">隐患详细描述</label>
+                                <textarea class="form-control" readonly>2号破碎机运行时发现轴承异响，经检查确认为轴承磨损导致，存在机械伤害风险</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">整改进度</label>
+                                <textarea class="form-control" id="progress-1" placeholder="请输入整改进度...">已更换新轴承，设备运行正常</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">责任人与完成时限</label>
+                                <div style="display: flex; gap: 12px;">
+                                    <input type="text" class="form-control" id="responsible-1" placeholder="责任人" value="王技术员" style="flex: 1;">
+                                    <input type="date" class="form-control" id="deadline-1" placeholder="完成时限" value="2026-01-17">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">佐证照片</label>
+                                <input type="file" class="form-control" id="evidence-1" accept="image/*">
+                            </div>
+                            <div style="display: flex; gap: 12px; margin-top: 12px;">
+                                <button class="btn-success" onclick="saveHazardFeedback(1)">
+                                    <i class="bi bi-check-circle"></i>
+                                    保存整改情况
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hazard-card" onclick="toggleHazardDetails(2)">
+                        <div class="hazard-header">
+                            <span class="hazard-id">隐患编号：YB-20260115-002</span>
+                            <span class="hazard-level hazard-level-medium">中风险</span>
+                        </div>
+                        <div class="hazard-description">3号筛分机异响</div>
+                        <div class="hazard-meta">
+                            <span>发现时间：2026-01-15 15:45</span>
+                            <span>发现人：李安全员</span>
+                        </div>
+                        <div class="hazard-status hazard-status-pending">未整改</div>
+                        <div class="hazard-details" id="hazard-details-2">
+                            <div class="form-group">
+                                <label class="form-label">隐患详细描述</label>
+                                <textarea class="form-control" readonly>3号筛分机运行时发现异响，经检查确认为筛网松动导致，存在机械伤害和粉尘爆炸风险</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">整改进度</label>
+                                <textarea class="form-control" id="progress-2" placeholder="请输入整改进度...">已紧固筛网，设备运行正常</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">责任人与完成时限</label>
+                                <div style="display: flex; gap: 12px;">
+                                    <input type="text" class="form-control" id="responsible-2" placeholder="责任人" value="赵维修工" style="flex: 1;">
+                                    <input type="date" class="form-control" id="deadline-2" placeholder="完成时限" value="2026-01-17">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">佐证照片</label>
+                                <input type="file" class="form-control" id="evidence-2" accept="image/*">
+                            </div>
+                            <div style="display: flex; gap: 12px; margin-top: 12px;">
+                                <button class="btn-success" onclick="saveHazardFeedback(2)">
+                                    <i class="bi bi-check-circle"></i>
+                                    保存整改情况
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hazard-card" onclick="toggleHazardDetails(3)">
+                        <div class="hazard-header">
+                            <span class="hazard-id">隐患编号：YB-20260115-003</span>
+                            <span class="hazard-level hazard-level-low">低风险</span>
+                        </div>
+                        <div class="hazard-description">4号照明灯具损坏</div>
+                        <div class="hazard-meta">
+                            <span>发现时间：2026-01-15 16:20</span>
+                            <span>发现人：李安全员</span>
+                        </div>
+                        <div class="hazard-status hazard-status-completed">已整改</div>
+                        <div class="hazard-details" id="hazard-details-3">
+                            <div class="form-group">
+                                <label class="form-label">隐患详细描述</label>
+                                <textarea class="form-control" readonly>4号作业区域照明灯具损坏，存在触电风险和作业安全风险</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">整改进度</label>
+                                <textarea class="form-control" id="progress-3" placeholder="请输入整改进度..."">已更换新灯具，照明恢复正常</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">责任人与完成时限</label>
+                                <div style="display: flex; gap: 12px;">
+                                    <input type="text" class="form-control" id="responsible-3" placeholder="责任人" value="冯电工" style="flex: 1;" readonly>
+                                    <input type="date" class="form-control" id="deadline-3" placeholder="完成时限" value="2026-01-16" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">佐证照片</label>
+                                <input type="file" class="form-control" id="evidence-3" accept="image/*" disabled>
+                            </div>
+                            <div style="display: flex; gap: 12px; margin-top: 12px;">
+                                <button class="btn-primary" disabled>
+                                    <i class="bi bi-check-circle"></i>
+                                    已完成
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-column">
+                <div class="column-header">
+                    <i class="bi bi-clipboard-check"></i>
+                    <span class="column-title">整改情况汇总</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">整改统计</label>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                        <div style="background: var(--bg-color); padding: 16px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: 700; color: var(--primary-color); font-family: 'Poppins', sans-serif;">3</div>
+                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-top: 4px;">未整改隐患</div>
+                        </div>
+                        <div style="background: var(--bg-color); padding: 16px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: 700; color: var(--success-color); font-family: 'Poppins', sans-serif;">1</div>
+                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-top: 4px;">已整改隐患</div>
+                        </div>
+                        <div style="background: var(--bg-color); padding: 16px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: 700; color: var(--warning-color); font-family: 'Poppins', sans-serif;">33%</div>
+                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-top: 4px;">整改完成率</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">备注</label>
+                    <textarea class="form-control" placeholder="请输入备注...">1. 所有未整改隐患已明确责任人和完成时限
+2. 已整改隐患已上传佐证照片
+3. 整改情况将同步至班组安全台账</textarea>
+                </div>
+
+                <div style="margin-top: auto;">
+                    <button class="btn-primary" onclick="saveSummary()">
+                        <i class="bi bi-check-circle"></i>
+                        保存汇总
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-actions">
+        <button class="btn-outline" onclick="window.location.href='02-当班安全情况复盘界面.html'">
+            <i class="bi bi-arrow-left"></i>
+            返回
+        </button>
+        <button class="btn-success" onclick="nextStep()">
+            <i class="bi bi-arrow-right"></i>
+            下一步
+        </button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleHazardDetails(id) {
+            const details = document.getElementById('hazard-details-' + id);
+            const allDetails = document.querySelectorAll('.hazard-details');
+            
+            allDetails.forEach(detail => {
+                detail.classList.remove('show');
+            });
+            
+            details.classList.toggle('show');
+        }
+
+        function saveHazardFeedback(id) {
+            const progress = document.getElementById('progress-' + id).value;
+            const responsible = document.getElementById('responsible-' + id).value;
+            const deadline = document.getElementById('deadline-' + id).value;
+
+            if (!progress.trim()) {
+                alert('请输入整改进度');
+                return;
+            }
+
+            if (!responsible.trim()) {
+                alert('请输入责任人');
+                return;
+            }
+
+            if (!deadline) {
+                alert('请选择完成时限');
+                return;
+            }
+
+            alert('隐患整改情况已保存！');
+        }
+
+        function saveSummary() {
+            alert('整改情况汇总已保存！');
+        }
+
+        function nextStep() {
+            alert('隐患整改情况反馈完成！');
+            window.location.href = '04-违规行为通报界面.html';
+        }
+    </script>
+</body>
+</html>

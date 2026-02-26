@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>积分兑换 - 安全积分</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .points-summary {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            border-radius: 12px;
+            color: white;
+            margin-bottom: 24px;
+        }
+
+        .points-icon {
+            font-size: 48px;
+        }
+
+        .points-info {
+            flex: 1;
+        }
+
+        .points-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .points-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .exchange-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .exchange-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .exchange-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .exchange-image {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 64px;
+        }
+
+        .exchange-content {
+            padding: 16px;
+        }
+
+        .exchange-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+
+        .exchange-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .exchange-points {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .points-required {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .exchange-btn {
+            padding: 8px 16px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .exchange-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .exchange-btn:disabled {
+            background: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .category-tab {
+            padding: 10px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .category-tab:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .category-tab.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-danger {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .badge-info {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        @media (max-width: 768px) {
+            .exchange-grid {
+                grid-template-columns: 1fr;
+            }
+            .points-summary {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../00班组智能会议系统/原型页面/交互平台首页.html">
+                    <i class="bi bi-star me-2"></i>
+                    班组安全账户积分管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">积分首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分规则界面.html">积分规则</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分明细界面.html">积分明细</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="积分兑换界面.html">积分兑换</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分排名界面.html">积分排名</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-积分规则配置（管理员）.html">积分规则配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-兑换规则配置（管理员）.html">兑换规则配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-排名规则配置（管理员）.html">排名规则配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            张三
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">积分兑换</h1>
+                <p class="page-subtitle">使用积分兑换奖励和福利</p>
+            </div>
+
+            <div class="points-summary">
+                <i class="bi bi-coin points-icon"></i>
+                <div class="points-info">
+                    <div class="points-value">1250</div>
+                    <div class="points-label">我的可用积分</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 14px; opacity: 0.9;">本月获得</div>
+                    <div style="font-size: 20px; font-weight: 600;">+380</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="category-tabs">
+                    <div 
+                        v-for="category in categories" 
+                        :key="category.id"
+                        class="category-tab"
+                        :class="{ active: selectedCategory === category.id }"
+                        @click="selectedCategory = category.id"
+                    >
+                        <i :class="category.icon" style="margin-right: 6px;"></i>
+                        {{ category.name }}
+                    </div>
+                </div>
+
+                <div class="exchange-grid">
+                    <div 
+                        v-for="item in filteredItems" 
+                        :key="item.id"
+                        class="exchange-card"
+                        @click="showExchangeDetail(item)"
+                    >
+                        <div class="exchange-image">
+                            <i :class="item.icon"></i>
+                        </div>
+                        <div class="exchange-content">
+                            <div class="exchange-title">{{ item.name }}</div>
+                            <div class="exchange-description">{{ item.description }}</div>
+                            <div class="exchange-points">
+                                <div class="points-required">{{ item.points }} 分</div>
+                                <button 
+                                    class="exchange-btn" 
+                                    :disabled="userPoints < item.points"
+                                    @click.stop="exchangeItem(item)"
+                                >
+                                    {{ userPoints >= item.points ? '立即兑换' : '积分不足' }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">兑换记录</h3>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>兑换时间</th>
+                                <th>兑换物品</th>
+                                <th>消耗积分</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(record, index) in exchangeRecords" :key="index">
+                                <td>{{ record.time }}</td>
+                                <td>{{ record.itemName }}</td>
+                                <td style="color: var(--danger-color); font-weight: 600;">-{{ record.points }}</td>
+                                <td>
+                                    <span class="badge" :class="getStatusBadgeClass(record.status)">
+                                        {{ record.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 兑换详情弹窗 -->
+        <div class="modal fade" :class="{ show: showDetailModal }" tabindex="-1" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">兑换详情</h5>
+                        <button type="button" class="btn-close" @click="closeDetailModal"></button>
+                    </div>
+                    <div class="modal-body" v-if="selectedItem">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <i :class="selectedItem.icon" style="font-size: 80px; color: var(--primary-color);"></i>
+                        </div>
+                        <h4 style="text-align: center; margin-bottom: 16px;">{{ selectedItem.name }}</h4>
+                        <p style="color: var(--text-secondary); text-align: center; margin-bottom: 20px;">
+                            {{ selectedItem.description }}
+                        </p>
+                        <div style="background: var(--bg-color); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="color: var(--text-secondary);">所需积分</span>
+                                <span style="font-weight: 600; color: var(--primary-color);">{{ selectedItem.points }} 分</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="color: var(--text-secondary);">我的积分</span>
+                                <span style="font-weight: 600;">{{ userPoints }} 分</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-secondary);">兑换后剩余</span>
+                                <span style="font-weight: 600; color: var(--success-color);">{{ userPoints - selectedItem.points }} 分</span>
+                            </div>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">
+                            <p><strong>兑换说明：</strong></p>
+                            <ul>
+                                <li>兑换成功后积分将立即扣除</li>
+                                <li>兑换物品将在3个工作日内发放</li>
+                                <li>如有疑问请联系安全管理部</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="closeDetailModal">取消</button>
+                        <button 
+                            type="button" 
+                            class="btn btn-primary" 
+                            :disabled="userPoints < selectedItem.points"
+                            @click="confirmExchange"
+                        >
+                            确认兑换
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    userPoints: 1250,
+                    selectedCategory: 'all',
+                    showDetailModal: false,
+                    selectedItem: null,
+                    categories: [
+                        { id: 'all', name: '全部', icon: 'bi bi-grid' },
+                        { id: 'protection', name: '防护用品', icon: 'bi bi-shield-check' },
+                        { id: 'training', name: '培训课程', icon: 'bi bi-book' },
+                        { id: 'welfare', name: '福利奖励', icon: 'bi bi-gift' }
+                    ],
+                    exchangeItems: [
+                        { id: 1, name: '安全帽', description: '高品质防冲击安全帽，符合国家标准', points: 100, category: 'protection', icon: 'bi bi-helmet' },
+                        { id: 2, name: '防尘口罩', description: 'KN95级别防尘口罩，50只装', points: 150, category: 'protection', icon: 'bi bi-mask' },
+                        { id: 3, name: '安全手套', description: '防滑耐磨安全手套，10双装', points: 80, category: 'protection', icon: 'bi bi-hand-index-thumb' },
+                        { id: 4, name: '有限空间作业培训', description: '专业有限空间作业安全培训课程', points: 300, category: 'training', icon: 'bi bi-book' },
+                        { id: 5, name: '应急救援培训', description: '应急救援技能提升培训', points: 400, category: 'training', icon: 'bi bi-book' },
+                        { id: 6, name: '外部实训名额', description: '知名设备厂家专项实训名额', points: 500, category: 'training', icon: 'bi bi-book' },
+                        { id: 7, name: '带薪休假1天', description: '带薪休假一天，需提前申请', points: 200, category: 'welfare', icon: 'bi bi-calendar-check' },
+                        { id: 8, name: '健康体检套餐', description: '职业健康体检套餐', points: 350, category: 'welfare', icon: 'bi bi-heart-pulse' },
+                        { id: 9, name: '安全之星证书', description: '月度安全之星荣誉证书', points: 150, category: 'welfare', icon: 'bi bi-award' },
+                        { id: 10, name: '防护眼镜', description: '防冲击防护眼镜', points: 120, category: 'protection', icon: 'bi bi-eye' },
+                        { id: 11, name: '安全鞋', description: '防刺穿安全鞋', points: 250, category: 'protection', icon: 'bi bi-boot' },
+                        { id: 12, name: '安全培训书籍', description: '安全管理专业书籍套装', points: 180, category: 'training', icon: 'bi bi-book' }
+                    ],
+                    exchangeRecords: [
+                        { time: '2026-01-15 10:30', itemName: '安全帽', points: 100, status: '已完成' },
+                        { time: '2026-01-10 14:20', itemName: '防尘口罩', points: 150, status: '已完成' },
+                        { time: '2026-01-05 09:15', itemName: '带薪休假1天', points: 200, status: '处理中' }
+                    ]
+                }
+            },
+            computed: {
+                filteredItems() {
+                    if (this.selectedCategory === 'all') {
+                        return this.exchangeItems;
+                    }
+                    return this.exchangeItems.filter(item => item.category === this.selectedCategory);
+                }
+            },
+            methods: {
+                showExchangeDetail(item) {
+                    this.selectedItem = item;
+                    this.showDetailModal = true;
+                },
+                closeDetailModal() {
+                    this.showDetailModal = false;
+                    this.selectedItem = null;
+                },
+                exchangeItem(item) {
+                    if (this.userPoints < item.points) {
+                        alert('积分不足，无法兑换');
+                        return;
+                    }
+                    this.showExchangeDetail(item);
+                },
+                confirmExchange() {
+                    if (!this.selectedItem) return;
+
+                    if (confirm(`确定要兑换「${this.selectedItem.name}」吗？消耗积分：${this.selectedItem.points}分`)) {
+                        this.userPoints -= this.selectedItem.points;
+                        this.exchangeRecords.unshift({
+                            time: new Date().toLocaleString('zh-CN'),
+                            itemName: this.selectedItem.name,
+                            points: this.selectedItem.points,
+                            status: '处理中'
+                        });
+                        alert('兑换成功！物品将在3个工作日内发放');
+                        this.closeDetailModal();
+                    }
+                },
+                getStatusBadgeClass(status) {
+                    switch (status) {
+                        case '已完成':
+                            return 'badge-success';
+                        case '处理中':
+                            return 'badge-warning';
+                        default:
+                            return 'badge-info';
+                    }
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

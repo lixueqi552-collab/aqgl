@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>职业健康库 - 智能学习地图</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --border-color: #E2E8F0;
+        }
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .health-card {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 12px;
+        }
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../index.html"><i class="bi bi-book"></i> 智能学习地图</a>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-muted">张明 | 重介操作工</span>
+                    <button class="btn btn-primary">个人中心</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <h2>职业健康库</h2>
+            <p class="text-muted">粉尘治理、劳动防护用品正确佩戴、职业健康体检</p>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <h3 class="text-primary">8</h3>
+                        <p class="mb-0">课程总数</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <h3 class="text-success">6</h3>
+                        <p class="mb-0">已完成</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <h3 class="text-warning">2</h3>
+                        <p class="mb-0">学习中</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <h3>24h</h3>
+                        <p class="mb-0">学习时长</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>职业健康课程</h4>
+                <div v-for="course in courses" :key="course.id" class="health-card">
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <div class="rounded bg-success text-white d-flex align-items-center justify-content-center" 
+                                 style="width: 60px; height: 60px; font-size: 24px;">
+                                <i :class="course.icon"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between">
+                                <h5>{{ course.title }}</h5>
+                                <span class="badge" :class="getStatusBadge(course.status)">
+                                    {{ getStatusText(course.status) }}
+                                </span>
+                            </div>
+                            <p class="mb-2 text-muted">{{ course.description }}</p>
+                            <div class="d-flex gap-3 mb-2">
+                                <small><i class="bi bi-clock"></i> {{ course.duration }}</small>
+                                <small><i class="bi bi-eye"></i> {{ course.views }}次浏览</small>
+                            </div>
+                            <div v-if="course.progress > 0" class="progress" style="height: 4px;">
+                                <div class="progress-bar" :class="course.status === 'completed' ? 'bg-success' : 'bg-primary'" 
+                                     :style="{ width: course.progress + '%' }"></div>
+                            </div>
+                        </div>
+                        <div class="ms-3">
+                            <button class="btn btn-sm btn-primary" @click="startCourse(course)">
+                                {{ course.status === 'completed' ? '回顾' : '开始' }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>职业健康体检记录</h4>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>体检日期</th>
+                            <th>体检类型</th>
+                            <th>体检结果</th>
+                            <th>医生建议</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="exam in exams" :key="exam.id">
+                            <td>{{ exam.date }}</td>
+                            <td>{{ exam.type }}</td>
+                            <td>
+                                <span class="badge" :class="getResultBadge(exam.result)">
+                                    {{ exam.result }}
+                                </span>
+                            </td>
+                            <td>{{ exam.advice }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h4>劳动防护用品使用指南</h4>
+                <div class="row">
+                    <div class="col-md-4" v-for="ppe in ppeList" :key="ppe.id">
+                        <div class="p-3 border rounded text-center">
+                            <i :class="ppe.icon" style="font-size: 48px; color: var(--primary-color);"></i>
+                            <h5 class="mt-2">{{ ppe.name }}</h5>
+                            <p class="text-muted small">{{ ppe.usage }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    courses: [
+                        {
+                            id: 1,
+                            title: '粉尘治理与防护',
+                            description: '了解选煤作业中的粉尘危害及防护措施',
+                            duration: '25分钟',
+                            views: 145,
+                            progress: 100,
+                            status: 'completed',
+                            icon: 'bi bi-wind'
+                        },
+                        {
+                            id: 2,
+                            title: '劳动防护用品正确佩戴',
+                            description: '学习防尘口罩、安全帽等防护用品的正确佩戴方法',
+                            duration: '20分钟',
+                            views: 167,
+                            progress: 100,
+                            status: 'completed',
+                            icon: 'bi bi-shield-check'
+                        },
+                        {
+                            id: 3,
+                            title: '职业健康体检注意事项',
+                            description: '职业健康体检的流程和注意事项',
+                            duration: '15分钟',
+                            views: 123,
+                            progress: 100,
+                            status: 'completed',
+                            icon: 'bi bi-heart-pulse'
+                        },
+                        {
+                            id: 4,
+                            title: '职业病预防知识',
+                            description: '了解常见职业病的预防和早期发现',
+                            duration: '30分钟',
+                            views: 98,
+                            progress: 60,
+                            status: 'in-progress',
+                            icon: 'bi bi-hospital'
+                        }
+                    ],
+                    exams: [
+                        { id: 1, date: '2025-12-15', type: '年度体检', result: '正常', advice: '继续保持良好工作习惯' },
+                        { id: 2, date: '2025-06-20', type: '专项检查', result: '正常', advice: '注意防护用品佩戴' }
+                    ],
+                    ppeList: [
+                        { id: 1, name: '防尘口罩', icon: 'bi bi-mask', usage: '正确佩戴，定期更换' },
+                        { id: 2, name: '安全帽', icon: 'bi bi-shield', usage: '佩戴牢固，系好下颚带' },
+                        { id: 3, name: '防护眼镜', icon: 'bi bi-eye', usage: '防止粉尘和异物进入' }
+                    ]
+                };
+            },
+            methods: {
+                getStatusBadge(status) {
+                    switch(status) {
+                        case 'completed': return 'bg-success';
+                        case 'in-progress': return 'bg-warning';
+                        default: return 'bg-secondary';
+                    }
+                },
+                getStatusText(status) {
+                    switch(status) {
+                        case 'completed': return '已完成';
+                        case 'in-progress': return '进行中';
+                        default: return '未开始';
+                    }
+                },
+                getResultBadge(result) {
+                    switch(result) {
+                        case '正常': return 'bg-success';
+                        case '异常': return 'bg-danger';
+                        default: return 'bg-warning';
+                    }
+                },
+                startCourse(course) {
+                    alert('开始学习：' + course.title);
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>制度上传 - AI知识库</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 24px;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background: #DBEAFE;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+
+        .upload-hint {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-color);
+        }
+
+        .file-icon {
+            font-size: 24px;
+            margin-right: 12px;
+            color: var(--primary-color);
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .file-size {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .file-remove {
+            padding: 6px 12px;
+            border: 1px solid var(--danger-color);
+            border-radius: 6px;
+            background: white;
+            color: var(--danger-color);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-remove:hover {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+
+        .form-control {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+        }
+
+        .form-select {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: white;
+            border-color: var(--border-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-color);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="01-主界面.html">
+                    <i class="bi bi-book me-2"></i>
+                    班组AI知识库管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">知识库首页</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                制度管理
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="03-制度列表界面.html">制度列表</a></li>
+                                <li><a class="dropdown-item" href="06-审核管理界面.html">审核管理</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                制度学习
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="12-制度学习界面.html">学习任务</a></li>
+                                <li><a class="dropdown-item" href="14-学习统计与分析界面.html">学习统计与分析</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="15-AI问答界面.html">AI问答</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-制度分类管理（管理员）.html">制度分类管理</a></li>
+                                <li><a class="dropdown-item" href="基础设置-审核流程配置（管理员）.html">审核流程配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-推送规则配置（管理员）.html">推送规则配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            管理员
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">制度上传</h1>
+                <p class="page-subtitle">上传安全制度和规程文档</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="main-content">
+                    <div class="card">
+                        <h3 class="card-title">文件上传</h3>
+                        <div class="upload-area" @click="triggerFileInput" @dragover.prevent @drop.prevent="handleDrop">
+                            <i class="bi bi-cloud-arrow-up upload-icon"></i>
+                            <div class="upload-text">点击或拖拽文件到此处上传</div>
+                            <div class="upload-hint">支持 PDF、Word、图片格式，单个文件不超过 100MB</div>
+                        </div>
+                        <input type="file" ref="fileInput" @change="handleFileSelect" multiple style="display: none;" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+
+                        <div class="file-list" v-if="files.length > 0">
+                            <div class="file-item" v-for="(file, index) in files" :key="index">
+                                <i class="bi bi-file-earmark-text file-icon"></i>
+                                <div class="file-info">
+                                    <div class="file-name">{{ file.name }}</div>
+                                    <div class="file-size">{{ formatFileSize(file.size) }}</div>
+                                </div>
+                                <button class="file-remove" @click="removeFile(index)">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">制度信息</h3>
+                        <div class="form-group">
+                            <label class="form-label">制度标题</label>
+                            <input type="text" class="form-control" v-model="form.title" placeholder="请输入制度标题">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">制度类型</label>
+                            <select class="form-select" v-model="form.type">
+                                <option value="">请选择制度类型</option>
+                                <option value="安全制度">安全制度</option>
+                                <option value="工艺规程">工艺规程</option>
+                                <option value="操作规程">操作规程</option>
+                                <option value="应急预案">应急预案</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">发布部门</label>
+                            <select class="form-select" v-model="form.department">
+                                <option value="">请选择发布部门</option>
+                                <option value="安全部">安全部</option>
+                                <option value="设备部">设备部</option>
+                                <option value="生产部">生产部</option>
+                                <option value="技术部">技术部</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">适用岗位</label>
+                            <select class="form-select" v-model="form.positions" multiple>
+                                <option value="重介操作工">重介操作工</option>
+                                <option value="破碎机维护工">破碎机维护工</option>
+                                <option value="筛分操作工">筛分操作工</option>
+                                <option value="压滤操作工">压滤操作工</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">制度描述</label>
+                            <textarea class="form-control" v-model="form.description" rows="3" placeholder="请输入制度描述"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">生效日期</label>
+                            <input type="date" class="form-control" v-model="form.effectiveDate">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">预计阅读时长</label>
+                            <input type="number" class="form-control" v-model="form.readTime" placeholder="请输入预计阅读时长（分钟）" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">审核方式</label>
+                            <select class="form-select" v-model="form.approval">
+                                <option value="single">单人审核</option>
+                                <option value="multi">多人审核</option>
+                                <option value="none">无需审核</option>
+                            </select>
+                        </div>
+                        <div class="form-group" v-if="form.approval !== 'none'">
+                            <label class="form-label">审核人</label>
+                            <select class="form-select" v-model="form.approver">
+                                <option value="">请选择审核人</option>
+                                <option value="安全部经理">安全部经理</option>
+                                <option value="生产部经理">生产部经理</option>
+                                <option value="设备部经理">设备部经理</option>
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button class="btn btn-secondary" @click="resetForm">重置</button>
+                            <button class="btn btn-primary" @click="submitUpload">
+                                <i class="bi bi-upload me-1"></i>提交审核
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="card">
+                        <h3 class="card-title">上传说明</h3>
+                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                            <p>1. 支持上传 PDF、Word、图片格式文档</p>
+                            <p>2. 单个文件大小不超过 100MB</p>
+                            <p>3. 上传后需要经过审核才能发布</p>
+                            <p>4. 审核通过后将自动推送给相关岗位</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">快速操作</h3>
+                        <div style="display: grid; gap: 8px;">
+                            <button class="btn btn-outline-primary" @click="goToList">
+                                <i class="bi bi-list me-1"></i>制度列表
+                            </button>
+                            <button class="btn btn-outline-primary" @click="goToApproval">
+                                <i class="bi bi-check-circle me-1"></i>审核管理
+                            </button>
+                            <button class="btn btn-outline-primary" @click="goToTemplate">
+                                <i class="bi bi-file-earmark me-1"></i>下载模板
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">上传统计</h3>
+                        <div class="info-row">
+                            <span class="info-label">本月上传</span>
+                            <span class="info-value">12份</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">待审核</span>
+                            <span class="info-value" style="color: var(--warning-color);">3份</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">已发布</span>
+                            <span class="info-value" style="color: var(--success-color);">9份</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    files: [],
+                    form: {
+                        title: '',
+                        type: '',
+                        department: '',
+                        positions: [],
+                        description: '',
+                        effectiveDate: '',
+                        readTime: 15,
+                        approval: 'single',
+                        approver: ''
+                    }
+                }
+            },
+            methods: {
+                triggerFileInput() {
+                    this.$refs.fileInput.click();
+                },
+                handleFileSelect(event) {
+                    const newFiles = Array.from(event.target.files);
+                    this.files = [...this.files, ...newFiles];
+                },
+                handleDrop(event) {
+                    const newFiles = Array.from(event.dataTransfer.files);
+                    this.files = [...this.files, ...newFiles];
+                },
+                removeFile(index) {
+                    this.files.splice(index, 1);
+                },
+                formatFileSize(bytes) {
+                    if (bytes === 0) return '0 Bytes';
+                    const k = 1024;
+                    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+                    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+                },
+                submitUpload() {
+                    if (this.files.length === 0) {
+                        alert('请上传文件');
+                        return;
+                    }
+                    if (!this.form.title) {
+                        alert('请输入制度标题');
+                        return;
+                    }
+                    if (!this.form.type) {
+                        alert('请选择制度类型');
+                        return;
+                    }
+                    if (!this.form.department) {
+                        alert('请选择发布部门');
+                        return;
+                    }
+                    alert('制度已提交审核');
+                },
+                resetForm() {
+                    this.files = [];
+                    this.form = {
+                        title: '',
+                        type: '',
+                        department: '',
+                        positions: [],
+                        description: '',
+                        effectiveDate: '',
+                        readTime: 15,
+                        approval: 'single',
+                        approver: ''
+                    };
+                },
+                goToList() {
+                    window.location.href = '03-制度列表界面.html';
+                },
+                goToApproval() {
+                    window.location.href = '06-审核管理界面.html';
+                },
+                goToTemplate() {
+                    alert('下载模板');
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

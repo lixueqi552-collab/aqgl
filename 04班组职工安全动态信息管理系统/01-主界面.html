@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主界面 - 职工动态</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid var(--border-color);
+            padding: 12px;
+            font-weight: 600;
+            color: var(--text-color);
+            background: var(--bg-color);
+        }
+
+        .table tbody td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background: var(--bg-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-danger {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .badge-info {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            color: var(--text-color);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 4px;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="01-主界面.html">
+                    <i class="bi bi-activity me-2"></i>
+                    班组职工安全动态信息管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="01-主界面.html">动态首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="02-自主上报界面.html">自主上报</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="05-评估结果界面.html">评估结果</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="08-措施制定界面.html">措施制定</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="11-效果跟踪界面.html">效果跟踪</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-评估模型配置（管理员）.html">评估模型配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-措施库管理（管理员）.html">措施库管理</a></li>
+                                <li><a class="dropdown-item" href="基础设置-通知规则配置（管理员）.html">通知规则配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            管理员
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">职工动态管理</h1>
+                <p class="page-subtitle">管理职工安全动态信息和关怀措施</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="bi bi-people stat-icon" style="color: var(--primary-color);"></i>
+                    <div class="stat-value">156</div>
+                    <div class="stat-label">总职工数</div>
+                </div>
+                <div class="stat-card">
+                    <i class="bi bi-exclamation-triangle stat-icon" style="color: var(--danger-color);"></i>
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">高风险</div>
+                </div>
+                <div class="stat-card">
+                    <i class="bi bi-clock stat-icon" style="color: var(--warning-color);"></i>
+                    <div class="stat-value">8</div>
+                    <div class="stat-label">中风险</div>
+                </div>
+                <div class="stat-card">
+                    <i class="bi bi-heart stat-icon" style="color: var(--success-color);"></i>
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">关怀措施</div>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="main-content">
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 class="card-title" style="margin-bottom: 0;">最新上报</h3>
+                            <button class="btn btn-outline-primary" @click="goToReport">
+                                <i class="bi bi-plus-lg me-1"></i>新增上报
+                            </button>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>姓名</th>
+                                    <th>岗位</th>
+                                    <th>上报类型</th>
+                                    <th>上报时间</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>李四</td>
+                                    <td>破碎机维护工</td>
+                                    <td>工作压力</td>
+                                    <td>2026-01-23 10:30</td>
+                                    <td><span class="badge badge-warning">待处理</span></td>
+                                    <td>
+                                        <button class="action-btn" @click="viewReport(0)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="action-btn" @click="handleReport(0)">
+                                            <i class="bi bi-gear"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>王五</td>
+                                    <td>重介操作工</td>
+                                    <td>身体健康</td>
+                                    <td>2026-01-22 14:20</td>
+                                    <td><span class="badge badge-info">处理中</span></td>
+                                    <td>
+                                        <button class="action-btn" @click="viewReport(1)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="action-btn" @click="handleReport(1)">
+                                            <i class="bi bi-gear"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>赵六</td>
+                                    <td>筛分操作工</td>
+                                    <td>家庭情况</td>
+                                    <td>2026-01-21 09:15</td>
+                                    <td><span class="badge badge-success">已完成</span></td>
+                                    <td>
+                                        <button class="action-btn" @click="viewReport(2)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 class="card-title" style="margin-bottom: 0;">评估结果</h3>
+                            <button class="btn btn-outline-primary" @click="goToAssessment">
+                                <i class="bi bi-file-earmark-text me-1"></i>查看全部
+                            </button>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>姓名</th>
+                                    <th>岗位</th>
+                                    <th>风险等级</th>
+                                    <th>评估时间</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>李四</td>
+                                    <td>破碎机维护工</td>
+                                    <td><span class="badge badge-danger">高风险</span></td>
+                                    <td>2026-01-22 14:30</td>
+                                    <td><span class="badge badge-warning">处理中</span></td>
+                                    <td>
+                                        <button class="action-btn" @click="viewAssessment(0)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="action-btn" @click="makeMeasure(0)">
+                                            <i class="bi bi-heart"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>王五</td>
+                                    <td>重介操作工</td>
+                                    <td><span class="badge badge-warning">中风险</span></td>
+                                    <td>2026-01-21 10:15</td>
+                                    <td><span class="badge badge-info">处理中</span></td>
+                                    <td>
+                                        <button class="action-btn" @click="viewAssessment(1)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="action-btn" @click="makeMeasure(1)">
+                                            <i class="bi bi-heart"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>赵六</td>
+                                    <td>筛分操作工</td>
+                                    <td><span class="badge badge-success">低风险</span></td>
+                                    <td>2026-01-20 09:20</td>
+                                    <td><span class="badge badge-success">已完成</span></td>
+                                    <td>
+                                        <button class="action-btn" @click="viewAssessment(2)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="card">
+                        <h3 class="card-title">快速操作</h3>
+                        <div style="display: grid; gap: 8px;">
+                            <button class="btn btn-outline-primary" @click="goToReport">
+                                <i class="bi bi-plus-lg me-1"></i>自主上报
+                            </button>
+                            <button class="btn btn-outline-primary" @click="goToAssessment">
+                                <i class="bi bi-file-earmark-text me-1"></i>评估结果
+                            </button>
+                            <button class="btn btn-outline-primary" @click="goToMeasure">
+                                <i class="bi bi-heart me-1"></i>措施制定
+                            </button>
+                            <button class="btn btn-outline-primary" @click="goToTrack">
+                                <i class="bi bi-graph-up me-1"></i>效果跟踪
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">待处理事项</h3>
+                        <div style="margin-bottom: 12px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">李四 - 工作压力</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">2026-01-23 10:30</div>
+                            <div style="font-size: 12px; color: var(--warning-color); margin-top: 4px;">待处理</div>
+                        </div>
+                        <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">王五 - 身体健康</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">2026-01-22 14:20</div>
+                            <div style="font-size: 12px; color: var(--info-color); margin-top: 4px;">处理中</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">关怀措施统计</h3>
+                        <div class="info-row">
+                            <span class="info-label">本月措施</span>
+                            <span class="info-value">12次</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">进行中</span>
+                            <span class="info-value">3次</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">已完成</span>
+                            <span class="info-value">9次</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">效果良好</span>
+                            <span class="info-value" style="color: var(--success-color);">8次</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {}
+            },
+            methods: {
+                goToReport() {
+                    window.location.href = '02-自主上报界面.html';
+                },
+                goToAssessment() {
+                    window.location.href = '05-评估结果界面.html';
+                },
+                goToMeasure() {
+                    window.location.href = '08-措施制定界面.html';
+                },
+                goToTrack() {
+                    window.location.href = '11-效果跟踪界面.html';
+                },
+                viewReport(index) {
+                    alert('查看上报详情: ' + index);
+                },
+                handleReport(index) {
+                    alert('处理上报: ' + index);
+                },
+                viewAssessment(index) {
+                    alert('查看评估详情: ' + index);
+                },
+                makeMeasure(index) {
+                    alert('制定措施: ' + index);
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

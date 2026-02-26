@@ -1,0 +1,501 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>职工列表 - 职工安全档案</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid var(--border-color);
+            padding: 12px;
+            font-weight: 600;
+            color: var(--text-color);
+            background: var(--bg-color);
+        }
+
+        .table tbody td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background: var(--bg-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-danger {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .badge-info {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            color: var(--text-color);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 4px;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .form-control {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+        }
+
+        .form-select {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="01-主界面.html">
+                    <i class="bi bi-person-badge me-2"></i>
+                    班组职工安全档案管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">档案首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="02-职工列表界面.html">职工列表</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="03-档案详情界面.html">档案详情</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="04-基本信息档案界面.html">基本信息档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="05-安全行为档案界面.html">安全行为档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="06-培训考核档案界面.html">培训考核档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="07-健康状态档案界面.html">健康状态档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="08-奖惩积分档案界面.html">奖惩积分档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="14-档案统计界面.html">档案统计</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="15-报表导出界面.html">报表导出</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-档案分类管理（管理员）.html">档案分类管理</a></li>
+                                <li><a class="dropdown-item" href="基础设置-权限管理（管理员）.html">权限管理</a></li>
+                                <li><a class="dropdown-item" href="基础设置-提醒规则配置（管理员）.html">提醒规则配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            管理员
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">职工列表</h1>
+                <p class="page-subtitle">查看和管理职工安全档案</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="main-content">
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <div style="display: flex; gap: 12px;">
+                                <input type="text" class="form-control" v-model="searchKeyword" placeholder="搜索职工姓名或工号" style="width: 250px;">
+                                <select class="form-select" v-model="filterDepartment" style="width: 150px;">
+                                    <option value="">全部部门</option>
+                                    <option value="A选煤中心">A选煤中心</option>
+                                    <option value="B选煤中心">B选煤中心</option>
+                                    <option value="C选煤中心">C选煤中心</option>
+                                    <option value="D选煤中心">D选煤中心</option>
+                                </select>
+                                <select class="form-select" v-model="filterPosition" style="width: 150px;">
+                                    <option value="">全部岗位</option>
+                                    <option value="重介操作工">重介操作工</option>
+                                    <option value="破碎机维护工">破碎机维护工</option>
+                                    <option value="筛分操作工">筛分操作工</option>
+                                    <option value="压滤操作工">压滤操作工</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" @click="addEmployee">
+                                <i class="bi bi-person-plus me-1"></i>新增职工
+                            </button>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>工号</th>
+                                    <th>姓名</th>
+                                    <th>岗位</th>
+                                    <th>部门</th>
+                                    <th>入职日期</th>
+                                    <th>档案状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(employee, index) in filteredEmployees" :key="index">
+                                    <td>{{ employee.workNo }}</td>
+                                    <td>{{ employee.name }}</td>
+                                    <td>{{ employee.position }}</td>
+                                    <td>{{ employee.department }}</td>
+                                    <td>{{ employee.joinDate }}</td>
+                                    <td>
+                                        <span class="badge" :class="getStatusBadgeClass(employee.status)">{{ employee.status }}</span>
+                                    </td>
+                                    <td>
+                                        <button class="action-btn" @click="viewDetail(index)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="action-btn" @click="editEmployee(index)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="action-btn" @click="deleteEmployee(index)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="card">
+                        <h3 class="card-title">快速操作</h3>
+                        <div style="display: grid; gap: 8px;">
+                            <button class="btn btn-outline-primary" @click="addEmployee">
+                                <i class="bi bi-person-plus me-1"></i>新增职工
+                            </button>
+                            <button class="btn btn-outline-primary" @click="batchImport">
+                                <i class="bi bi-upload me-1"></i>批量导入
+                            </button>
+                            <button class="btn btn-outline-primary" @click="exportData">
+                                <i class="bi bi-download me-1"></i>导出数据
+                            </button>
+                            <button class="btn btn-outline-primary" @click="goToStatistics">
+                                <i class="bi bi-bar-chart me-1"></i>档案统计
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">档案统计</h3>
+                        <div class="info-row">
+                            <span class="info-label">总职工数</span>
+                            <span class="info-value">156人</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">建档完成</span>
+                            <span class="info-value" style="color: var(--success-color);">156人</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">本月更新</span>
+                            <span class="info-value" style="color: var(--info-color);">45人</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">资质到期</span>
+                            <span class="info-value" style="color: var(--danger-color);">8人</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">部门分布</h3>
+                        <div class="info-row">
+                            <span class="info-label">A选煤中心</span>
+                            <span class="info-value">42人</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">B选煤中心</span>
+                            <span class="info-value">38人</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">C选煤中心</span>
+                            <span class="info-value">35人</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">D选煤中心</span>
+                            <span class="info-value">41人</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    searchKeyword: '',
+                    filterDepartment: '',
+                    filterPosition: '',
+                    employees: [
+                        { workNo: 'XB001', name: '张三', position: '重介操作工', department: 'A选煤中心', joinDate: '2023-05-15', status: '完整' },
+                        { workNo: 'XB002', name: '李四', position: '破碎机维护工', department: 'A选煤中心', joinDate: '2023-06-20', status: '完整' },
+                        { workNo: 'CJ001', name: '王五', position: '筛分操作工', department: 'B选煤中心', joinDate: '2023-04-10', status: '待更新' },
+                        { workNo: 'CJ002', name: '赵六', position: '压滤操作工', department: 'B选煤中心', joinDate: '2023-07-25', status: '完整' },
+                        { workNo: 'YX001', name: '孙七', position: '重介操作工', department: 'C选煤中心', joinDate: '2023-03-08', status: '完整' },
+                        { workNo: 'YX002', name: '周八', position: '破碎机维护工', department: 'C选煤中心', joinDate: '2023-08-12', status: '待更新' }
+                    ]
+                }
+            },
+            computed: {
+                filteredEmployees() {
+                    return this.employees.filter(employee => {
+                        const matchKeyword = !this.searchKeyword || 
+                            employee.name.includes(this.searchKeyword) || 
+                            employee.workNo.includes(this.searchKeyword);
+                        const matchDepartment = !this.filterDepartment || employee.department === this.filterDepartment;
+                        const matchPosition = !this.filterPosition || employee.position === this.filterPosition;
+                        return matchKeyword && matchDepartment && matchPosition;
+                    });
+                }
+            },
+            methods: {
+                getStatusBadgeClass(status) {
+                    switch (status) {
+                        case '完整':
+                            return 'badge-success';
+                        case '待更新':
+                            return 'badge-warning';
+                        default:
+                            return 'badge-info';
+                    }
+                },
+                viewDetail(index) {
+                    window.location.href = '03-档案详情界面.html';
+                },
+                addEmployee() {
+                    alert('新增职工');
+                },
+                editEmployee(index) {
+                    alert('编辑职工: ' + index);
+                },
+                deleteEmployee(index) {
+                    if (confirm('确定删除此职工档案吗？')) {
+                        alert('删除职工: ' + index);
+                    }
+                },
+                batchImport() {
+                    alert('批量导入');
+                },
+                exportData() {
+                    alert('导出数据');
+                },
+                goToStatistics() {
+                    window.location.href = '14-档案统计界面.html';
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

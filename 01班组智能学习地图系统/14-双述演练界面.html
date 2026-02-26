@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>双述演练 - 智能学习地图</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --border-color: #E2E8F0;
+        }
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .video-area {
+            background: #000;
+            border-radius: 8px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .script-area {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+        }
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+        }
+        .recording-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #EF4444;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../index.html"><i class="bi bi-book"></i> 智能学习地图</a>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-muted">张明 | 重介操作工</span>
+                    <button class="btn btn-primary">个人中心</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <h2>双述演练</h2>
+            <p class="text-muted">岗位描述和手指口述实操演练</p>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <h4>演练视频</h4>
+                        <div class="video-area mb-3">
+                            <div v-if="!isRecording" class="text-center">
+                                <i class="bi bi-camera-video" style="font-size: 64px;"></i>
+                                <p class="mt-3">点击"开始录制"开始双述演练</p>
+                            </div>
+                            <div v-else class="text-center">
+                                <div class="recording-indicator mb-3"></div>
+                                <p>正在录制...</p>
+                                <p class="text-muted">{{ recordingTime }}</p>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary" @click="toggleRecording">
+                                <i :class="isRecording ? 'bi bi-stop-circle' : 'bi bi-record-circle'"></i>
+                                {{ isRecording ? '停止录制' : '开始录制' }}
+                            </button>
+                            <button class="btn btn-outline-secondary" @click="playDemo">
+                                <i class="bi bi-play-circle"></i> 播放示范
+                            </button>
+                            <button class="btn btn-outline-secondary" @click="pausePlay">
+                                <i class="bi bi-pause-circle"></i> 暂停
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h4>演练话术</h4>
+                        <div class="script-area">
+                            <h5>岗位描述</h5>
+                            <p class="mb-3">{{ script.positionDescription }}</p>
+                            <h5>手指口述</h5>
+                            <p>{{ script.fingerDescription }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card">
+                        <h4>演练信息</h4>
+                        <div class="mb-3">
+                            <label>演练项目</label>
+                            <select class="form-select" v-model="selectedProject">
+                                <option v-for="project in projects" :key="project.id" :value="project.id">
+                                    {{ project.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>演练类型</label>
+                            <select class="form-select" v-model="selectedType">
+                                <option value="position">岗位描述</option>
+                                <option value="finger">手指口述</option>
+                                <option value="both">双述结合</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>演练要求</label>
+                            <ul>
+                                <li>声音清晰洪亮</li>
+                                <li>表述准确无误</li>
+                                <li>动作规范标准</li>
+                                <li>节奏均匀流畅</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h4>演练记录</h4>
+                        <div v-for="record in records" :key="record.id" class="mb-3 p-3 border rounded">
+                            <div class="d-flex justify-content-between">
+                                <span>{{ record.date }}</span>
+                                <span class="badge" :class="getScoreBadge(record.score)">
+                                    {{ record.score }}分
+                                </span>
+                            </div>
+                            <small class="text-muted">{{ record.project }}</small>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h4>提交演练</h4>
+                        <div class="mb-3">
+                            <label>演练心得</label>
+                            <textarea class="form-control" rows="3" placeholder="请输入演练心得..."></textarea>
+                        </div>
+                        <button class="btn btn-primary w-100" @click="submit">
+                            <i class="bi bi-upload"></i> 提交演练
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    isRecording: false,
+                    recordingTime: '00:00',
+                    selectedProject: 1,
+                    selectedType: 'both',
+                    script: {
+                        positionDescription: '我是重介操作工张明，负责重介旋流器的操作和维护。我的主要职责包括：监控旋流器压力、调整重介浓度、清理旋流器堵塞、记录运行数据等。我严格遵守安全操作规程，确保设备安全稳定运行。',
+                        fingerDescription: '（手指压力表）压力表正常，压力在标准范围内。（手指阀门）阀门开启正常，流量稳定。（手指旋流器）旋流器运行正常，无异常声音。（手指记录表）数据记录完整，符合要求。'
+                    },
+                    projects: [
+                        { id: 1, name: '岗位描述 - 重介操作工' },
+                        { id: 2, name: '手指口述 - 重介旋流器操作' },
+                        { id: 3, name: '手指口述 - 皮带机操作' }
+                    ],
+                    records: [
+                        { id: 1, date: '2026-01-21', project: '岗位描述', score: 95 },
+                        { id: 2, date: '2026-01-20', project: '手指口述-重介旋流器', score: 88 }
+                    ]
+                };
+            },
+            methods: {
+                toggleRecording() {
+                    this.isRecording = !this.isRecording;
+                    if (this.isRecording) {
+                        this.startTimer();
+                    } else {
+                        this.stopTimer();
+                    }
+                },
+                startTimer() {
+                    let seconds = 0;
+                    this.timer = setInterval(() => {
+                        seconds++;
+                        const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+                        const secs = (seconds % 60).toString().padStart(2, '0');
+                        this.recordingTime = `${mins}:${secs}`;
+                    }, 1000);
+                },
+                stopTimer() {
+                    clearInterval(this.timer);
+                    this.recordingTime = '00:00';
+                },
+                playDemo() {
+                    alert('播放示范视频');
+                },
+                pausePlay() {
+                    alert('暂停播放');
+                },
+                submit() {
+                    alert('提交演练视频');
+                },
+                getScoreBadge(score) {
+                    if (score >= 90) return 'bg-success';
+                    if (score >= 80) return 'bg-primary';
+                    if (score >= 70) return 'bg-warning';
+                    return 'bg-danger';
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

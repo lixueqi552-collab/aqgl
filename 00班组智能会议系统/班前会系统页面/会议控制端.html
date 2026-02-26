@@ -1,0 +1,1047 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会议控制端 - XX选煤班组安全平台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --cta-color: #F97316;
+            --cta-hover: #EA580C;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        /* 顶部导航栏 */
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 0 32px;
+            height: 64px;
+            flex-shrink: 0;
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .navbar-brand i {
+            font-size: 24px;
+        }
+
+        .navbar-nav {
+            gap: 8px;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(37, 99, 235, 0.05);
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            padding: 20px 32px;
+            height: calc(100vh - 64px);
+            overflow: hidden;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 200px 1fr 320px;
+            gap: 20px;
+            height: 100%;
+        }
+
+        /* 左侧菜单 */
+        .sidebar-menu {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .menu-item:hover {
+            background-color: rgba(37, 99, 235, 0.05);
+            color: var(--primary-color);
+        }
+
+        .menu-item.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .menu-item i {
+            font-size: 18px;
+        }
+
+        /* 中间主内容 */
+        .main-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 16px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .card-header i {
+            color: var(--primary-color);
+        }
+
+        /* 会议流程进度 */
+        .progress-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .progress-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 14px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .progress-item:hover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .progress-item.completed {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--success-color);
+        }
+
+        .progress-item.current {
+            background: rgba(249, 115, 22, 0.1);
+            border-color: var(--cta-color);
+            box-shadow: 0 0 10px rgba(249, 115, 22, 0.2);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+
+        .progress-item.completed .step-number {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .progress-item.current .step-number {
+            background: var(--cta-color);
+            color: white;
+        }
+
+        .step-info {
+            flex: 1;
+        }
+
+        .step-name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .step-status {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .progress-item.completed .step-status {
+            color: var(--success-color);
+        }
+
+        .progress-item.current .step-status {
+            color: var(--cta-color);
+        }
+
+        /* 大屏控制面板 */
+        .control-panel {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .control-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 20px;
+            background: var(--bg-color);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .control-btn:hover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .control-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .control-btn.active i,
+        .control-btn.active span {
+            color: white;
+        }
+
+        .control-btn i {
+            font-size: 28px;
+            color: var(--primary-color);
+        }
+
+        .control-btn span {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        /* 计时器显示 */
+        .timer-display {
+            text-align: center;
+            padding: 20px;
+            background: var(--bg-color);
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .timer-value {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--primary-color);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .timer-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        /* 参会人员列表 */
+        .attendee-list {
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .attendee-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .attendee-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+        }
+
+        .attendee-info {
+            flex: 1;
+        }
+
+        .attendee-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .attendee-role {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .attendee-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-present {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+
+        .status-absent {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+        }
+
+        /* 右侧：大屏预览 */
+        .preview-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .preview-window {
+            background: #0a0e1a;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid var(--border-color);
+            flex: 1;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-header {
+            background: rgba(0, 21, 41, 0.9);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.3);
+        }
+
+        .preview-title {
+            color: #00e5ff;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .preview-content {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+        }
+
+        .preview-content-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #00e5ff;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .preview-content-body {
+            font-size: 16px;
+            text-align: center;
+            color: #a0a0a0;
+            line-height: 1.6;
+        }
+
+        /* 快捷操作按钮 */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 12px;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .action-btn:hover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .action-btn i {
+            font-size: 16px;
+            color: var(--primary-color);
+        }
+
+        /* 按钮样式 */
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-cta {
+            background: var(--cta-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .btn-cta:hover {
+            background: var(--cta-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1400px) {
+            .content-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .sidebar-menu {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 16px;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .control-panel {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="../../index.html">
+                <i class="bi bi-shield-check"></i>
+                <span>XX选煤班组安全平台</span>
+            </a>
+            <div class="navbar-nav">
+                <a class="nav-link active" href="../../index.html">班前会</a>
+                <a class="nav-link" href="../../index.html">班后会</a>
+                <a class="nav-link" href="../../index.html">学习会</a>
+            </div>
+            <div class="user-info">
+                <img src="https://via.placeholder.com/36" alt="张班长的头像" class="user-avatar">
+                <span class="user-name">张班长</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <div class="content-grid">
+            <!-- 左侧菜单 -->
+            <div class="sidebar-menu">
+                <div class="menu-item">
+                    <i class="bi bi-gear"></i>
+                    <span>准备班前会</span>
+                </div>
+                <div class="menu-item active">
+                    <i class="bi bi-display"></i>
+                    <span>会议控制端</span>
+                </div>
+                <div class="menu-item">
+                    <i class="bi bi-person-check"></i>
+                    <span>点名及确认安全</span>
+                </div>
+                <div class="menu-item">
+                    <i class="bi bi-music-note"></i>
+                    <span>集体唱班歌</span>
+                </div>
+                <div class="menu-item">
+                    <i class="bi bi-file-text"></i>
+                    <span>传达会议精神</span>
+                </div>
+                <div class="menu-item">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <span>事故案例学习</span>
+                </div>
+                <div class="menu-item">
+                    <i class="bi bi-clipboard-data"></i>
+                    <span>工作安排</span>
+                </div>
+                <div class="menu-item">
+                    <i class="bi bi-journal-check"></i>
+                    <span>每日一学</span>
+                </div>
+                <div class="menu-item">
+                    <i class="bi bi-hand-index-thumb"></i>
+                    <span>安全宣誓</span>
+                </div>
+                <div class="menu-item">
+                    <i class="bi bi-stop-circle"></i>
+                    <span>班后会</span>
+                </div>
+            </div>
+
+            <!-- 中间主内容 -->
+            <div class="main-panel">
+                <!-- 会议流程进度 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-list-check"></i>
+                        <span>会议流程</span>
+                        <button class="btn-primary" style="padding: 6px 16px; font-size: 13px;">
+                            <i class="bi bi-sync"></i>
+                            同步到大屏
+                        </button>
+                    </div>
+                    <div class="progress-list">
+                        <div class="progress-item completed" onclick="jumpToStep(1)">
+                            <div class="step-number">01</div>
+                            <div class="step-info">
+                                <div class="step-name">点名及确认安全</div>
+                                <div class="step-status">✓ 已完成</div>
+                            </div>
+                        </div>
+
+                        <div class="progress-item current" onclick="jumpToStep(2)">
+                            <div class="step-number">02</div>
+                            <div class="step-info">
+                                <div class="step-name">集体唱班歌</div>
+                                <div class="step-status">● 进行中</div>
+                            </div>
+                        </div>
+
+                        <div class="progress-item" onclick="jumpToStep(3)">
+                            <div class="step-number">03</div>
+                            <div class="step-info">
+                                <div class="step-name">传达会议精神与文件学习</div>
+                                <div class="step-status">○ 待开始</div>
+                            </div>
+                        </div>
+
+                        <div class="progress-item" onclick="jumpToStep(4)">
+                            <div class="step-number">04</div>
+                            <div class="step-info">
+                                <div class="step-name">事故案例学习</div>
+                                <div class="step-status">○ 待开始</div>
+                            </div>
+                        </div>
+
+                        <div class="progress-item" onclick="jumpToStep(5)">
+                            <div class="step-number">05</div>
+                            <div class="step-info">
+                                <div class="step-name">工作安排和现场风险研判</div>
+                                <div class="step-status">○ 待开始</div>
+                            </div>
+                        </div>
+
+                        <div class="progress-item" onclick="jumpToStep(6)">
+                            <div class="step-number">06</div>
+                            <div class="step-info">
+                                <div class="step-name">每日一学和应知应会的抽查</div>
+                                <div class="step-status">○ 待开始</div>
+                            </div>
+                        </div>
+
+                        <div class="progress-item" onclick="jumpToStep(7)">
+                            <div class="step-number">07</div>
+                            <div class="step-info">
+                                <div class="step-name">安全宣誓</div>
+                                <div class="step-status">○ 待开始</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 大屏控制面板 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-sliders"></i>
+                        <span>大屏控制</span>
+                    </div>
+                    <div class="control-panel">
+                        <div class="control-btn active" onclick="syncToBigScreen()">
+                            <i class="bi bi-broadcast"></i>
+                            <span>同步到大屏</span>
+                        </div>
+                        <div class="control-btn" onclick="showOnBigScreen('流程')">
+                            <i class="bi bi-list-ol"></i>
+                            <span>显示流程</span>
+                        </div>
+                        <div class="control-btn" onclick="showOnBigScreen('人员')">
+                            <i class="bi bi-people"></i>
+                            <span>显示人员</span>
+                        </div>
+                        <div class="control-btn" onclick="showOnBigScreen('内容')">
+                            <i class="bi bi-file-text"></i>
+                            <span>显示内容</span>
+                        </div>
+                        <div class="control-btn" onclick="toggleFullscreen()">
+                            <i class="bi bi-aspect-ratio"></i>
+                            <span>全屏模式</span>
+                        </div>
+                        <div class="control-btn" onclick="openBigScreen()">
+                            <i class="bi bi-box-arrow-up-right"></i>
+                            <span>打开大屏</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 参会人员 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-people"></i>
+                        <span>参会人员</span>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-outline" style="padding: 6px 16px; font-size: 13px;">
+                                <i class="bi bi-person-plus"></i>
+                                签到
+                            </button>
+                            <button class="btn-primary" style="padding: 6px 16px; font-size: 13px;">
+                                <i class="bi bi-cloud-upload"></i>
+                                上传名单
+                            </button>
+                        </div>
+                    </div>
+                    <div class="attendee-list">
+                        <div class="attendee-item">
+                            <img src="https://via.placeholder.com/40" alt="张班长的头像" class="attendee-avatar">
+                            <div class="attendee-info">
+                                <div class="attendee-name">张班长</div>
+                                <div class="attendee-role">班组长</div>
+                            </div>
+                            <span class="attendee-status status-present">已签到</span>
+                        </div>
+
+                        <div class="attendee-item">
+                            <img src="https://via.placeholder.com/40" alt="李安全员的头像" class="attendee-avatar">
+                            <div class="attendee-info">
+                                <div class="attendee-name">李安全员</div>
+                                <div class="attendee-role">安全员</div>
+                            </div>
+                            <span class="attendee-status status-present">已签到</span>
+                        </div>
+
+                        <div class="attendee-item">
+                            <img src="https://via.placeholder.com/40" alt="王技术员的头像" class="attendee-avatar">
+                            <div class="attendee-info">
+                                <div class="attendee-name">王技术员</div>
+                                <div class="attendee-role">技术员</div>
+                            </div>
+                            <span class="attendee-status status-present">已签到</span>
+                        </div>
+
+                        <div class="attendee-item">
+                            <img src="https://via.placeholder.com/40" alt="赵维修工的头像" class="attendee-avatar">
+                            <div class="attendee-info">
+                                <div class="attendee-name">赵维修工</div>
+                                <div class="attendee-role">维修工</div>
+                            </div>
+                            <span class="attendee-status status-present">已签到</span>
+                        </div>
+
+                        <div class="attendee-item">
+                            <img src="https://via.placeholder.com/40" alt="孙维修工的头像" class="attendee-avatar">
+                            <div class="attendee-info">
+                                <div class="attendee-name">孙维修工</div>
+                                <div class="attendee-role">维修工</div>
+                            </div>
+                            <span class="attendee-status status-absent">未签到</span>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color);">
+                        <div style="text-align: center; padding: 10px; background: var(--bg-color); border-radius: 8px;">
+                            <div style="font-size: 20px; font-weight: 700; color: var(--primary-color);">12</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">总人数</div>
+                        </div>
+                        <div style="text-align: center; padding: 10px; background: var(--bg-color); border-radius: 8px;">
+                            <div style="font-size: 20px; font-weight: 700; color: var(--success-color);">10</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">已签到</div>
+                        </div>
+                        <div style="text-align: center; padding: 10px; background: var(--bg-color); border-radius: 8px;">
+                            <div style="font-size: 20px; font-weight: 700; color: var(--cta-color);">83%</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">出勤率</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：大屏预览 -->
+            <div class="preview-panel">
+                <!-- 大屏预览窗口 -->
+                <div class="card" style="flex: 1; display: flex; flex-direction: column;">
+                    <div class="card-header">
+                        <i class="bi bi-display"></i>
+                        <span>大屏预览</span>
+                        <button class="btn-outline" style="padding: 6px 12px; font-size: 12px;" onclick="refreshPreview()">
+                            <i class="bi bi-arrow-clockwise"></i>
+                            刷新
+                        </button>
+                    </div>
+                    <div class="preview-window" id="previewWindow">
+                        <div class="preview-header">
+                            <div class="preview-title">
+                                <i class="bi bi-music-note-beamed"></i>
+                                集体唱班歌
+                            </div>
+                            <div style="color: #a0a0a0; font-size: 12px;">08:05</div>
+                        </div>
+                        <div class="preview-content">
+                            <div class="preview-content-title">机电维修班 - 班前会</div>
+                            <div class="preview-content-body">
+                                请全体起立，共同演唱班歌<br><br>
+                                <i class="bi bi-music-note-beamed" style="color: #00e5ff;"></i> 《安全之歌》<br><br>
+                                班组是我家，安全靠大家<br>
+                                遵章守纪是根本，生命重如山<br>
+                                时刻紧绷安全弦，幸福千万家
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 会议计时器 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-stopwatch"></i>
+                        <span>会议计时器</span>
+                    </div>
+                    <div class="timer-display">
+                        <div class="timer-value" id="meetingTimer">05:23</div>
+                        <div class="timer-label">已用时</div>
+                    </div>
+                    <div class="button-group">
+                        <button class="btn-outline" onclick="pauseTimer()">
+                            <i class="bi bi-pause"></i>
+                            暂停
+                        </button>
+                        <button class="btn-primary" onclick="resetTimer()">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                            重置
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 快捷操作 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-lightning"></i>
+                        <span>快捷操作</span>
+                    </div>
+                    <div class="quick-actions">
+                        <div class="action-btn" onclick="alert('已跳转到点名界面')">
+                            <i class="bi bi-person-check"></i>
+                            <span>开始点名</span>
+                        </div>
+                        <div class="action-btn" onclick="alert('已发送签到提醒')">
+                            <i class="bi bi-bell"></i>
+                            <span>签到提醒</span>
+                        </div>
+                        <div class="action-btn" onclick="alert('已生成会议纪要')">
+                            <i class="bi bi-file-earmark-text"></i>
+                            <span>生成纪要</span>
+                        </div>
+                        <div class="action-btn" onclick="alert('已结束会议')">
+                            <i class="bi bi-stop-circle"></i>
+                            <span>结束会议</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 会议计时器
+        let meetingSeconds = 323; // 5分23秒
+        let timerInterval = null;
+        let isPaused = false;
+
+        function updateTimer() {
+            if (!isPaused) {
+                meetingSeconds++;
+                const minutes = String(Math.floor(meetingSeconds / 60)).padStart(2, '0');
+                const seconds = String(meetingSeconds % 60).padStart(2, '0');
+                document.getElementById('meetingTimer').textContent = `${minutes}:${seconds}`;
+            }
+        }
+
+        timerInterval = setInterval(updateTimer, 1000);
+
+        function pauseTimer() {
+            isPaused = !isPaused;
+        }
+
+        function resetTimer() {
+            if (confirm('确定要重置计时器吗？')) {
+                meetingSeconds = 0;
+                isPaused = false;
+                const minutes = String(Math.floor(meetingSeconds / 60)).padStart(2, '0');
+                const seconds = String(meetingSeconds % 60).padStart(2, '0');
+                document.getElementById('meetingTimer').textContent = `${minutes}:${seconds}`;
+            }
+        }
+
+        // 跳转到指定环节
+        function jumpToStep(stepNumber) {
+            alert(`已跳转到第${stepNumber}个环节`);
+            // 更新预览窗口内容
+            updatePreview(stepNumber);
+        }
+
+        // 更新预览窗口
+        function updatePreview(stepNumber) {
+            const stepTitles = {
+                1: '点名及确认安全',
+                2: '集体唱班歌',
+                3: '传达会议精神与文件学习',
+                4: '事故案例学习',
+                5: '工作安排和现场风险研判',
+                6: '每日一学和应知应会的抽查',
+                7: '安全宣誓'
+            };
+
+            const previewWindow = document.getElementById('previewWindow');
+            const title = stepTitles[stepNumber] || '会议进行中';
+            
+            previewWindow.innerHTML = `
+                <div class="preview-header">
+                    <div class="preview-title">
+                        <i class="bi bi-play-circle"></i>
+                        ${title}
+                    </div>
+                    <div style="color: #a0a0a0; font-size: 12px;">08:0${stepNumber + 4}</div>
+                </div>
+                <div class="preview-content">
+                    <div class="preview-content-title">机电维修班 - 班前会</div>
+                    <div class="preview-content-body">
+                        正在进行第 ${stepNumber} 个环节：<br><br>
+                        <strong>${title}</strong><br><br>
+                        当前环节内容显示中...
+                    </div>
+                </div>
+            `;
+        }
+
+        // 同步到大屏
+        function syncToBigScreen() {
+            alert('已同步到大屏');
+        }
+
+        // 在大屏上显示
+        function showOnBigScreen(contentType) {
+            alert(`在大屏上显示：${contentType}`);
+        }
+
+        // 全屏模式
+        function toggleFullscreen() {
+            alert('切换全屏模式');
+        }
+
+        // 打开大屏
+        function openBigScreen() {
+            window.open('班组大屏.html', '_blank');
+        }
+
+        // 刷新预览
+        function refreshPreview() {
+            alert('预览已刷新');
+        }
+    </script>
+</body>
+</html>

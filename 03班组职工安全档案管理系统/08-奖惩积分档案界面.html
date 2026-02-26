@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>奖惩积分档案 - 职工安全档案</title>
+    <link href="https://cdn.jsdelivr.net/npm/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .score-overview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .score-item {
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .score-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+
+        .score-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid var(--border-color);
+            padding: 12px;
+            font-weight: 600;
+            color: var(--text-color);
+            background: var(--bg-color);
+        }
+
+        .table tbody td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background: var(--bg-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-danger {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .badge-info {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            color: var(--text-color);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 4px;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            .score-overview {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="01-主界面.html">
+                    <i class="bi bi-person-badge me-2"></i>
+                    班组职工安全档案管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">档案首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="02-职工列表界面.html">职工列表</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="03-档案详情界面.html">档案详情</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="04-基本信息档案界面.html">基本信息档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="05-安全行为档案界面.html">安全行为档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="06-培训考核档案界面.html">培训考核档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="07-健康状态档案界面.html">健康状态档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="08-奖惩积分档案界面.html">奖惩积分档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="14-档案统计界面.html">档案统计</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="15-报表导出界面.html">报表导出</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-档案分类管理（管理员）.html">档案分类管理</a></li>
+                                <li><a class="dropdown-item" href="基础设置-权限管理（管理员）.html">权限管理</a></li>
+                                <li><a class="dropdown-item" href="基础设置-提醒规则配置（管理员）.html">提醒规则配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            管理员
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">奖惩积分档案</h1>
+                <p class="page-subtitle">查看职工奖惩积分记录</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="main-content">
+                    <div class="card">
+                        <h3 class="card-title">积分概览</h3>
+                        <div class="score-overview">
+                            <div class="score-item">
+                                <div class="score-value">1250</div>
+                                <div class="score-label">当前积分</div>
+                            </div>
+                            <div class="score-item">
+                                <div class="score-value">+380</div>
+                                <div class="score-label">本月获得</div>
+                            </div>
+                            <div class="score-item">
+                                <div class="score-value">-20</div>
+                                <div class="score-label">本月扣除</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 class="card-title" style="margin-bottom: 0;">积分明细</h3>
+                            <button class="btn btn-primary" @click="addRecord">
+                                <i class="bi bi-plus-lg me-1"></i>新增记录
+                            </button>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>日期</th>
+                                    <th>类型</th>
+                                    <th>说明</th>
+                                    <th>积分变化</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2026-01-23</td>
+                                    <td><span class="badge badge-success">奖励</span></td>
+                                    <td>发现重介浓度异常并及时上报</td>
+                                    <td style="color: var(--success-color); font-weight: 600;">+50</td>
+                                    <td><span class="badge badge-info">已生效</span></td>
+                                    <td>
+                                        <button class="action-btn" @click="viewDetail(0)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="action-btn" @click="appeal(0)">
+                                            <i class="bi bi-question-circle"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2026-01-22</td>
+                                    <td><span class="badge badge-success">奖励</span></td>
+                                    <td>参加安全知识竞赛获奖</td>
+                                    <td style="color: var(--success-color); font-weight: 600;">+30</td>
+                                    <td><span class="badge badge-info">已生效</span></td>
+                                    <td>
+                                        <button class="action-btn" @click="viewDetail(1)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="action-btn" @click="appeal(1)">
+                                            <i class="bi bi-question-circle"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2026-01-20</td>
+                                    <td><span class="badge badge-danger">扣分</span></td>
+                                    <td>未按规定佩戴安全帽</td>
+                                    <td style="color: var(--danger-color); font-weight: 600;">-20</td>
+                                    <td><span class="badge badge-info">已生效</span></td>
+                                    <td>
+                                        <button class="action-btn" @click="viewDetail(2)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="action-btn" @click="appeal(2)">
+                                            <i class="bi bi-question-circle"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2026-01-18</td>
+                                    <td><span class="badge badge-success">奖励</span></td>
+                                    <td>提出安全改进建议</td>
+                                    <td style="color: var(--success-color); font-weight: 600;">+20</td>
+                                    <td><span class="badge badge-info">已生效</span></td>
+                                    <td>
+                                        <button class="action-btn" @click="viewDetail(3)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="action-btn" @click="appeal(3)">
+                                            <i class="bi bi-question-circle"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="card">
+                        <h3 class="card-title">快速操作</h3>
+                        <div style="display: grid; gap: 8px;">
+                            <button class="btn btn-outline-primary" @click="addRecord">
+                                <i class="bi bi-plus-lg me-1"></i>新增记录
+                            </button>
+                            <button class="btn btn-outline-primary" @click="goToDetail">
+                                <i class="bi bi-arrow-left me-1"></i>返回详情
+                            </button>
+                            <button class="btn btn-outline-primary" @click="exportData">
+                                <i class="bi bi-download me-1"></i>导出数据
+                            </button>
+                            <button class="btn btn-outline-primary" @click="goToExchange">
+                                <i class="bi bi-cart me-1"></i>积分兑换
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">积分统计</h3>
+                        <div class="info-row">
+                            <span class="info-label">总记录数</span>
+                            <span class="info-value">15条</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">奖励记录</span>
+                            <span class="info-value" style="color: var(--success-color);">12条</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">扣分记录</span>
+                            <span class="info-value" style="color: var(--danger-color);">3条</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">本月获得</span>
+                            <span class="info-value" style="color: var(--success-color);">+380分</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">本月扣除</span>
+                            <span class="info-value" style="color: var(--danger-color);">-20分</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">积分规则</h3>
+                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                            <p>1. 发现安全隐患并及时上报：+50分</p>
+                            <p>2. 参加安全培训并考核合格：+30分</p>
+                            <p>3. 提出安全改进建议：+20分</p>
+                            <p>4. 考核优秀：+100分</p>
+                            <p>5. 未按规定佩戴防护用品：-20分</p>
+                            <p>6. 违章操作：-50分</p>
+                            <p>7. 未参加安全培训：-30分</p>
+                            <p>8. 考核不合格：-100分</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {}
+            },
+            methods: {
+                addRecord() {
+                    alert('新增记录');
+                },
+                viewDetail(index) {
+                    alert('查看详情: ' + index);
+                },
+                appeal(index) {
+                    alert('申诉: ' + index);
+                },
+                goToDetail() {
+                    window.location.href = '03-档案详情界面.html';
+                },
+                exportData() {
+                    alert('导出数据');
+                },
+                goToExchange() {
+                    alert('积分兑换');
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

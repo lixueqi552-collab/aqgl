@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>岗位能力建模 - 智能学习地图</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --border-color: #E2E8F0;
+        }
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .ability-card {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 16px;
+        }
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../index.html"><i class="bi bi-book"></i> 智能学习地图</a>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-muted">张明 | 重介操作工</span>
+                    <button class="btn btn-primary">个人中心</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <h2>岗位能力建模</h2>
+            <p class="text-muted">定义重介操作工岗位能力标准</p>
+
+            <div class="card">
+                <h4>岗位基本信息</h4>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label>岗位名称</label>
+                        <input type="text" class="form-control" value="重介操作工" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label>所属车间</label>
+                        <input type="text" class="form-control" value="重介车间" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>能力维度</h4>
+                <div v-for="(ability, index) in abilities" :key="index" class="ability-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>{{ ability.name }}</h5>
+                        <span class="badge bg-primary">{{ ability.dimensions }}个指标</span>
+                    </div>
+                    <div class="mb-3">
+                        <label>能力描述</label>
+                        <textarea class="form-control" rows="2" v-model="ability.description"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label>核心指标</label>
+                        <div v-for="(indicator, i) in ability.indicators" :key="i" class="input-group mb-2">
+                            <input type="text" class="form-control" v-model="indicator.name">
+                            <select class="form-select" style="width: 120px;" v-model="indicator.weight">
+                                <option value="30">30分</option>
+                                <option value="40">40分</option>
+                                <option value="50">50分</option>
+                            </select>
+                            <button class="btn btn-outline-danger" @click="removeIndicator(index, i)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary" @click="addIndicator(index)">
+                            <i class="bi bi-plus"></i> 添加指标
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>能力标准配置</h4>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label>优秀标准</label>
+                        <input type="number" class="form-control" value="90" min="0" max="100">
+                    </div>
+                    <div class="col-md-4">
+                        <label>良好标准</label>
+                        <input type="number" class="form-control" value="80" min="0" max="100">
+                    </div>
+                    <div class="col-md-4">
+                        <label>合格标准</label>
+                        <input type="number" class="form-control" value="70" min="0" max="100">
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button class="btn btn-primary btn-lg" @click="saveModel">
+                    <i class="bi bi-save"></i> 保存能力模型
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    abilities: [
+                        {
+                            name: '双述能力',
+                            description: '岗位描述和手指口述的表达能力和规范性',
+                            dimensions: 2,
+                            indicators: [
+                                { name: '岗位描述标准话术掌握', weight: 30 },
+                                { name: '手指口述动作规范性', weight: 30 }
+                            ]
+                        },
+                        {
+                            name: '应急处置能力',
+                            description: '突发情况下的应急处理能力',
+                            dimensions: 3,
+                            indicators: [
+                                { name: '火灾应急处置流程', weight: 40 },
+                                { name: '设备故障应急处置', weight: 30 },
+                                { name: '粉尘超标应急处置', weight: 30 }
+                            ]
+                        },
+                        {
+                            name: '职业健康防护能力',
+                            description: '职业健康知识和防护用品使用能力',
+                            dimensions: 2,
+                            indicators: [
+                                { name: '粉尘治理知识掌握', weight: 30 },
+                                { name: '劳动防护用品正确佩戴', weight: 30 }
+                            ]
+                        },
+                        {
+                            name: '有限空间作业安全能力',
+                            description: '有限空间作业的安全操作能力',
+                            dimensions: 2,
+                            indicators: [
+                                { name: '有限空间作业安全规程', weight: 40 },
+                                { name: '防护措施和应急处理', weight: 30 }
+                            ]
+                        }
+                    ]
+                };
+            },
+            methods: {
+                addIndicator(index) {
+                    this.abilities[index].indicators.push({ name: '', weight: 30 });
+                },
+                removeIndicator(abilityIndex, indicatorIndex) {
+                    this.abilities[abilityIndex].indicators.splice(indicatorIndex, 1);
+                },
+                saveModel() {
+                    alert('能力模型已保存！');
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

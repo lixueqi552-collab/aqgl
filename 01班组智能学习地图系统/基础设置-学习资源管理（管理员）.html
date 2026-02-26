@@ -1,0 +1,503 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习资源管理（管理员） - 智能学习地图</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --border-color: #E2E8F0;
+        }
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .resource-card {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+        .resource-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1050;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal.show {
+            display: block;
+        }
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            margin: 50px auto;
+            max-width: 800px;
+            padding: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 顶部导航栏 -->
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../index.html">
+                    <i class="bi bi-book"></i> 智能学习地图
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="../index.html">首页</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                岗位能力与学习路径
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="../index.html">岗位能力建模</a></li>
+                                <li><a class="dropdown-item" href="../index.html">年度轮训计划</a></li>
+                                <li><a class="dropdown-item" href="../index.html">能力差距评估</a></li>
+                                <li><a class="dropdown-item" href="../index.html">学习计划定制</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                学习资源与过程管理
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item active" href="../index.html">学习资源库</a></li>
+                                <li><a class="dropdown-item" href="../index.html">岗位题库</a></li>
+                                <li><a class="dropdown-item" href="../index.html">双述实操库</a></li>
+                                <li><a class="dropdown-item" href="../index.html">应急演练库</a></li>
+                                <li><a class="dropdown-item" href="../index.html">职业健康库</a></li>
+                                <li><a class="dropdown-item" href="../index.html">事故案例库</a></li>
+                                <li><a class="dropdown-item" href="../index.html">班组学习会</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                学习效果评估
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="../index.html">学习效果评估</a></li>
+                                <li><a class="dropdown-item" href="../index.html">双述演练</a></li>
+                                <li><a class="dropdown-item" href="../index.html">在线考试</a></li>
+                                <li><a class="dropdown-item" href="../index.html">应急演练评估</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="user-info position-relative">
+                        <div class="user-avatar">李</div>
+                        <div>
+                            <div class="user-name">李管理员</div>
+                            <div class="user-role">管理员 | A选煤中心</div>
+                        </div>
+                        <div class="dropdown ms-3">
+                            <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle"></i> 个人中心
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-person"></i> 个人信息</a></li>
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-clock-history"></i> 操作记录</a></li>
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-gear"></i> 系统设置</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-box-arrow-right"></i> 退出登录</a></li>
+                            </ul>
+                        </div>
+                        <div class="dropdown ms-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-gear"></i> 基础设置
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-diagram-3"></i> 岗位能力建模</a></li>
+                                <li><a class="dropdown-item active" href="../index.html"><i class="bi bi-database"></i> 学习资源管理</a></li>
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-people"></i> 职工管理</a></li>
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-gear"></i> 系统设置</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>学习资源管理（管理员）</h2>
+                <button class="btn btn-primary" @click="showAddModal">
+                    <i class="bi bi-plus-circle"></i> 上传资源
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" placeholder="搜索学习资源..." v-model="searchQuery">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" v-model="filterCategory">
+                            <option value="">全部类别</option>
+                            <option value="岗位题库">岗位题库</option>
+                            <option value="双述实操">双述实操</option>
+                            <option value="应急演练">应急演练</option>
+                            <option value="职业健康">职业健康</option>
+                            <option value="事故案例">事故案例</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" v-model="filterType">
+                            <option value="">全部类型</option>
+                            <option value="视频">视频</option>
+                            <option value="文档">文档</option>
+                            <option value="音频">音频</option>
+                            <option value="图片">图片</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" v-model="filterStatus">
+                            <option value="">全部状态</option>
+                            <option value="已发布">已发布</option>
+                            <option value="待审核">待审核</option>
+                            <option value="已下架">已下架</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div v-for="resource in filteredResources" :key="resource.id" class="resource-card">
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <div class="rounded text-white d-flex align-items-center justify-content-center" 
+                                 style="width: 80px; height: 80px; font-size: 32px;"
+                                 :style="{ background: getCategoryColor(resource.category) }">
+                                <i :class="resource.icon"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <h5>{{ resource.title }}</h5>
+                                        <span class="badge bg-secondary">{{ resource.category }}</span>
+                                        <span class="badge" :class="getStatusBadge(resource.status)">{{ resource.status }}</span>
+                                    </div>
+                                    <p class="mb-2 text-muted">{{ resource.description }}</p>
+                                    <div class="d-flex gap-3">
+                                        <small><i class="bi bi-clock"></i> {{ resource.duration }}</small>
+                                        <small><i class="bi bi-eye"></i> {{ resource.views }}次浏览</small>
+                                        <small><i class="bi bi-people"></i> {{ resource.learners }}人学习</small>
+                                        <small><i class="bi bi-calendar"></i> {{ resource.uploadTime }}</small>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <button class="btn btn-sm btn-outline-primary me-2" @click="viewResource(resource)">
+                                        <i class="bi bi-eye"></i> 查看
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary me-2" @click="editResource(resource)">
+                                        <i class="bi bi-pencil"></i> 编辑
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" @click="deleteResource(resource)">
+                                        <i class="bi bi-trash"></i> 删除
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 新建/编辑学习资源弹窗 -->
+        <div class="modal" :class="{ show: showModal }">
+            <div class="modal-content">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4>{{ isEditing ? '编辑' : '上传' }}学习资源</h4>
+                    <button class="btn btn-link" @click="closeModal">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+
+                <div class="mb-3">
+                    <label>资源标题</label>
+                    <input type="text" class="form-control" v-model="currentResource.title" placeholder="请输入资源标题">
+                </div>
+
+                <div class="mb-3">
+                    <label>资源类别</label>
+                    <select class="form-select" v-model="currentResource.category">
+                        <option value="">请选择类别</option>
+                        <option value="岗位题库">岗位题库</option>
+                        <option value="双述实操">双述实操</option>
+                        <option value="应急演练">应急演练</option>
+                        <option value="职业健康">职业健康</option>
+                        <option value="事故案例">事故案例</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label>资源类型</label>
+                    <select class="form-select" v-model="currentResource.type">
+                        <option value="">请选择类型</option>
+                        <option value="视频">视频</option>
+                        <option value="文档">文档</option>
+                        <option value="音频">音频</option>
+                        <option value="图片">图片</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label>资源描述</label>
+                    <textarea class="form-control" rows="3" v-model="currentResource.description" placeholder="请输入资源描述"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label>上传文件</label>
+                    <input type="file" class="form-control" ref="fileInput">
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label>时长（分钟）</label>
+                        <input type="number" class="form-control" v-model="currentResource.duration" placeholder="请输入时长">
+                    </div>
+                    <div class="col-md-6">
+                        <label>适用岗位</label>
+                        <input type="text" class="form-control" v-model="currentResource.applicablePosts" placeholder="请输入适用岗位">
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button class="btn btn-outline-secondary" @click="closeModal">取消</button>
+                    <button class="btn btn-primary" @click="saveResource">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    searchQuery: '',
+                    filterCategory: '',
+                    filterType: '',
+                    filterStatus: '',
+                    showModal: false,
+                    isEditing: false,
+                    currentResource: {
+                        title: '',
+                        category: '',
+                        type: '',
+                        description: '',
+                        duration: '',
+                        applicablePosts: ''
+                    },
+                    resources: [
+                        {
+                            id: 1,
+                            title: '重介旋流器操作规程',
+                            category: '岗位题库',
+                            type: '视频',
+                            description: '掌握重介旋流器的基本原理、操作流程和注意事项',
+                            duration: '45分钟',
+                            views: 234,
+                            learners: 189,
+                            uploadTime: '2025-12-15',
+                            status: '已发布',
+                            icon: 'bi bi-book'
+                        },
+                        {
+                            id: 2,
+                            title: '岗位描述标准话术',
+                            category: '双述实操',
+                            type: '视频',
+                            description: '学习重介操作工岗位描述的标准话术和表达要点',
+                            duration: '15分钟',
+                            views: 189,
+                            learners: 156,
+                            uploadTime: '2025-12-10',
+                            status: '已发布',
+                            icon: 'bi bi-mic'
+                        },
+                        {
+                            id: 3,
+                            title: '火灾应急处置演练',
+                            category: '应急演练',
+                            type: '视频',
+                            description: '学习火灾发生时的应急处置流程和逃生方法',
+                            duration: '30分钟',
+                            views: 267,
+                            learners: 198,
+                            uploadTime: '2025-12-05',
+                            status: '已发布',
+                            icon: 'bi bi-fire'
+                        },
+                        {
+                            id: 4,
+                            title: '粉尘治理与防护',
+                            category: '职业健康',
+                            type: '文档',
+                            description: '了解选煤作业中的粉尘危害及防护措施',
+                            duration: '25分钟',
+                            views: 145,
+                            learners: 112,
+                            uploadTime: '2025-11-28',
+                            status: '已发布',
+                            icon: 'bi bi-mask'
+                        },
+                        {
+                            id: 5,
+                            title: '皮带机绞伤事故案例',
+                            category: '事故案例',
+                            type: '视频',
+                            description: '分析皮带机绞伤事故的原因和防范措施',
+                            duration: '28分钟',
+                            views: 223,
+                            learners: 167,
+                            uploadTime: '2025-11-20',
+                            status: '待审核',
+                            icon: 'bi bi-exclamation-triangle'
+                        }
+                    ]
+                };
+            },
+            computed: {
+                filteredResources() {
+                    let filtered = this.resources;
+                    if (this.searchQuery) {
+                        const query = this.searchQuery.toLowerCase();
+                        filtered = filtered.filter(r => 
+                            r.title.toLowerCase().includes(query) || 
+                            r.description.toLowerCase().includes(query)
+                        );
+                    }
+                    if (this.filterCategory) {
+                        filtered = filtered.filter(r => r.category === this.filterCategory);
+                    }
+                    if (this.filterType) {
+                        filtered = filtered.filter(r => r.type === this.filterType);
+                    }
+                    if (this.filterStatus) {
+                        filtered = filtered.filter(r => r.status === this.filterStatus);
+                    }
+                    return filtered;
+                }
+            },
+            methods: {
+                showAddModal() {
+                    this.isEditing = false;
+                    this.currentResource = {
+                        title: '',
+                        category: '',
+                        type: '',
+                        description: '',
+                        duration: '',
+                        applicablePosts: ''
+                    };
+                    this.showModal = true;
+                },
+                editResource(resource) {
+                    this.isEditing = true;
+                    this.currentResource = JSON.parse(JSON.stringify(resource));
+                    this.showModal = true;
+                },
+                viewResource(resource) {
+                    alert('查看学习资源：' + resource.title);
+                },
+                deleteResource(resource) {
+                    if (confirm('确定要删除该学习资源吗？')) {
+                        const index = this.resources.findIndex(r => r.id === resource.id);
+                        if (index > -1) {
+                            this.resources.splice(index, 1);
+                        }
+                    }
+                },
+                closeModal() {
+                    this.showModal = false;
+                },
+                saveResource() {
+                    if (!this.currentResource.title || !this.currentResource.category) {
+                        alert('请填写资源标题和类别');
+                        return;
+                    }
+                    if (this.isEditing) {
+                        const index = this.resources.findIndex(r => r.id === this.currentResource.id);
+                        if (index > -1) {
+                            this.resources[index] = { ...this.currentResource };
+                        }
+                    } else {
+                        this.resources.push({
+                            id: Date.now(),
+                            ...this.currentResource,
+                            views: 0,
+                            learners: 0,
+                            uploadTime: new Date().toISOString().split('T')[0],
+                            status: '待审核',
+                            icon: 'bi bi-file-earmark'
+                        });
+                    }
+                    this.closeModal();
+                },
+                getCategoryColor(category) {
+                    switch(category) {
+                        case '岗位题库': return '#2563EB';
+                        case '双述实操': return '#10B981';
+                        case '应急演练': return '#F59E0B';
+                        case '职业健康': return '#8B5CF6';
+                        case '事故案例': return '#EF4444';
+                        default: return '#64748B';
+                    }
+                },
+                getStatusBadge(status) {
+                    switch(status) {
+                        case '已发布': return 'bg-success';
+                        case '待审核': return 'bg-warning';
+                        case '已下架': return 'bg-danger';
+                        default: return 'bg-secondary';
+                    }
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

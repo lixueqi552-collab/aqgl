@@ -1,0 +1,869 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>档案统计 - 职工安全档案</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .stats-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .form-control {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+        }
+
+        .form-select {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        .chart-placeholder {
+            height: 200px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .chart-container {
+            height: 300px;
+            width: 100%;
+        }
+
+        .chart-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .alert-item-red {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 3px solid var(--danger-color);
+            border-radius: 4px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            transition: 0.3s;
+        }
+
+        .alert-item-red:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .alert-icon-red {
+            font-size: 20px;
+            color: var(--danger-color);
+        }
+
+        .alert-content-red {
+            flex: 1;
+        }
+
+        .alert-title-red {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 3px;
+        }
+
+        .alert-time-red {
+            font-size: 12px;
+            color: var(--danger-color);
+        }
+
+        .report-preview {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            background: var(--bg-color);
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .report-table th,
+        .report-table td {
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            text-align: left;
+        }
+
+        .report-table th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .report-table tr:nth-child(even) {
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="01-主界面.html">
+                    <i class="bi bi-person-badge me-2"></i>
+                    班组职工安全档案管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">档案首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="02-职工列表界面.html">职工列表</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="03-档案详情界面.html">档案详情</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="04-基本信息档案界面.html">基本信息档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="05-安全行为档案界面.html">安全行为档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="06-培训考核档案界面.html">培训考核档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="07-健康状态档案界面.html">健康状态档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="08-奖惩积分档案界面.html">奖惩积分档案</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="14-档案统计界面.html">档案统计</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="15-报表导出界面.html">报表导出</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-档案分类管理（管理员）.html">档案分类管理</a></li>
+                                <li><a class="dropdown-item" href="基础设置-权限管理（管理员）.html">权限管理</a></li>
+                                <li><a class="dropdown-item" href="基础设置-提醒规则配置（管理员）.html">提醒规则配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            管理员
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">档案统计</h1>
+                <p class="page-subtitle">查看职工安全档案统计数据</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="main-content">
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 class="card-title" style="margin-bottom: 0;">档案统计</h3>
+                            <div style="display: flex; gap: 12px;">
+                                <select class="form-select" v-model="filterDepartment" style="width: 150px;">
+                                    <option value="">全部部门</option>
+                                    <option value="A选煤中心">A选煤中心</option>
+                                    <option value="B选煤中心">B选煤中心</option>
+                                    <option value="C选煤中心">C选煤中心</option>
+                                    <option value="D选煤中心">D选煤中心</option>
+                                </select>
+                                <select class="form-select" v-model="filterPeriod" style="width: 150px;">
+                                    <option value="">全部周期</option>
+                                    <option value="本月">本月</option>
+                                    <option value="本季度">本季度</option>
+                                    <option value="本年度">本年度</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="stats-grid-2">
+                            <div class="stat-card">
+                                <div class="stat-value">156</div>
+                                <div class="stat-label">总职工数</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">100%</div>
+                                <div class="stat-label">建档率</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">45</div>
+                                <div class="stat-label">本月更新</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">8</div>
+                                <div class="stat-label">资质到期</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">档案类型统计</h3>
+                        <div style="margin-bottom: 24px;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">基本信息档案</div>
+                            <div style="display: flex; gap: 16px;">
+                                <div style="flex: 1;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--primary-color);">156份</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">总数</div>
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--success-color);">100%</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">完整率</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 24px;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">安全行为档案</div>
+                            <div style="display: flex; gap: 16px;">
+                                <div style="flex: 1;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--primary-color);">142份</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">总数</div>
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--success-color);">91%</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">完整率</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 24px;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">培训考核档案</div>
+                            <div style="display: flex; gap: 16px;">
+                                <div style="flex: 1;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--primary-color);">138份</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">总数</div>
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--success-color);">88%</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">完整率</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 24px;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">健康状态档案</div>
+                            <div style="display: flex; gap: 16px;">
+                                <div style="flex: 1;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--primary-color);">145份</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">总数</div>
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--success-color);">93%</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">完整率</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">奖惩积分档案</div>
+                            <div style="display: flex; gap: 16px;">
+                                <div style="flex: 1;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--primary-color);">150份</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">总数</div>
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--success-color);">96%</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">完整率</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">可视化统计分析</h3>
+                        <div class="chart-row">
+                            <div>
+                                <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">各岗位违规率趋势图</div>
+                                <div id="violationTrendChart" class="chart-container"></div>
+                            </div>
+                            <div>
+                                <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">培训完成率柱状图</div>
+                                <div id="trainingCompletionChart" class="chart-container"></div>
+                            </div>
+                        </div>
+                        <div class="chart-row">
+                            <div>
+                                <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">健康异常人员分布饼图</div>
+                                <div id="healthDistributionChart" class="chart-container"></div>
+                            </div>
+                            <div>
+                                <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">积分等级分布直方图</div>
+                                <div id="scoreDistributionChart" class="chart-container"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">异常预警提醒</h3>
+                        <div style="margin-bottom: 16px;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--danger-color);">
+                                <i class="bi bi-exclamation-triangle me-1"></i>逾期未更新档案
+                            </div>
+                            <div class="alert-item-red">
+                                <div class="alert-icon-red"><i class="bi bi-file-x"></i></div>
+                                <div class="alert-content-red">
+                                    <div class="alert-title-red">李四 - 资质证书已过期</div>
+                                    <div class="alert-time-red">安全培训合格证 · 已过期3天</div>
+                                </div>
+                            </div>
+                            <div class="alert-item-red">
+                                <div class="alert-icon-red"><i class="bi bi-file-x"></i></div>
+                                <div class="alert-content-red">
+                                    <div class="alert-title-red">王五 - 资质证书即将到期</div>
+                                    <div class="alert-time-red">特种作业操作证 · 剩余23天</div>
+                                </div>
+                            </div>
+                            <div class="alert-item-red">
+                                <div class="alert-icon-red"><i class="bi bi-file-x"></i></div>
+                                <div class="alert-content-red">
+                                    <div class="alert-title-red">赵六 - 年度体检未完成</div>
+                                    <div class="alert-time-red">职业健康证 · 逾期30天</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--danger-color);">
+                                <i class="bi bi-exclamation-triangle me-1"></i>高风险行为人员
+                            </div>
+                            <div class="alert-item-red">
+                                <div class="alert-icon-red"><i class="bi bi-person-x"></i></div>
+                                <div class="alert-content-red">
+                                    <div class="alert-title-red">孙七 - 多次违规行为</div>
+                                    <div class="alert-time-red">本月违规3次 · 需重点关注</div>
+                                </div>
+                            </div>
+                            <div class="alert-item-red">
+                                <div class="alert-icon-red"><i class="bi bi-person-x"></i></div>
+                                <div class="alert-content-red">
+                                    <div class="alert-title-red">周八 - 培训考核不合格</div>
+                                    <div class="alert-time-red">安全培训 · 58分 · 需补考</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">部门档案统计</h3>
+                        <div style="margin-bottom: 24px;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">A选煤中心</div>
+                            <div style="display: flex; gap: 16px;">
+                                <div style="flex: 1;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--primary-color);">42人</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">职工数</div>
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--success-color);">100%</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">建档率</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 24px;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">B选煤中心</div>
+                            <div style="display: flex; gap: 16px;">
+                                <div style="flex: 1;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--primary-color);">38人</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">职工数</div>
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--success-color);">100%</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">建档率</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 24px;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">C选煤中心</div>
+                            <div style="display: flex; gap: 16px;">
+                                <div style="flex: 1;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--primary-color);">35人</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">职工数</div>
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--success-color);">100%</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">建档率</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">D选煤中心</div>
+                            <div style="display: flex; gap: 16px;">
+                                <div style="flex: 1;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--primary-color);">41人</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">职工数</div>
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--success-color);">100%</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">建档率</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="card">
+                        <h3 class="card-title">快速操作</h3>
+                        <div style="display: grid; gap: 8px;">
+                            <button class="btn btn-outline-primary" @click="goToList">
+                                <i class="bi bi-list me-1"></i>职工列表
+                            </button>
+                            <button class="btn btn-outline-primary" @click="exportData">
+                                <i class="bi bi-download me-1"></i>导出数据
+                            </button>
+                            <button class="btn btn-outline-primary" @click="printReport">
+                                <i class="bi bi-printer me-1"></i>打印报告
+                            </button>
+                            <button class="btn btn-outline-primary" @click="analyzeData">
+                                <i class="bi bi-bar-chart me-1"></i>数据分析
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">更新趋势</h3>
+                        <div class="chart-placeholder">
+                            <i class="bi bi-graph-up me-2"></i>
+                            更新趋势图表
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">资质到期提醒</h3>
+                        <div style="margin-bottom: 12px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">李四 - 安全培训合格证</div>
+                            <div style="font-size: 12px; color: var(--danger-color);">已到期</div>
+                        </div>
+                        <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">王五 - 特种作业操作证</div>
+                            <div style="font-size: 12px; color: var(--warning-color);">剩余23天</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    filterDepartment: '',
+                    filterPeriod: ''
+                }
+            },
+            mounted() {
+                this.initCharts();
+            },
+            methods: {
+                goToList() {
+                    window.location.href = '02-职工列表界面.html';
+                },
+                exportData() {
+                    alert('导出数据');
+                },
+                printReport() {
+                    alert('打印报告');
+                },
+                analyzeData() {
+                    alert('数据分析');
+                },
+                initCharts() {
+                    // 各岗位违规率趋势图
+                    const violationTrendChart = echarts.init(document.getElementById('violationTrendChart'));
+                    const violationTrendOption = {
+                        tooltip: {
+                            trigger: 'axis'
+                        },
+                        legend: {
+                            data: ['重介操作工', '破碎机维护工', '筛分操作工', '压滤操作工']
+                        },
+                        grid: {
+                            left: '3%',
+                            right: '4%',
+                            bottom: '3%',
+                            containLabel: true
+                        },
+                        xAxis: {
+                            type: 'category',
+                            boundaryGap: false,
+                            data: ['1月', '2月', '3月', '4月', '5月', '6月']
+                        },
+                        yAxis: {
+                            type: 'value',
+                            name: '违规率(%)',
+                            max: 10
+                        },
+                        series: [
+                            {
+                                name: '重介操作工',
+                                type: 'line',
+                                data: [2.5, 2.8, 2.3, 2.1, 1.9, 1.8],
+                                smooth: true
+                            },
+                            {
+                                name: '破碎机维护工',
+                                type: 'line',
+                                data: [3.2, 3.5, 3.1, 2.8, 2.6, 2.4],
+                                smooth: true
+                            },
+                            {
+                                name: '筛分操作工',
+                                type: 'line',
+                                data: [2.8, 3.0, 2.6, 2.4, 2.2, 2.1],
+                                smooth: true
+                            },
+                            {
+                                name: '压滤操作工',
+                                type: 'line',
+                                data: [1.8, 2.0, 1.7, 1.5, 1.4, 1.3],
+                                smooth: true
+                            }
+                        ]
+                    };
+                    violationTrendChart.setOption(violationTrendOption);
+
+                    // 培训完成率柱状图
+                    const trainingCompletionChart = echarts.init(document.getElementById('trainingCompletionChart'));
+                    const trainingCompletionOption = {
+                        tooltip: {
+                            trigger: 'axis',
+                            axisPointer: {
+                                type: 'shadow'
+                            }
+                        },
+                        grid: {
+                            left: '3%',
+                            right: '4%',
+                            bottom: '3%',
+                            containLabel: true
+                        },
+                        xAxis: {
+                            type: 'category',
+                            data: ['重介操作工', '破碎机维护工', '筛分操作工', '压滤操作工', '电工', '质检员']
+                        },
+                        yAxis: {
+                            type: 'value',
+                            name: '完成率(%)',
+                            max: 100
+                        },
+                        series: [
+                            {
+                                name: '培训完成率',
+                                type: 'bar',
+                                data: [95, 92, 88, 97, 94, 90],
+                                itemStyle: {
+                                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                        { offset: 0, color: '#3B82F6' },
+                                        { offset: 1, color: '#1E40AF' }
+                                    ])
+                                },
+                                label: {
+                                    show: true,
+                                    position: 'top',
+                                    formatter: '{c}%'
+                                }
+                            }
+                        ]
+                    };
+                    trainingCompletionChart.setOption(trainingCompletionOption);
+
+                    // 健康异常人员分布饼图
+                    const healthDistributionChart = echarts.init(document.getElementById('healthDistributionChart'));
+                    const healthDistributionOption = {
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: '{a} <br/>{b}: {c}人 ({d}%)'
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left'
+                        },
+                        series: [
+                            {
+                                name: '健康异常',
+                                type: 'pie',
+                                radius: ['40%', '70%'],
+                                avoidLabelOverlap: false,
+                                itemStyle: {
+                                    borderRadius: 10,
+                                    borderColor: '#fff',
+                                    borderWidth: 2
+                                },
+                                label: {
+                                    show: false,
+                                    position: 'center'
+                                },
+                                emphasis: {
+                                    label: {
+                                        show: true,
+                                        fontSize: 16,
+                                        fontWeight: 'bold'
+                                    }
+                                },
+                                labelLine: {
+                                    show: false
+                                },
+                                data: [
+                                    { value: 5, name: '疲劳状态' },
+                                    { value: 3, name: '心率异常' },
+                                    { value: 2, name: '血压偏高' },
+                                    { value: 4, name: '职业病风险' },
+                                    { value: 142, name: '健康正常' }
+                                ]
+                            }
+                        ]
+                    };
+                    healthDistributionChart.setOption(healthDistributionOption);
+
+                    // 积分等级分布直方图
+                    const scoreDistributionChart = echarts.init(document.getElementById('scoreDistributionChart'));
+                    const scoreDistributionOption = {
+                        tooltip: {
+                            trigger: 'axis',
+                            axisPointer: {
+                                type: 'shadow'
+                            }
+                        },
+                        grid: {
+                            left: '3%',
+                            right: '4%',
+                            bottom: '3%',
+                            containLabel: true
+                        },
+                        xAxis: {
+                            type: 'category',
+                            data: ['0-500分', '500-1000分', '1000-1500分', '1500-2000分', '2000分以上']
+                        },
+                        yAxis: {
+                            type: 'value',
+                            name: '人数'
+                        },
+                        series: [
+                            {
+                                name: '人数',
+                                type: 'bar',
+                                data: [8, 25, 62, 45, 16],
+                                itemStyle: {
+                                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                        { offset: 0, color: '#10B981' },
+                                        { offset: 1, color: '#059669' }
+                                    ])
+                                },
+                                label: {
+                                    show: true,
+                                    position: 'top'
+                                }
+                            }
+                        ]
+                    };
+                    scoreDistributionChart.setOption(scoreDistributionOption);
+
+                    // 响应式调整
+                    window.addEventListener('resize', () => {
+                        violationTrendChart.resize();
+                        trainingCompletionChart.resize();
+                        healthDistributionChart.resize();
+                        scoreDistributionChart.resize();
+                    });
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

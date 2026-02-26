@@ -1,0 +1,491 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能学习地图（管理员） - 系统管理</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 20px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .welcome-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 20px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 顶部导航栏 -->
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../index.html">
+                    <i class="bi bi-book"></i> 智能学习地图
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="../index.html">首页</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                岗位能力与学习路径
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="../index.html">岗位能力建模</a></li>
+                                <li><a class="dropdown-item" href="../index.html">年度轮训计划</a></li>
+                                <li><a class="dropdown-item" href="../index.html">能力差距评估</a></li>
+                                <li><a class="dropdown-item" href="../index.html">学习计划定制</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                学习资源与过程管理
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="../index.html">学习资源库</a></li>
+                                <li><a class="dropdown-item" href="../index.html">岗位题库</a></li>
+                                <li><a class="dropdown-item" href="../index.html">双述实操库</a></li>
+                                <li><a class="dropdown-item" href="../index.html">应急演练库</a></li>
+                                <li><a class="dropdown-item" href="../index.html">职业健康库</a></li>
+                                <li><a class="dropdown-item" href="../index.html">事故案例库</a></li>
+                                <li><a class="dropdown-item" href="../index.html">班组学习会</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                学习效果评估
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="../index.html">学习效果评估</a></li>
+                                <li><a class="dropdown-item" href="../index.html">双述演练</a></li>
+                                <li><a class="dropdown-item" href="../index.html">在线考试</a></li>
+                                <li><a class="dropdown-item" href="../index.html">应急演练评估</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="user-info position-relative">
+                        <div class="user-avatar">李</div>
+                        <div>
+                            <div class="user-name">李管理员</div>
+                            <div class="user-role">管理员 | A选煤中心</div>
+                        </div>
+                        <div class="dropdown ms-3">
+                            <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle"></i> 个人中心
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-person"></i> 个人信息</a></li>
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-clock-history"></i> 操作记录</a></li>
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-gear"></i> 系统设置</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-box-arrow-right"></i> 退出登录</a></li>
+                            </ul>
+                        </div>
+                        <div class="dropdown ms-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-gear"></i> 基础设置
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-diagram-3"></i> 岗位能力建模</a></li>
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-database"></i> 学习资源管理</a></li>
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-people"></i> 职工管理</a></li>
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-gear"></i> 系统设置</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主容器 -->
+        <div class="main-container">
+            <!-- 欢迎卡片 -->
+            <div class="welcome-card">
+                <h2>👋 欢迎回来，李管理员！</h2>
+                <p>今天是系统运行的第 <strong>180</strong> 天，系统运行正常</p>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon text-primary">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div class="stat-value">245</div>
+                        <div class="stat-label">职工总数</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon text-success">
+                            <i class="bi bi-book"></i>
+                        </div>
+                        <div class="stat-value">156</div>
+                        <div class="stat-label">学习资源</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon text-warning">
+                            <i class="bi bi-diagram-3"></i>
+                        </div>
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">岗位模型</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon text-danger">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">待处理事项</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 快捷操作 -->
+            <div class="card">
+                <div class="section-title">快捷操作</div>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <button class="btn btn-primary w-100">
+                            <i class="bi bi-plus-circle"></i> 新建岗位模型
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-primary w-100">
+                            <i class="bi bi-upload"></i> 上传学习资源
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-primary w-100">
+                            <i class="bi bi-person-plus"></i> 添加职工
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-primary w-100">
+                            <i class="bi bi-file-earmark-text"></i> 生成报表
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 学习进度统计 -->
+            <div class="card">
+                <div class="section-title">学习进度统计</div>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label>培训完成率</label>
+                            <div class="progress" style="height: 30px;">
+                                <div class="progress-bar bg-success" style="width: 78%;">
+                                    78%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>考试通过率</label>
+                            <div class="progress" style="height: 30px;">
+                                <div class="progress-bar bg-primary" style="width: 85%;">
+                                    85%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>双述达标率</label>
+                            <div class="progress" style="height: 30px;">
+                                <div class="progress-bar bg-warning" style="width: 72%;">
+                                    72%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>各中心学习情况</h6>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>中心</th>
+                                    <th>人数</th>
+                                    <th>完成率</th>
+                                    <th>平均分</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>A选煤中心</td>
+                                    <td>65</td>
+                                    <td>82%</td>
+                                    <td>87分</td>
+                                </tr>
+                                <tr>
+                                    <td>B选煤中心</td>
+                                    <td>58</td>
+                                    <td>75%</td>
+                                    <td>84分</td>
+                                </tr>
+                                <tr>
+                                    <td>C选煤中心</td>
+                                    <td>62</td>
+                                    <td>78%</td>
+                                    <td>85分</td>
+                                </tr>
+                                <tr>
+                                    <td>D选煤中心</td>
+                                    <td>60</td>
+                                    <td>76%</td>
+                                    <td>83分</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 待处理事项 -->
+            <div class="card">
+                <div class="section-title">待处理事项</div>
+                <div v-for="item in pendingItems" :key="item.id" class="mb-3 p-3 border rounded">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6>{{ item.title }}</h6>
+                            <p class="mb-0 text-muted small">{{ item.description }}</p>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge" :class="getPriorityBadge(item.priority)">{{ item.priority }}</span>
+                            <div class="mt-2">
+                                <button class="btn btn-sm btn-primary" @click="handleItem(item)">
+                                    处理
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    pendingItems: [
+                        {
+                            id: 1,
+                            title: '审核新的岗位能力模型',
+                            description: '重介操作工岗位能力模型待审核',
+                            priority: '高'
+                        },
+                        {
+                            id: 2,
+                            title: '处理职工申诉',
+                            description: '张明对积分记录有异议',
+                            priority: '中'
+                        },
+                        {
+                            id: 3,
+                            title: '更新学习资源',
+                            description: '新增5个应急演练视频待审核',
+                            priority: '中'
+                        },
+                        {
+                            id: 4,
+                            title: '生成月度报表',
+                            description: '1月份学习情况统计报表待生成',
+                            priority: '低'
+                        }
+                    ]
+                };
+            },
+            methods: {
+                getPriorityBadge(priority) {
+                    switch(priority) {
+                        case '高': return 'bg-danger';
+                        case '中': return 'bg-warning';
+                        default: return 'bg-secondary';
+                    }
+                },
+                handleItem(item) {
+                    alert('处理事项：' + item.title);
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

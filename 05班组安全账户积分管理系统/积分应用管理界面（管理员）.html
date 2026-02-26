@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>积分应用管理 - 安全积分</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid var(--border-color);
+            padding: 12px;
+            font-weight: 600;
+            color: var(--text-color);
+            background: var(--bg-color);
+        }
+
+        .table tbody td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background: var(--bg-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-danger {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .badge-info {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .badge-primary {
+            background: #E0E7FF;
+            color: #3730A3;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            color: var(--text-color);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 4px;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .application-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+
+        .application-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .application-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .application-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .application-status {
+            font-size: 13px;
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+
+        .application-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .application-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../00班组智能会议系统/原型页面/交互平台首页.html">
+                    <i class="bi bi-star me-2"></i>
+                    班组安全账户积分管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">积分首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分规则界面.html">积分规则</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分明细界面.html">积分明细</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分兑换界面.html">积分兑换</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分排名界面.html">积分排名</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-积分规则配置（管理员）.html">积分规则配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-兑换规则配置（管理员）.html">兑换规则配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-排名规则配置（管理员）.html">排名规则配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            管理员
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">积分应用管理</h1>
+                <p class="page-subtitle">管理积分与绩效、评优、岗位调整的联动应用</p>
+            </div>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <i class="bi bi-graph-up stat-icon" style="color: var(--primary-color);"></i>
+                    <div class="stat-value">85%</div>
+                    <div class="stat-label">绩效联动率</div>
+                </div>
+                <div class="stat-card">
+                    <i class="bi bi-award stat-icon" style="color: var(--success-color);"></i>
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">评优推荐人数</div>
+                </div>
+                <div class="stat-card">
+                    <i class="bi bi-people stat-icon" style="color: var(--warning-color);"></i>
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">岗位调整提醒</div>
+                </div>
+                <div class="stat-card">
+                    <i class="bi bi-exclamation-triangle stat-icon" style="color: var(--danger-color);"></i>
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">待处理申请</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="card-title" style="margin-bottom: 0;">积分应用配置</h3>
+                    <button class="btn btn-primary" @click="saveConfig">
+                        <i class="bi bi-check-lg me-1"></i>保存配置
+                    </button>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card" style="margin-bottom: 0;">
+                            <h5 style="margin-bottom: 16px;">绩效联动配置</h5>
+                            <div class="mb-3">
+                                <label class="form-label">是否启用绩效联动</label>
+                                <select class="form-select" v-model="appConfig.performance.enabled">
+                                    <option value="yes">启用</option>
+                                    <option value="no">停用</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">积分系数配置</label>
+                                <div style="padding: 12px; background: var(--bg-color); border-radius: 8px;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                        <span>优秀（前10%）</span>
+                                        <span style="font-weight: 600;">系数 1.2</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                        <span>良好（10%-30%）</span>
+                                        <span style="font-weight: 600;">系数 1.1</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                        <span>一般（30%-60%）</span>
+                                        <span style="font-weight: 600;">系数 1.0</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>较差（后40%）</span>
+                                        <span style="font-weight: 600;">系数 0.9</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card" style="margin-bottom: 0;">
+                            <h5 style="margin-bottom: 16px;">评优联动配置</h5>
+                            <div class="mb-3">
+                                <label class="form-label">年度评优积分要求</label>
+                                <input type="number" class="form-control" v-model="appConfig.honor.minPoints" min="0">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">违规要求</label>
+                                <select class="form-select" v-model="appConfig.honor.violationLimit">
+                                    <option value="none">无任何违规</option>
+                                    <option value="serious">无严重违规</option>
+                                    <option value="all">不限</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">排名要求</label>
+                                <select class="form-select" v-model="appConfig.honor.rankLimit">
+                                    <option value="top10">前10%</option>
+                                    <option value="top20">前20%</option>
+                                    <option value="top30">前30%</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card" style="margin-bottom: 0;">
+                            <h5 style="margin-bottom: 16px;">岗位调整配置</h5>
+                            <div class="mb-3">
+                                <label class="form-label">连续末位月数</label>
+                                <input type="number" class="form-control" v-model="appConfig.position.consecutiveMonths" min="1">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">调整措施</label>
+                                <select class="form-select" v-model="appConfig.position.action">
+                                    <option value="warning">预警提醒</option>
+                                    <option value="training">强制培训</option>
+                                    <option value="adjust">岗位调整</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">是否自动触发</label>
+                                <select class="form-select" v-model="appConfig.position.autoTrigger">
+                                    <option value="yes">自动触发</option>
+                                    <option value="no">人工审核</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card" style="margin-bottom: 0;">
+                            <h5 style="margin-bottom: 16px;">培训联动配置</h5>
+                            <div class="mb-3">
+                                <label class="form-label">积分低分培训</label>
+                                <select class="form-select" v-model="appConfig.training.lowPoints">
+                                    <option value="yes">启用</option>
+                                    <option value="no">停用</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">低分阈值</label>
+                                <input type="number" class="form-control" v-model="appConfig.training.threshold" min="0">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">培训类型</label>
+                                <select class="form-select" v-model="appConfig.training.type">
+                                    <option value="mandatory">强制培训</option>
+                                    <option value="recommend">推荐培训</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">应用申请管理</h3>
+                
+                <div class="filter-bar mb-4">
+                    <div class="filter-item">
+                        <label class="form-label">申请类型</label>
+                        <select class="form-select" v-model="filters.type">
+                            <option value="all">全部类型</option>
+                            <option value="绩效">绩效调整</option>
+                            <option value="评优">评优推荐</option>
+                            <option value="岗位">岗位调整</option>
+                            <option value="培训">培训申请</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="form-label">申请状态</label>
+                        <select class="form-select" v-model="filters.status">
+                            <option value="all">全部状态</option>
+                            <option value="待审核">待审核</option>
+                            <option value="已批准">已批准</option>
+                            <option value="已拒绝">已拒绝</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div v-for="(application, index) in filteredApplications" :key="index" class="application-card">
+                    <div class="application-header">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 40px; height: 40px; border-radius: 8px; background: var(--bg-color); display: flex; align-items: center; justify-content: center;">
+                                <i :class="getApplicationIcon(application.type)" style="font-size: 20px; color: var(--primary-color);"></i>
+                            </div>
+                            <div>
+                                <div class="application-title">{{ application.title }}</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">
+                                    <span class="badge badge-info">{{ application.type }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="application-status" :class="getApplicationStatusClass(application.status)">
+                                {{ application.status }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="application-description">{{ application.description }}</div>
+                    <div class="application-meta">
+                        <span><i class="bi bi-person me-1"></i>申请人：{{ application.applicant }}</span>
+                        <span><i class="bi bi-calendar me-1"></i>申请时间：{{ application.applyTime }}</span>
+                        <span><i class="bi bi-star me-1"></i>积分：{{ application.points }}</span>
+                    </div>
+                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color);">
+                        <button class="action-btn" @click="viewApplicationDetail(application)">
+                            <i class="bi bi-eye"></i>查看详情
+                        </button>
+                        <button class="action-btn" v-if="application.status === '待审核'" @click="approveApplication(application)">
+                            <i class="bi bi-check-lg"></i>批准
+                        </button>
+                        <button class="action-btn" v-if="application.status === '待审核'" @click="rejectApplication(application)">
+                            <i class="bi bi-x-lg"></i>拒绝
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">应用历史记录</h3>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>应用时间</th>
+                                <th>应用类型</th>
+                                <th>应用对象</th>
+                                <th>积分</th>
+                                <th>应用结果</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(record, index) in historyRecords" :key="index">
+                                <td>{{ record.time }}</td>
+                                <td>
+                                    <span class="badge badge-info">{{ record.type }}</span>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 500;">{{ record.target }}</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">{{ record.employeeId }}</div>
+                                </td>
+                                <td>{{ record.points }}</td>
+                                <td>
+                                    <span class="badge" :class="getHistoryResultBadgeClass(record.result)">
+                                        {{ record.result }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-outline-primary btn-sm" @click="viewHistoryDetail(record)">
+                                        <i class="bi bi-eye me-1"></i>查看详情
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    filters: {
+                        type: 'all',
+                        status: 'all'
+                    },
+                    appConfig: {
+                        performance: {
+                            enabled: 'yes'
+                        },
+                        honor: {
+                            minPoints: 1200,
+                            violationLimit: 'serious',
+                            rankLimit: 'top20'
+                        },
+                        position: {
+                            consecutiveMonths: 6,
+                            action: 'adjust',
+                            autoTrigger: 'yes'
+                        },
+                        training: {
+                            lowPoints: 'yes',
+                            threshold: 1000,
+                            type: 'mandatory'
+                        }
+                    },
+                    applications: [
+                        { title: '绩效系数调整申请', type: '绩效', description: '申请将绩效系数从1.0调整至1.1，基于本月积分排名前20%', applicant: '张三', employeeId: 'XBB009', points: 1250, applyTime: '2026-01-23 10:30', status: '待审核' },
+                        { title: '年度评优推荐', type: '评优', description: '申请推荐为年度安全先进，积分排名前10%，无严重违规记录', applicant: '王五', employeeId: 'XBB001', points: 1580, applyTime: '2026-01-22 14:20', status: '待审核' },
+                        { title: '岗位调整提醒', type: '岗位', description: '连续6个月积分排名末位10%，建议进行岗位调整', applicant: '系统自动', employeeId: 'YXSL012', points: 1100, applyTime: '2026-01-21 09:15', status: '待审核' },
+                        { title: '强制培训申请', type: '培训', description: '积分低于1000分，申请强制安全培训', applicant: '系统自动', employeeId: 'CJT014', points: 1120, applyTime: '2026-01-20 16:45', status: '已批准' },
+                        { title: '绩效系数调整申请', type: '绩效', description: '申请将绩效系数从1.1调整至1.2，基于本月积分排名前10%', applicant: '李四', employeeId: 'CJT002', points: 1450, applyTime: '2026-01-19 11:30', status: '已批准' }
+                    ],
+                    historyRecords: [
+                        { time: '2026-01-18 10:00', type: '绩效', target: '赵六', employeeId: 'YXAS003', points: 1380, result: '已生效' },
+                        { time: '2026-01-15 14:30', type: '评优', target: '孙七', employeeId: 'YXSL004', points: 1350, result: '已生效' },
+                        { time: '2026-01-12 09:00', type: '培训', target: '周八', employeeId: 'XBB005', points: 1320, result: '已完成' },
+                        { time: '2026-01-10 16:20', type: '岗位', target: '吴九', employeeId: 'CJT006', points: 1300, result: '已调整' },
+                        { time: '2026-01-08 11:15', type: '绩效', target: '郑十', employeeId: 'YXAS007', points: 1280, result: '已生效' }
+                    ]
+                }
+            },
+            computed: {
+                filteredApplications() {
+                    return this.applications.filter(app => {
+                        let match = true;
+                        if (this.filters.type !== 'all' && app.type !== this.filters.type) {
+                            match = false;
+                        }
+                        if (this.filters.status !== 'all' && app.status !== this.filters.status) {
+                            match = false;
+                        }
+                        return match;
+                    });
+                }
+            },
+            methods: {
+                getApplicationIcon(type) {
+                    switch (type) {
+                        case '绩效':
+                            return 'bi bi-graph-up';
+                        case '评优':
+                            return 'bi bi-award';
+                        case '岗位':
+                            return 'bi bi-people';
+                        case '培训':
+                            return 'bi bi-book';
+                        default:
+                            return 'bi bi-star';
+                    }
+                },
+                getApplicationStatusClass(status) {
+                    switch (status) {
+                        case '待审核':
+                            return 'badge-warning';
+                        case '已批准':
+                            return 'badge-success';
+                        case '已拒绝':
+                            return 'badge-danger';
+                        default:
+                            return 'badge-info';
+                    }
+                },
+                getHistoryResultBadgeClass(result) {
+                    switch (result) {
+                        case '已生效':
+                            return 'badge-success';
+                        case '已完成':
+                            return 'badge-success';
+                        case '已调整':
+                            return 'badge-success';
+                        case '已拒绝':
+                            return 'badge-danger';
+                        default:
+                            return 'badge-info';
+                    }
+                },
+                saveConfig() {
+                    alert('应用配置已保存');
+                },
+                viewApplicationDetail(application) {
+                    alert('查看申请详情：' + application.title);
+                },
+                approveApplication(application) {
+                    if (confirm('确定要批准此申请吗？')) {
+                        application.status = '已批准';
+                        alert('申请已批准');
+                    }
+                },
+                rejectApplication(application) {
+                    if (confirm('确定要拒绝此申请吗？')) {
+                        application.status = '已拒绝';
+                        alert('申请已拒绝');
+                    }
+                },
+                viewHistoryDetail(record) {
+                    alert('查看历史记录详情：' + record.type);
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

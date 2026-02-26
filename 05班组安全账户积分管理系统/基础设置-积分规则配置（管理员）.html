@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>积分规则配置 - 安全积分</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid var(--border-color);
+            padding: 12px;
+            font-weight: 600;
+            color: var(--text-color);
+            background: var(--bg-color);
+        }
+
+        .table tbody td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background: var(--bg-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-danger {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .badge-info {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            color: var(--text-color);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 4px;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .nav-tabs .nav-link {
+            color: var(--text-secondary);
+            padding: 12px 20px;
+            font-weight: 500;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .rule-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .rule-type-add {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .rule-type-subtract {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .version-tag {
+            font-size: 11px;
+            color: var(--text-secondary);
+            background: var(--bg-color);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../00班组智能会议系统/原型页面/交互平台首页.html">
+                    <i class="bi bi-star me-2"></i>
+                    班组安全账户积分管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">积分首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分规则界面.html">积分规则</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分明细界面.html">积分明细</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分兑换界面.html">积分兑换</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分排名界面.html">积分排名</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item active" href="基础设置-积分规则配置（管理员）.html">积分规则配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-兑换规则配置（管理员）.html">兑换规则配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-排名规则配置（管理员）.html">排名规则配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            管理员
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">积分规则配置</h1>
+                <p class="page-subtitle">配置各工种的积分获取和扣除规则</p>
+            </div>
+
+            <div class="card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#add-rules">加分规则</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#subtract-rules">扣分规则</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#version-history">版本历史</a>
+                        </li>
+                    </ul>
+                    <button class="btn btn-primary" @click="showAddModal = true">
+                        <i class="bi bi-plus-lg me-1"></i>新增规则
+                    </button>
+                </div>
+
+                <div class="tab-content">
+                    <!-- 加分规则 -->
+                    <div class="tab-pane fade show active" id="add-rules">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>规则名称</th>
+                                        <th>适用工种</th>
+                                        <th>分值</th>
+                                        <th>权重</th>
+                                        <th>状态</th>
+                                        <th>版本</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(rule, index) in addRules" :key="index">
+                                        <td>
+                                            <div style="font-weight: 500;">{{ rule.name }}</div>
+                                            <div style="font-size: 12px; color: var(--text-secondary);">{{ rule.description }}</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-info">{{ rule.jobType }}</span>
+                                        </td>
+                                        <td>
+                                            <span style="color: var(--success-color); font-weight: 600;">+{{ rule.points }}</span>
+                                        </td>
+                                        <td>{{ rule.weight }}%</td>
+                                        <td>
+                                            <span class="badge" :class="rule.status === '启用' ? 'badge-success' : 'badge-warning'">
+                                                {{ rule.status }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="version-tag">v{{ rule.version }}</span>
+                                        </td>
+                                        <td>
+                                            <button class="action-btn" @click="editRule('add', index)">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="action-btn" @click="toggleRuleStatus('add', index)">
+                                                <i class="bi bi-power"></i>
+                                            </button>
+                                            <button class="action-btn" @click="deleteRule('add', index)">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 扣分规则 -->
+                    <div class="tab-pane fade" id="subtract-rules">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>规则名称</th>
+                                        <th>适用工种</th>
+                                        <th>分值</th>
+                                        <th>权重</th>
+                                        <th>状态</th>
+                                        <th>版本</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(rule, index) in subtractRules" :key="index">
+                                        <td>
+                                            <div style="font-weight: 500;">{{ rule.name }}</div>
+                                            <div style="font-size: 12px; color: var(--text-secondary);">{{ rule.description }}</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-info">{{ rule.jobType }}</span>
+                                        </td>
+                                        <td>
+                                            <span style="color: var(--danger-color); font-weight: 600;">-{{ rule.points }}</span>
+                                        </td>
+                                        <td>{{ rule.weight }}%</td>
+                                        <td>
+                                            <span class="badge" :class="rule.status === '启用' ? 'badge-success' : 'badge-warning'">
+                                                {{ rule.status }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="version-tag">v{{ rule.version }}</span>
+                                        </td>
+                                        <td>
+                                            <button class="action-btn" @click="editRule('subtract', index)">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="action-btn" @click="toggleRuleStatus('subtract', index)">
+                                                <i class="bi bi-power"></i>
+                                            </button>
+                                            <button class="action-btn" @click="deleteRule('subtract', index)">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 版本历史 -->
+                    <div class="tab-pane fade" id="version-history">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>版本号</th>
+                                        <th>更新时间</th>
+                                        <th>更新内容</th>
+                                        <th>更新人</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(version, index) in versionHistory" :key="index">
+                                        <td>
+                                            <span class="version-tag">v{{ version.number }}</span>
+                                        </td>
+                                        <td>{{ version.updateTime }}</td>
+                                        <td>{{ version.content }}</td>
+                                        <td>{{ version.updater }}</td>
+                                        <td>
+                                            <button class="action-btn" @click="viewVersionDetail(version.number)">
+                                                <i class="bi bi-eye"></i>查看详情
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 新增/编辑规则弹窗 -->
+            <div class="modal fade" :class="{ show: showAddModal }" tabindex="-1" style="display: none;">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{{ editingRule ? '编辑规则' : '新增规则' }}</h5>
+                            <button type="button" class="btn-close" @click="closeModal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">规则类型</label>
+                                        <select class="form-select" v-model="ruleForm.type">
+                                            <option value="add">加分规则</option>
+                                            <option value="subtract">扣分规则</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">适用工种</label>
+                                        <select class="form-select" v-model="ruleForm.jobType">
+                                            <option value="全部">全部工种</option>
+                                            <option value="检修工">检修工</option>
+                                            <option value="电工">电工</option>
+                                            <option value="巡检工">巡检工</option>
+                                            <option value="煤质检测工">煤质检测工</option>
+                                            <option value="重介操作工">重介操作工</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">规则名称</label>
+                                    <input type="text" class="form-control" v-model="ruleForm.name" placeholder="请输入规则名称">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">规则描述</label>
+                                    <textarea class="form-control" rows="3" v-model="ruleForm.description" placeholder="请输入规则描述"></textarea>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">积分分值</label>
+                                        <input type="number" class="form-control" v-model="ruleForm.points" placeholder="请输入分值">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">权重（%）</label>
+                                        <input type="number" class="form-control" v-model="ruleForm.weight" placeholder="请输入权重">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">状态</label>
+                                        <select class="form-select" v-model="ruleForm.status">
+                                            <option value="启用">启用</option>
+                                            <option value="停用">停用</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @click="closeModal">取消</button>
+                            <button type="button" class="btn btn-primary" @click="saveRule">保存</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    showAddModal: false,
+                    editingRule: false,
+                    ruleForm: {
+                        type: 'add',
+                        jobType: '全部',
+                        name: '',
+                        description: '',
+                        points: 0,
+                        weight: 50,
+                        status: '启用'
+                    },
+                    addRules: [
+                        { name: '发现安全隐患并及时上报', description: '发现重大安全隐患并及时上报', jobType: '全部', points: 50, weight: 50, status: '启用', version: '1.0' },
+                        { name: '参加安全培训并考核合格', description: '完成安全培训并通过考核', jobType: '全部', points: 30, weight: 40, status: '启用', version: '1.0' },
+                        { name: '提出安全改进建议', description: '提出有效的安全改进建议', jobType: '全部', points: 20, weight: 30, status: '启用', version: '1.0' },
+                        { name: '双述演练优秀', description: '岗位描述和手指口述演练优秀', jobType: '检修工', points: 40, weight: 50, status: '启用', version: '1.0' },
+                        { name: '应急演练达标', description: '参与应急演练并达标', jobType: '全部', points: 35, weight: 45, status: '启用', version: '1.0' }
+                    ],
+                    subtractRules: [
+                        { name: '未按规定佩戴防护用品', description: '未按规定佩戴安全帽、防尘口罩等', jobType: '全部', points: 20, weight: 30, status: '启用', version: '1.0' },
+                        { name: '违章操作（一般三违）', description: '发生一般违章操作行为', jobType: '全部', points: 50, weight: 50, status: '启用', version: '1.0' },
+                        { name: '违章操作（较重三违）', description: '发生较重违章操作行为', jobType: '检修工', points: 100, weight: 60, status: '启用', version: '1.0' },
+                        { name: '违章操作（严重三违）', description: '发生严重违章操作行为', jobType: '全部', points: 200, weight: 80, status: '启用', version: '1.0' },
+                        { name: '未参加安全培训', description: '未按规定参加安全培训', jobType: '全部', points: 30, weight: 40, status: '启用', version: '1.0' }
+                    ],
+                    versionHistory: [
+                        { number: '1.0', updateTime: '2025-11-01 10:00', content: '初始版本，建立基本积分规则体系', updater: '系统管理员' },
+                        { number: '1.1', updateTime: '2025-12-15 14:30', content: '新增有限空间作业合规加分项', updater: '安全管理部' },
+                        { number: '1.2', updateTime: '2026-01-05 09:15', content: '调整严重三违扣分标准', updater: '安全管理部' }
+                    ]
+                }
+            },
+            methods: {
+                editRule(type, index) {
+                    this.editingRule = true;
+                    this.ruleForm = type === 'add' ? { ...this.addRules[index] } : { ...this.subtractRules[index] };
+                    this.showAddModal = true;
+                },
+                toggleRuleStatus(type, index) {
+                    const rules = type === 'add' ? this.addRules : this.subtractRules;
+                    rules[index].status = rules[index].status === '启用' ? '停用' : '启用';
+                    alert('规则状态已更新');
+                },
+                deleteRule(type, index) {
+                    if (confirm('确定要删除此规则吗？')) {
+                        const rules = type === 'add' ? this.addRules : this.subtractRules;
+                        rules.splice(index, 1);
+                        alert('规则已删除');
+                    }
+                },
+                saveRule() {
+                    if (this.ruleForm.type === 'add') {
+                        if (this.editingRule) {
+                            const index = this.addRules.findIndex(r => r.name === this.ruleForm.name);
+                            if (index !== -1) {
+                                this.addRules[index] = { ...this.ruleForm, version: '1.3' };
+                            }
+                        } else {
+                            this.addRules.push({ ...this.ruleForm, version: '1.3' });
+                        }
+                    } else {
+                        if (this.editingRule) {
+                            const index = this.subtractRules.findIndex(r => r.name === this.ruleForm.name);
+                            if (index !== -1) {
+                                this.subtractRules[index] = { ...this.ruleForm, version: '1.3' };
+                            }
+                        } else {
+                            this.subtractRules.push({ ...this.ruleForm, version: '1.3' });
+                        }
+                    }
+                    this.closeModal();
+                    alert('规则已保存');
+                },
+                closeModal() {
+                    this.showAddModal = false;
+                    this.editingRule = false;
+                    this.ruleForm = {
+                        type: 'add',
+                        jobType: '全部',
+                        name: '',
+                        description: '',
+                        points: 0,
+                        weight: 50,
+                        status: '启用'
+                    };
+                },
+                viewVersionDetail(versionNumber) {
+                    alert('查看版本 v' + versionNumber + ' 的详细信息');
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

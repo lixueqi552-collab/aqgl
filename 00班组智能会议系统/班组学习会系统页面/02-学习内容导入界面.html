@@ -1,0 +1,686 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习内容导入 - XX选煤班组安全平台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --cta-color: #F97316;
+            --cta-hover: #EA580C;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 0 32px;
+            height: 64px;
+            flex-shrink: 0;
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .navbar-brand i {
+            font-size: 24px;
+        }
+
+        .navbar-nav {
+            gap: 8px;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(37, 99, 235, 0.05);
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .main-content {
+            padding: 24px 32px;
+            height: calc(100vh - 64px);
+            overflow: hidden;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--text-color);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            height: calc(100% - 80px);
+        }
+
+        .content-column {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .column-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .column-header i {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .column-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .material-library {
+            max-height: calc(100% - 100px);
+            overflow-y: auto;
+        }
+
+        .material-card {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .material-card:hover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .material-card.selected {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .material-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .material-title {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .material-type {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary-color);
+        }
+
+        .material-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .material-description {
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--text-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-color);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-control {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 14px;
+            transition: all 0.2s;
+            background-color: var(--bg-color);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-control:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        textarea.form-control {
+            resize: none;
+            min-height: 100px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-primary:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-success:focus-visible {
+            outline: 2px solid var(--success-color);
+            outline-offset: 2px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+
+        .btn-outline:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .btn-delete {
+            background: transparent;
+            border: none;
+            color: var(--danger-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-delete:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .btn-delete:focus-visible {
+            outline: 2px solid var(--danger-color);
+            outline-offset: 2px;
+        }
+
+        .footer-actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            padding: 16px 32px;
+            box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 16px;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-actions {
+                padding: 12px 16px;
+            }
+
+            .btn-primary, .btn-success, .btn-outline {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="01-主界面.html">
+                <i class="bi bi-shield-check"></i>
+                <span>XX选煤班组安全平台</span>
+            </a>
+            <div class="navbar-nav">
+                <a class="nav-link" href="../../index.html">班前会</a>
+                <a class="nav-link" href="../../index.html">班后会</a>
+                <a class="nav-link active" href="../../index.html">学习会</a>
+            </div>
+            <div class="user-info">
+                <img src="https://via.placeholder.com/36" alt="张班长的头像" class="user-avatar">
+                <span class="user-name">张班长</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <h1 class="page-title">学习内容导入</h1>
+
+        <div class="content-grid">
+            <div class="content-column">
+                <div class="column-header">
+                    <i class="bi bi-folder"></i>
+                    <span class="column-title">学习资料库</span>
+                </div>
+
+                <div class="material-library">
+                    <div class="material-card selected" onclick="selectMaterial(1)">
+                        <div class="material-header">
+                            <div class="material-title">设备安全操作规程</div>
+                            <div class="material-type">岗位题库</div>
+                        </div>
+                        <div class="material-meta">
+                            <span>适用岗位：巡检工、检修工</span>
+                            <span>题数：30题</span>
+                        </div>
+                        <div class="material-description">包含设备安全操作规程相关题目，覆盖设备点检、维护、检修等安全操作要求</div>
+                    </div>
+
+                    <div class="material-card" onclick="selectMaterial(2)">
+                        <div class="material-header">
+                            <div class="material-title">有限空间作业安全</div>
+                            <div class="material-type">岗位题库</div>
+                        </div>
+                        <div class="material-meta">
+                            <span>适用岗位：检修工、电工</span>
+                            <span>题数：25题</span>
+                        </div>
+                        <div class="material-description">包含有限空间作业安全要求，涉及通风、检测、监护等关键环节</div>
+                    </div>
+
+                    <div class="material-card" onclick="selectMaterial(3)">
+                        <div class="material-header">
+                            <div class="material-title">粉尘治理</div>
+                            <div class="material-type">职业健康库</div>
+                        </div>
+                        <div class="material-meta">
+                            <span>适用岗位：操作工、巡检工</span>
+                            <span>题数：20题</span>
+                        </div>
+                        <div class="material-description">包含粉尘治理相关知识，涉及防尘措施、防护用品、健康监测等内容</div>
+                    </div>
+
+                    <div class="material-card" onclick="selectMaterial(4)">
+                        <div class="material-header">
+                            <div class="material-title">皮带机绞伤事故</div>
+                            <div class="material-type">事故案例库</div>
+                        </div>
+                        <div class="material-meta">
+                            <span>事故类型：设备伤害</span>
+                            <span>发生时间：2025-12-15</span>
+                        </div>
+                        <div class="material-description">皮带机运行时发生绞伤事故，造成1人受伤，事故原因正在调查中</div>
+                    </div>
+
+                    <div class="material-card" onclick="selectMaterial(5)">
+                        <div class="material-header">
+                            <div class="material-title">粉尘爆炸事故</div>
+                            <div class="material-type">事故案例库</div>
+                        </div>
+                        <div class="material-meta">
+                            <span>事故类型：环境灾害</span>
+                            <span>发生时间：2025-11-20</span>
+                        </div>
+                        <div class="material-description">筛分车间发生粉尘爆炸事故，造成3人受伤，事故原因已查明</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-column">
+                <div class="column-header">
+                    <i class="bi bi-check-circle"></i>
+                    <span class="column-title">已选学习内容</span>
+                </div>
+
+                <div id="selected-materials-list">
+                    <div class="material-card selected">
+                        <div class="material-header">
+                            <div class="material-title">设备安全操作规程</div>
+                            <button class="btn-delete" onclick="event.stopPropagation(); removeMaterial(1)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                        <div class="material-meta">
+                            <span>适用岗位：巡检工、检修工</span>
+                            <span>题数：30题</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="custom-material">自定义学习资料上传</label>
+                    <input type="file" class="form-control" id="custom-material" multiple accept=".pdf,.doc,.doc,.ppt,.pptx,.mp4,.avi,.jpg,.png">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">已上传的自定义资料</label>
+                    <div id="uploaded-materials" style="display: none;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">学习内容说明</label>
+                    <textarea class="form-control" id="material-notes" placeholder="请输入学习内容说明..."></textarea>
+                </div>
+
+                <div style="margin-top: auto;">
+                    <button class="btn-success" onclick="importMaterials()">
+                        <i class="bi bi-download"></i>
+                        导入学习内容
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-actions">
+        <button class="btn-outline" onclick="window.location.href='01-主界面.html'">
+            <i class="bi bi-arrow-left"></i>
+            返回
+        </button>
+        <button class="btn-primary" onclick="nextStep()">
+            <i class="bi bi-arrow-right"></i>
+            下一步
+        </button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let selectedMaterials = [1];
+
+        function selectMaterial(id) {
+            const cards = document.querySelectorAll('.material-library .material-card');
+            cards.forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            event.currentTarget.classList.add('selected');
+
+            const materials = {
+                1: { title: '设备安全操作规程', type: '岗位题库', position: '巡检工、检修工', count: '30题' },
+                2: { title: '有限空间作业安全', type: '岗位题库', position: '检修工、电工', count: '25题' },
+                3: { title: '粉尘治理', type: '职业健康库', position: '操作工、巡检工', count: '20题' },
+                4: { title: '皮带机绞伤事故', type: '事故案例库', position: '设备伤害', count: '1例' },
+                5: { title: '粉尘爆炸事故', type: '事故案例库', position: '环境灾害', count: '1例' }
+            };
+
+            const material = materials[id];
+            if (material && !selectedMaterials.includes(id)) {
+                selectedMaterials.push(id);
+                updateSelectedMaterialsList();
+            }
+        }
+
+        function removeMaterial(id) {
+            const index = selectedMaterials.indexOf(id);
+            if (index > -1) {
+                selectedMaterials.splice(index, 1);
+                updateSelectedMaterialsList();
+            }
+        }
+
+        function updateSelectedMaterialsList() {
+            const materials = {
+                1: { title: '设备安全操作规程', type: '岗位题库', position: '巡检工、检修工', count: '30题' },
+                2: { title: '有限空间作业安全', type: '岗位题库', position: '检修工、电工', count: '25题' },
+                3: { title: '粉尘治理', type: '职业健康库', position: '操作工、巡检工', count: '20题' },
+                4: { title: '皮带机绞伤事故', type: '事故案例库', position: '设备伤害', count: '1例' },
+                5: { title: '粉尘爆炸事故', type: '事故案例库', position: '环境灾害', count: '1例' }
+            };
+
+            const list = document.getElementById('selected-materials-list');
+            list.innerHTML = '';
+
+            selectedMaterials.forEach(id => {
+                const material = materials[id];
+                const html = `
+                    <div class="material-card selected">
+                        <div class="material-header">
+                            <div class="material-title">${material.title}</div>
+                            <button class="btn-delete" onclick="event.stopPropagation(); removeMaterial(${id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                        <div class="material-meta">
+                            <span>适用岗位：${material.position}</span>
+                            <span>${material.count}</span>
+                        </div>
+                    </div>
+                `;
+                list.innerHTML += html;
+            });
+        }
+
+        function importMaterials() {
+            const materialNotes = document.getElementById('material-notes').value;
+            
+            if (selectedMaterials.length === 0) {
+                alert('请先选择学习资料');
+                return;
+            }
+
+            alert('学习内容已导入！\n已选资料数：' + selectedMaterials.length + '个\n说明：' + (materialNotes || '无'));
+        }
+
+        function nextStep() {
+            if (selectedMaterials.length === 0) {
+                alert('请先导入学习内容');
+                return;
+            }
+
+            alert('学习内容导入完成！');
+            window.location.href = '03-案例研讨界面.html';
+        }
+
+        document.getElementById('custom-material').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const uploadedDiv = document.getElementById('uploaded-materials');
+            uploadedDiv.style.display = 'block';
+            uploadedDiv.innerHTML = '';
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const html = `
+                    <div style="background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                        <i class="bi bi-file-earmark" style="color: var(--primary-color); font-size: 16px;"></i>
+                        <span style="flex: 1; font-size: 14px; font-weight: 500;">${file.name}</span>
+                        <button class="btn-delete" onclick="removeUploadedFile(this)">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                `;
+                uploadedDiv.innerHTML += html;
+            }
+        });
+
+        function removeUploadedFile(btn) {
+            btn.parentElement.remove();
+            const uploadedDiv = document.getElementById('uploaded-materials');
+            if (uploadedDiv.children.length === 0) {
+                uploadedDiv.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

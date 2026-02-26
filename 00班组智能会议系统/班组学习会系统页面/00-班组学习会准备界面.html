@@ -1,0 +1,601 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>班组学习会准备 - XX选煤班组安全平台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --cta-color: #F97316;
+            --cta-hover: #EA580C;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 0 32px;
+            height: 64px;
+            flex-shrink: 0;
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .navbar-brand i {
+            font-size: 24px;
+        }
+
+        .navbar-nav {
+            gap: 8px;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(37, 99, 235, 0.05);
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .main-content {
+            padding: 24px 32px;
+            height: calc(100vh - 64px);
+            overflow: hidden;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--text-color);
+        }
+
+        .preparation-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            height: calc(100% - 80px);
+        }
+
+        .preparation-column {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .column-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .column-header i {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .column-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .material-library {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .material-card {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .material-card:hover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .material-card.selected {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .material-icon {
+            font-size: 32px;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .material-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .material-count {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-color);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-control {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 14px;
+            transition: all 0.2s;
+            background-color: var(--bg-color);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-control:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        textarea.form-control {
+            resize: none;
+            min-height: 80px;
+        }
+
+        .footer-actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            padding: 16px 32px;
+            box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .btn-finish {
+            background: var(--cta-color);
+            color: white;
+            border: none;
+            padding: 14px 48px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+        }
+
+        .btn-finish:hover {
+            background: var(--cta-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(249, 115, 22, 0.4);
+        }
+
+        .btn-finish:focus-visible {
+            outline: 2px solid var(--cta-color);
+            outline-offset: 2px;
+        }
+
+        .btn-back {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 14px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+        }
+
+        .btn-back:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+
+        .btn-back:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .status-badge-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        @media (max-width: 1200px) {
+            .preparation-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 16px;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .preparation-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .material-library {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-actions {
+                padding: 12px 16px;
+            }
+
+            .btn-finish {
+                padding: 12px 32px;
+                font-size: 15px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="01-主界面.html">
+                <i class="bi bi-shield-check"></i>
+                <span>XX选煤班组安全平台</span>
+            </a>
+            <div class="navbar-nav">
+                <a class="nav-link" href="../../index.html">班前会</a>
+                <a class="nav-link" href="../../index.html">班后会</a>
+                <a class="nav-link active" href="../../index.html">学习会</a>
+            </div>
+            <div class="user-info">
+                <img src="https://via.placeholder.com/36" alt="张班长的头像" class="user-avatar">
+                <span class="user-name">张班长</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <h1 class="page-title">班组学习会准备</h1>
+
+        <div class="preparation-grid">
+            <div class="preparation-column">
+                <div class="column-header">
+                    <i class="bi bi-folder"></i>
+                    <span class="column-title">学习资料库</span>
+                </div>
+
+                <div class="material-library">
+                    <div class="material-card selected" onclick="toggleMaterial('question')">
+                        <div class="material-icon">
+                            <i class="bi bi-question-square"></i>
+                        </div>
+                        <div class="material-name">岗位题库</div>
+                        <div class="material-count">120题</div>
+                    </div>
+
+                    <div class="material-card" onclick="toggleMaterial('case')">
+                        <div class="material-icon">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                        <div class="material-name">事故案例库</div>
+                        <div class="material-count">50例</div>
+                    </div>
+
+                    <div class="material-card" onclick="toggleMaterial('shuangshu')">
+                        <div class="material-icon">
+                            <i class="bi bi-hand-index"></i>
+                        </div>
+                        <div class="material-name">双述实操库</div>
+                        <div class="material-count">80个</div>
+                    </div>
+
+                    <div class="material-card" onclick="toggleMaterial('emergency')">
+                        <div class="material-icon">
+                            <i class="bi bi-shield-exclamation"></i>
+                        </div>
+                        <div class="material-name">应急演练库</div>
+                        <div class="material-count">30个</div>
+                    </div>
+
+                    <div class="material-card" onclick="toggleMaterial('health')">
+                        <div class="material-icon">
+                            <i class="bi bi-heart-pulse"></i>
+                        </div>
+                        <div class="material-name">职业健康库</div>
+                        <div class="material-count">40个</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preparation-column">
+                <div class="column-header">
+                    <i class="bi bi-check-square"></i>
+                    <span class="column-title">学习内容选择</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">已选学习资料</label>
+                    <textarea class="form-control" id="selected-materials" placeholder="请选择学习资料..." readonly>岗位题库（设备安全操作规程、有限空间作业安全、粉尘治理、职业健康防护）</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">学习主题</label>
+                    <input type="text" class="form-control" id="learning-theme" placeholder="请输入学习主题..." value="设备安全操作规程学习">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">学习时长预计</label>
+                    <input type="text" class="form-control" id="learning-duration" placeholder="请输入学习时长..." value="60分钟">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">准备状态</label>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="status-badge status-badge-warning">
+                            准备中
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preparation-column">
+                <div class="column-header">
+                    <i class="bi bi-list-check"></i>
+                    <span class="column-title">各环节内容准备</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="case-study">案例研讨准备</label>
+                    <textarea class="form-control" id="case-study" placeholder="请输入案例研讨准备内容...">1. 选择典型事故案例：皮带机绞伤事故
+2. 准备讨论要点：事故原因、防范措施、应急处置</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="regulation-interpretation">规程解读准备</label>
+                    <textarea class="form-control" id="regulation-interpretation" placeholder="请输入规程解读准备内容...">1. 解读设备安全操作规程
+2. 重点标注：操作要点、安全注意事项</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="interactive-exchange">互动交流准备</label>
+                    <textarea class="form-control" id="interactive-exchange" placeholder="请输入互动交流准备内容...">1. 讨论主题：如何提高安全意识
+2. 预计发言人数：8-10人</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="reflection-record">心得记录准备</label>
+                    <textarea class="form-control" id="reflection-record" placeholder="请输入心得记录准备内容...">1. 心得记录要点：学习收获、改进建议
+2. 预计记录人数：10人</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-actions">
+        <button class="btn-back" onclick="window.location.href='01-主界面.html'">
+            <i class="bi bi-arrow-left"></i>
+            返回
+        </button>
+        <button class="btn-finish" onclick="finishPreparation()">
+            <i class="bi bi-check-circle"></i>
+            学习会准备结束
+        </button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let selectedMaterials = ['question'];
+
+        function toggleMaterial(type) {
+            const cards = document.querySelectorAll('.material-card');
+            cards.forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            event.currentTarget.classList.add('selected');
+
+            const materialNames = {
+                'question': '岗位题库（设备安全操作规程、有限空间作业安全、粉尘治理、职业健康防护）',
+                'case': '事故案例库（选煤行业典型事故案例）',
+                'shuangshu': '双述实操库（岗位描述、手指口述）',
+                'emergency': '应急演练库（火灾、设备故障、粉尘超标、人员伤害）',
+                'health': '职业健康库（粉尘治理、劳动防护用品、职业健康体检）'
+            };
+
+            document.getElementById('selected-materials').value = materialNames[type];
+        }
+
+        function finishPreparation() {
+            const learningTheme = document.getElementById('learning-theme').value;
+            const learningDuration = document.getElementById('learning-duration').value;
+            const caseStudy = document.getElementById('case-study').value;
+            const regulationInterpretation = document.getElementById('regulation-interpretation').value;
+            const interactiveExchange = document.getElementById('interactive-exchange').value;
+            const reflectionRecord = document.getElementById('reflection-record').value;
+
+            if (!learningTheme.trim()) {
+                alert('请输入学习主题');
+                return;
+            }
+
+            if (!learningDuration.trim()) {
+                alert('请输入学习时长预计');
+                return;
+            }
+
+            if (!caseStudy.trim()) {
+                alert('请输入案例研讨准备内容');
+                return;
+            }
+
+            if (!regulationInterpretation.trim()) {
+                alert('请输入规程解读准备内容');
+                return;
+            }
+
+            if (!interactiveExchange.trim()) {
+                alert('请输入互动交流准备内容');
+                return;
+            }
+
+            if (!reflectionRecord.trim()) {
+                alert('请输入心得记录准备内容');
+                return;
+            }
+
+            alert('学习会准备完成！现在可以开始学习会了。');
+            window.location.href = '01-主界面.html';
+        }
+    </script>
+</body>
+</html>

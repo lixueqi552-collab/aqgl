@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>能力差距评估 - 智能学习地图</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --border-color: #E2E8F0;
+            --danger-color: #EF4444;
+        }
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .gap-item {
+            background: #FEF2F2;
+            border-left: 4px solid var(--danger-color);
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../index.html"><i class="bi bi-book"></i> 智能学习地图</a>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-muted">张明 | 重介操作工</span>
+                    <button class="btn btn-primary">个人中心</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <h2>能力差距评估</h2>
+            <p class="text-muted">评估时间：2026年1月15日 | 评估类型：季度复评</p>
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="card">
+                        <h4>能力雷达图</h4>
+                        <div class="chart-container">
+                            <canvas id="abilityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <h4>评估结果概览</h4>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="text-center p-3 bg-light rounded">
+                                    <h3 class="text-primary">85</h3>
+                                    <p class="mb-0">综合得分</p>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center p-3 bg-light rounded">
+                                    <h3 class="text-success">良好</h3>
+                                    <p class="mb-0">能力等级</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <h5>能力分布</h5>
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    优秀（90分以上）
+                                    <span class="badge bg-success">2项</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    良好（80-89分）
+                                    <span class="badge bg-primary">3项</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    合格（70-79分）
+                                    <span class="badge bg-warning">1项</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    需改进（70分以下）
+                                    <span class="badge bg-danger">0项</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>能力差距分析</h4>
+                <div v-for="gap in gaps" :key="gap.id" class="gap-item">
+                    <div class="d-flex">
+                        <i class="bi bi-exclamation-triangle text-danger me-3" style="font-size: 24px;"></i>
+                        <div>
+                            <h5>{{ gap.title }}</h5>
+                            <p class="mb-2">{{ gap.description }}</p>
+                            <div class="mb-2">
+                                <span class="badge bg-danger">当前得分: {{ gap.currentScore }}</span>
+                                <span class="badge bg-success ms-2">目标得分: {{ gap.targetScore }}</span>
+                            </div>
+                            <div class="mb-2">
+                                <strong>改进建议：</strong>{{ gap.suggestion }}
+                            </div>
+                            <button class="btn btn-sm btn-primary" @click="startImprovement(gap)">
+                                <i class="bi bi-play-circle"></i> 开始改进
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>各能力详细评估</h4>
+                <div v-for="ability in abilities" :key="ability.id" class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5>{{ ability.name }}</h5>
+                        <span class="badge" :class="getScoreBadge(ability.score)">
+                            {{ ability.score }}分
+                        </span>
+                    </div>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar" :class="getScoreBarClass(ability.score)" 
+                             :style="{ width: ability.score + '%' }"></div>
+                    </div>
+                    <p class="text-muted small">{{ ability.description }}</p>
+                    <div v-for="indicator in ability.indicators" :key="indicator.id" class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span>{{ indicator.name }}</span>
+                        <span class="badge bg-secondary">{{ indicator.score }}分</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button class="btn btn-primary btn-lg" @click="generatePlan">
+                    <i class="bi bi-magic"></i> 基于差距生成学习计划
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    gaps: [
+                        {
+                            id: 1,
+                            title: '应急处置能力 - 设备故障',
+                            currentScore: 78,
+                            targetScore: 90,
+                            description: '在重介旋流器压力异常情况下的应急处置流程掌握不够熟练',
+                            suggestion: '建议完成《设备故障应急处置》课程学习，并进行至少3次模拟演练'
+                        },
+                        {
+                            id: 2,
+                            title: '双述能力 - 手指口述',
+                            currentScore: 88,
+                            targetScore: 95,
+                            description: '手指口述动作不够规范，部分细节需要加强',
+                            suggestion: '建议观看标准视频，每天进行15分钟针对性练习'
+                        }
+                    ],
+                    abilities: [
+                        {
+                            id: 1,
+                            name: '双述能力',
+                            score: 92,
+                            description: '岗位描述和手指口述的表达能力和规范性',
+                            indicators: [
+                                { id: 1, name: '岗位描述标准话术掌握', score: 95 },
+                                { id: 2, name: '手指口述动作规范性', score: 88 }
+                            ]
+                        },
+                        {
+                            id: 2,
+                            name: '应急处置能力',
+                            score: 78,
+                            description: '突发情况下的应急处理能力',
+                            indicators: [
+                                { id: 1, name: '火灾应急处置流程', score: 85 },
+                                { id: 2, name: '设备故障应急处置', score: 78 },
+                                { id: 3, name: '粉尘超标应急处置', score: 72 }
+                            ]
+                        },
+                        {
+                            id: 3,
+                            name: '职业健康防护能力',
+                            score: 88,
+                            description: '职业健康知识和防护用品使用能力',
+                            indicators: [
+                                { id: 1, name: '粉尘治理知识掌握', score: 90 },
+                                { id: 2, name: '劳动防护用品正确佩戴', score: 85 }
+                            ]
+                        },
+                        {
+                            id: 4,
+                            name: '有限空间作业安全能力',
+                            score: 85,
+                            description: '有限空间作业的安全操作能力',
+                            indicators: [
+                                { id: 1, name: '有限空间作业安全规程', score: 88 },
+                                { id: 2, name: '防护措施和应急处理', score: 82 }
+                            ]
+                        }
+                    ]
+                };
+            },
+            methods: {
+                getScoreBadge(score) {
+                    if (score >= 90) return 'bg-success';
+                    if (score >= 80) return 'bg-primary';
+                    if (score >= 70) return 'bg-warning';
+                    return 'bg-danger';
+                },
+                getScoreBarClass(score) {
+                    if (score >= 90) return 'bg-success';
+                    if (score >= 80) return 'bg-primary';
+                    if (score >= 70) return 'bg-warning';
+                    return 'bg-danger';
+                },
+                startImprovement(gap) {
+                    alert('开始改进：' + gap.title);
+                },
+                generatePlan() {
+                    alert('已基于能力差距生成个性化学习计划！');
+                }
+            },
+            mounted() {
+                const ctx = document.getElementById('abilityChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['双述能力', '应急处置', '职业健康', '有限空间', '设备操作'],
+                        datasets: [{
+                            label: '当前能力',
+                            data: [92, 78, 88, 85, 90],
+                            backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                            borderColor: 'rgba(37, 99, 235, 1)',
+                            borderWidth: 2
+                        }, {
+                            label: '岗位标准',
+                            data: [90, 90, 90, 90, 90],
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderColor: 'rgba(16, 185, 129, 1)',
+                            borderWidth: 2,
+                            borderDash: [5, 5]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

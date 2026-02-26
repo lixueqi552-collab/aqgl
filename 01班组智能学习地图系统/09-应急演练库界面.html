@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>应急演练库 - 智能学习地图</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --border-color: #E2E8F0;
+        }
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .drill-card {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 12px;
+        }
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../index.html"><i class="bi bi-book"></i> 智能学习地图</a>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-muted">张明 | 重介操作工</span>
+                    <button class="btn btn-primary">个人中心</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <h2>应急演练库</h2>
+            <p class="text-muted">火灾、设备故障、粉尘超标等应急处置演练</p>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <h3 class="text-primary">10</h3>
+                        <p class="mb-0">演练场景</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <h3 class="text-success">7</h3>
+                        <p class="mb-0">已完成</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <h3 class="text-warning">3</h3>
+                        <p class="mb-0">待完成</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <h3>88分</h3>
+                        <p class="mb-0">平均得分</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>演练场景列表</h4>
+                <div v-for="drill in drills" :key="drill.id" class="drill-card">
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <div class="rounded text-white d-flex align-items-center justify-content-center" 
+                                 style="width: 60px; height: 60px; font-size: 24px;"
+                                 :style="{ background: drill.color }">
+                                <i :class="drill.icon"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between">
+                                <h5>{{ drill.title }}</h5>
+                                <span class="badge" :class="getStatusBadge(drill.status)">
+                                    {{ getStatusText(drill.status) }}
+                                </span>
+                            </div>
+                            <p class="mb-2 text-muted">{{ drill.description }}</p>
+                            <div class="d-flex gap-3 mb-2">
+                                <small><i class="bi bi-clock"></i> {{ drill.duration }}</small>
+                                <small><i class="bi bi-calendar"></i> 演练次数: {{ drill.drillCount }}</small>
+                            </div>
+                            <div v-if="drill.status !== 'pending'" class="progress" style="height: 4px;">
+                                <div class="progress-bar" :class="getScoreBarClass(drill.score)" 
+                                     :style="{ width: drill.score + '%' }"></div>
+                            </div>
+                            <small v-if="drill.status !== 'pending'" class="text-muted">得分: {{ drill.score }}/100</small>
+                        </div>
+                        <div class="ms-3">
+                            <button class="btn btn-sm btn-primary" @click="startDrill(drill)">
+                                <i class="bi bi-play-circle"></i> {{ drill.status === 'pending' ? '开始' : '回顾' }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>年度演练要求</h4>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> 
+                    根据《班组安全建设管理规定》，每年至少完成1次应急演练，当前已完成1次。
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded">
+                            <h5>演练类型</h5>
+                            <ul>
+                                <li>火灾应急处置</li>
+                                <li>设备故障应急处置</li>
+                                <li>粉尘超标应急处置</li>
+                                <li>人员伤害应急处置</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded">
+                            <h5>演练要求</h5>
+                            <ul>
+                                <li>每年至少1次综合演练</li>
+                                <li>演练记录需完整保存</li>
+                                <li>演练后需进行评估总结</li>
+                                <li>演练成绩计入培训档案</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>演练记录</h4>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>演练场景</th>
+                            <th>演练日期</th>
+                            <th>得分</th>
+                            <th>评估结果</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="record in drillRecords" :key="record.id">
+                            <td>{{ record.drill }}</td>
+                            <td>{{ record.date }}</td>
+                            <td>
+                                <span class="badge" :class="getScoreBadge(record.score)">
+                                    {{ record.score }}分
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge" :class="getResultBadge(record.result)">
+                                    {{ record.result }}
+                                </span>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" @click="viewRecord(record)">
+                                    <i class="bi bi-eye"></i> 查看
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    drills: [
+                        {
+                            id: 1,
+                            title: '火灾应急处置演练',
+                            description: '学习火灾发生时的应急处置流程和逃生方法',
+                            duration: '30分钟',
+                            drillCount: 3,
+                            score: 90,
+                            status: 'completed',
+                            icon: 'bi bi-fire',
+                            color: '#EF4444'
+                        },
+                        {
+                            id: 2,
+                            title: '设备故障应急处置',
+                            description: '重介旋流器压力异常等设备故障的应急处置',
+                            duration: '35分钟',
+                            drillCount: 2,
+                            score: 87,
+                            status: 'completed',
+                            icon: 'bi bi-tools',
+                            color: '#F59E0B'
+                        },
+                        {
+                            id: 3,
+                            title: '粉尘超标应急处置',
+                            description: '粉尘超标情况下的应急处置流程',
+                            duration: '25分钟',
+                            drillCount: 2,
+                            score: 88,
+                            status: 'in-progress',
+                            icon: 'bi bi-wind',
+                            color: '#8B5CF6'
+                        },
+                        {
+                            id: 4,
+                            title: '人员伤害应急处置',
+                            description: '发生人员伤害时的应急处置流程',
+                            duration: '20分钟',
+                            drillCount: 0,
+                            score: 0,
+                            status: 'pending',
+                            icon: 'bi bi-person-exclamation',
+                            color: '#EC4899'
+                        }
+                    ],
+                    drillRecords: [
+                        { id: 1, drill: '火灾应急处置', date: '2026-01-15', score: 90, result: '优秀' },
+                        { id: 2, drill: '设备故障应急处置', date: '2026-01-10', score: 87, result: '良好' }
+                    ]
+                };
+            },
+            methods: {
+                getStatusBadge(status) {
+                    switch(status) {
+                        case 'completed': return 'bg-success';
+                        case 'in-progress': return 'bg-warning';
+                        default: return 'bg-secondary';
+                    }
+                },
+                getStatusText(status) {
+                    switch(status) {
+                        case 'completed': return '已完成';
+                        case 'in-progress': return '进行中';
+                        default: return '待开始';
+                    }
+                },
+                getScoreBadge(score) {
+                    if (score >= 90) return 'bg-success';
+                    if (score >= 80) return 'bg-primary';
+                    if (score >= 70) return 'bg-warning';
+                    return 'bg-danger';
+                },
+                getScoreBarClass(score) {
+                    if (score >= 90) return 'bg-success';
+                    if (score >= 80) return 'bg-primary';
+                    if (score >= 70) return 'bg-warning';
+                    return 'bg-danger';
+                },
+                getResultBadge(result) {
+                    switch(result) {
+                        case '优秀': return 'bg-success';
+                        case '良好': return 'bg-primary';
+                        case '合格': return 'bg-warning';
+                        default: return 'bg-danger';
+                    }
+                },
+                startDrill(drill) {
+                    alert('开始演练：' + drill.title);
+                },
+                viewRecord(record) {
+                    alert('查看演练记录：' + record.drill);
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

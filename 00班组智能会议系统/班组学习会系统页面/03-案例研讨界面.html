@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>案例研讨 - 班组智能会议管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #EFF6FF;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+            --bg-color: #F3F4F6;
+            --card-bg: #FFFFFF;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .navbar {
+            background: var(--card-bg);
+            border-bottom: 2px solid var(--primary-color);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-brand i {
+            font-size: 24px;
+        }
+
+        .container {
+            height: calc(100vh - 60px);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .content-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 20px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-menu {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .menu-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .step-list {
+            list-style: none;
+        }
+
+        .step-item {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .step-item:hover {
+            background: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .step-item.step-completed {
+            color: var(--success-color);
+            background: #ECFDF5;
+        }
+
+        .step-item.step-current {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 500;
+        }
+
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .step-item.step-completed .step-number {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .step-item.step-current .step-number {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .step-item.step-pending .step-number {
+            background: var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .main-panel {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .panel-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-title i {
+            color: var(--primary-color);
+        }
+
+        .panel-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .case-study-section {
+            margin-bottom: 25px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        .case-card {
+            background: var(--primary-light);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .case-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .case-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .case-tag {
+            background: var(--danger-color);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .case-tag.warning {
+            background: var(--warning-color);
+        }
+
+        .case-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+        }
+
+        .case-key-points {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .key-point-card {
+            background: white;
+            border-radius: 6px;
+            padding: 12px;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .key-point-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .key-point-value {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .discussion-points {
+            background: #FFF7ED;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 3px solid var(--warning-color);
+        }
+
+        .discussion-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--warning-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .discussion-item {
+            background: white;
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border: 1px solid #FED7AA;
+        }
+
+        .discussion-question {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .employee-response {
+            background: var(--primary-light);
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .employee-response-header {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .employee-response-content {
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .risk-analysis {
+            background: #FEF2F2;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 3px solid var(--danger-color);
+        }
+
+        .risk-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--danger-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .risk-item {
+            background: white;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .risk-header {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--danger-color);
+            margin-bottom: 5px;
+        }
+
+        .risk-description {
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .risk-prevention {
+            background: #ECFDF5;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 13px;
+            color: #065F46;
+        }
+
+        .safety-points {
+            background: #ECFDF5;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 3px solid var(--success-color);
+        }
+
+        .safety-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--success-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .safety-point-item {
+            background: white;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .safety-point-item i {
+            color: var(--success-color);
+            margin-top: 2px;
+        }
+
+        .safety-point-text {
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding-top: 20px;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 10px 30px;
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            background: var(--bg-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: #E5E7EB;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1D4ED8;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #93C5FD;
+            cursor: not-allowed;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .info-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            color: #D1D5DB;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 1200px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar-menu {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .case-key-points {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar-brand {
+                font-size: 16px;
+            }
+
+            .panel-title {
+                font-size: 20px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        .btn:focus-visible {
+            outline: 3px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .step-item:focus-visible {
+            outline: 3px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <i class="bi bi-shield-check"></i>
+            班组智能会议管理系统
+        </div>
+        <div class="ms-auto">
+            <span class="info-badge">学习会进行中</span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="content-grid">
+            <div class="sidebar-menu">
+                <div class="menu-title">学习会议程</div>
+                <ul class="step-list">
+                    <li class="step-item step-completed">
+                        <span class="step-number">1</span>
+                        <span>学习内容导入</span>
+                        <i class="bi bi-check2 ms-auto"></i>
+                    </li>
+                    <li class="step-item step-current">
+                        <span class="step-number">2</span>
+                        <span>案例研讨</span>
+                        <i class="bi bi-play-circle ms-auto"></i>
+                    </li>
+                    <li class="step-item step-pending">
+                        <span class="step-number">3</span>
+                        <span>规程解读</span>
+                    </li>
+                    <li class="step-item step-pending">
+                        <span class="step-number">4</span>
+                        <span>互动交流</span>
+                    </li>
+                    <li class="step-item step-pending">
+                        <span class="step-number">5</span>
+                        <span>心得记录</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="main-panel">
+                <h1 class="panel-title">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    案例研讨
+                </h1>
+                <p class="panel-subtitle">深度分析事故案例，识别安全风险，制定防范措施</p>
+
+                <div class="case-study-section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="bi bi-file-text"></i>
+                            事故案例分析
+                        </div>
+                    </div>
+
+                    <div id="caseStudyList">
+                        <div class="case-card">
+                            <div class="case-header">
+                                <div class="case-title">
+                                    <i class="bi bi-geo-alt-fill"></i>
+                                    煤矿瓦斯爆炸事故案例分析
+                                </div>
+                                <span class="case-tag">重大事故</span>
+                            </div>
+
+                            <div class="case-content">
+                                2023年某煤矿工作面发生瓦斯爆炸事故，造成3人死亡，5人受伤。事故原因是工作面通风系统不完善，局部瓦斯积聚达到爆炸浓度，遇到明火引发爆炸。事故暴露出企业在通风管理、瓦斯监测、现场作业规程执行等方面存在严重问题。
+                            </div>
+
+                            <div class="case-key-points">
+                                <div class="key-point-card">
+                                    <div class="key-point-title">事故类型</div>
+                                    <div class="key-point-value">瓦斯爆炸</div>
+                                </div>
+                                <div class="key-point-card">
+                                    <div class="key-point-title">伤亡情况</div>
+                                    <div class="key-point-value">3死5伤</div>
+                                </div>
+                                <div class="key-point-card">
+                                    <div class="key-point-title">直接经济损失</div>
+                                    <div class="key-point-value">约800万元</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="case-study-section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="bi bi-chat-dots"></i>
+                            讨论要点
+                        </div>
+                    </div>
+
+                    <div class="discussion-points">
+                        <div class="discussion-title">
+                            <i class="bi bi-lightbulb"></i>
+                            核心讨论问题
+                        </div>
+
+                        <div class="discussion-item">
+                            <div class="discussion-question">
+                                <i class="bi bi-question-circle text-warning me-2"></i>
+                                1. 该事故的直接原因和根本原因分别是什么？
+                            </div>
+                            <div class="employee-response">
+                                <div class="employee-response-header">
+                                    <i class="bi bi-person"></i>
+                                    班组长 张三 回答
+                                </div>
+                                <div class="employee-response-content">
+                                    直接原因是瓦斯浓度超标遇到明火引发爆炸。根本原因是企业管理不到位，通风系统设计不合理，瓦斯监测报警装置失效，现场作业人员安全意识薄弱，违章作业现象普遍存在。
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="discussion-item">
+                            <div class="discussion-question">
+                                <i class="bi bi-question-circle text-warning me-2"></i>
+                                2. 我们班组在类似作业中是否存在相同的风险？
+                            </div>
+                            <div class="employee-response">
+                                <div class="employee-response-header">
+                                    <i class="bi bi-person"></i>
+                                    安全员 李四 回答
+                                </div>
+                                <div class="employee-response-content">
+                                    我们班组在检修作业时，确实存在局部通风不完善的情况。特别是在密闭空间作业时，有时为赶工期会忽略通风时间要求。瓦斯检测仪有时校验不及时，存在数据误差风险。这是我们急需改进的问题。
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="discussion-item">
+                            <div class="discussion-question">
+                                <i class="bi bi-question-circle text-warning me-2"></i>
+                                3. 如何从根本上预防此类事故发生？
+                            </div>
+                            <div class="employee-response">
+                                <div class="employee-response-header">
+                                    <i class="bi bi-person"></i>
+                                    技术员 王五 回答
+                                </div>
+                                <div class="employee-response-content">
+                                    首先要完善通风系统设计，确保所有工作面通风达标；其次加强瓦斯监测，安装双套监测设备并定期校验；再次严格执行"一炮三检"制度；最后加强员工安全培训，提高安全意识和应急处置能力。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="case-study-section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="bi bi-shield-exclamation"></i>
+                            风险识别与分析
+                        </div>
+                    </div>
+
+                    <div class="risk-analysis">
+                        <div class="risk-title">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            识别出的安全风险
+                        </div>
+
+                        <div class="risk-item">
+                            <div class="risk-header">
+                                <i class="bi bi-arrow-right-circle me-1"></i>
+                                风险1：瓦斯积聚风险
+                            </div>
+                            <div class="risk-description">
+                                在通风不良区域或密闭空间作业时，瓦斯容易积聚达到爆炸浓度。主要发生在检修、停风恢复通风等特殊情况。
+                            </div>
+                            <div class="risk-prevention">
+                                <strong>防范措施：</strong>加强通风系统管理，确保通风时间充足；使用便携式瓦斯检测仪实时监测；严格执行通风管理制度。
+                            </div>
+                        </div>
+
+                        <div class="risk-item">
+                            <div class="risk-header">
+                                <i class="bi bi-arrow-right-circle me-1"></i>
+                                风险2：火源管理不当风险
+                            </div>
+                            <div class="risk-description">
+                                电气设备火花、明火作业、静电等都可能成为点火源。特别是在瓦斯浓度较高的环境中，任何火源都可能引发爆炸。
+                            </div>
+                            <div class="risk-prevention">
+                                <strong>防范措施：</strong>使用防爆电气设备；严格控制明火作业；加强防静电管理；禁止携带火种入井。
+                            </div>
+                        </div>
+
+                        <div class="risk-item">
+                            <div class="risk-header">
+                                <i class="bi bi-arrow-right-circle me-1"></i>
+                                风险3：监测报警失效风险
+                            </div>
+                            <div class="risk-description">
+                                瓦斯监测仪器未定期校验、传感器失效、报警装置失灵等，导致不能及时发现瓦斯超标情况。
+                            </div>
+                            <div class="risk-prevention">
+                                <strong>防范措施：</strong>建立定期校验制度；使用双套监测设备；加强设备日常维护；建立备用监测系统。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="case-study-section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="bi bi-check-circle"></i>
+                            安全要点总结
+                        </div>
+                    </div>
+
+                    <div class="safety-points">
+                        <div class="safety-title">
+                            <i class="bi bi-lightbulb"></i>
+                            本次研讨重点安全要点
+                        </div>
+
+                        <div class="safety-point-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <div class="safety-point-text">
+                                <strong>通风管理：</strong>确保工作面通风系统完善，通风时间充足，通风量符合规程要求。定期检查通风设施，发现问题及时处理。
+                            </div>
+                        </div>
+
+                        <div class="safety-point-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <div class="safety-point-text">
+                                <strong>瓦斯监测：</strong>严格执行瓦斯检查制度，使用经校验合格的瓦斯检测仪。瓦斯浓度超标时立即停止作业，撤出人员。
+                            </div>
+                        </div>
+
+                        <div class="safety-point-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <div class="safety-point-text">
+                                <strong>火源控制：</strong>严格管控火源，禁止携带火种入井。电气设备必须符合防爆要求，定期检查维护。
+                            </div>
+                        </div>
+
+                        <div class="safety-point-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <div class="safety-point-text">
+                                <strong>作业规程：</strong>严格执行《煤矿安全规程》和作业规程，杜绝违章作业。特殊作业必须编制专项安全技术措施。
+                            </div>
+                        </div>
+
+                        <div class="safety-point-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <div class="safety-point-text">
+                                <strong>应急准备：</strong>完善应急预案，定期组织应急演练。确保员工掌握应急处置知识和技能，配备必要的应急物资。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="goBack()">
+                <i class="bi bi-arrow-left"></i>
+                返回上一步
+            </button>
+            <button class="btn btn-primary" onclick="goNext()">
+                下一步：规程解读
+                <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            window.location.href = '02-学习内容导入界面.html';
+        }
+
+        function goNext() {
+            window.location.href = '04-规程解读界面.html';
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                const focusedElement = document.activeElement;
+                if (focusedElement.classList.contains('btn')) {
+                    focusedElement.click();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

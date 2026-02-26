@@ -1,0 +1,407 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>岗位能力建模（管理员） - 智能学习地图</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --border-color: #E2E8F0;
+        }
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .model-card {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+        .model-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1050;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal.show {
+            display: block;
+        }
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            margin: 50px auto;
+            max-width: 800px;
+            padding: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 顶部导航栏 -->
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../index.html">
+                    <i class="bi bi-book"></i> 智能学习地图
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="../index.html">首页</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                岗位能力与学习路径
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="../index.html">岗位能力建模</a></li>
+                                <li><a class="dropdown-item" href="../index.html">年度轮训计划</a></li>
+                                <li><a class="dropdown-item" href="../index.html">能力差距评估</a></li>
+                                <li><a class="dropdown-item" href="../index.html">学习计划定制</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                学习资源与过程管理
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="../index.html">学习资源库</a></li>
+                                <li><a class="dropdown-item" href="../index.html">岗位题库</a></li>
+                                <li><a class="dropdown-item" href="../index.html">双述实操库</a></li>
+                                <li><a class="dropdown-item" href="../index.html">应急演练库</a></li>
+                                <li><a class="dropdown-item" href="../index.html">职业健康库</a></li>
+                                <li><a class="dropdown-item" href="../index.html">事故案例库</a></li>
+                                <li><a class="dropdown-item" href="../index.html">班组学习会</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                学习效果评估
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="../index.html">学习效果评估</a></li>
+                                <li><a class="dropdown-item" href="../index.html">双述演练</a></li>
+                                <li><a class="dropdown-item" href="../index.html">在线考试</a></li>
+                                <li><a class="dropdown-item" href="../index.html">应急演练评估</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="user-info position-relative">
+                        <div class="user-avatar">李</div>
+                        <div>
+                            <div class="user-name">李管理员</div>
+                            <div class="user-role">管理员 | A选煤中心</div>
+                        </div>
+                        <div class="dropdown ms-3">
+                            <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle"></i> 个人中心
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-person"></i> 个人信息</a></li>
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-clock-history"></i> 学习记录</a></li>
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-trophy"></i> 积分排行</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-box-arrow-right"></i> 退出登录</a></li>
+                            </ul>
+                        </div>
+                        <div class="dropdown ms-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-gear"></i> 基础设置
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item active" href="../index.html"><i class="bi bi-diagram-3"></i> 岗位能力建模</a></li>
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-database"></i> 学习资源管理</a></li>
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-people"></i> 职工管理</a></li>
+                                <li><a class="dropdown-item" href="../index.html"><i class="bi bi-gear"></i> 系统设置</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>岗位能力建模（管理员）</h2>
+                <button class="btn btn-primary" @click="showAddModal">
+                    <i class="bi bi-plus-circle"></i> 新建岗位能力模型
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="d-flex gap-2 mb-4">
+                    <input type="text" class="form-control" placeholder="搜索岗位能力模型..." v-model="searchQuery">
+                    <select class="form-select" style="width: 200px;" v-model="filterCategory">
+                        <option value="">全部类别</option>
+                        <option value="操作岗">操作岗</option>
+                        <option value="维护岗">维护岗</option>
+                        <option value="管理岗">管理岗</option>
+                    </select>
+                </div>
+
+                <div v-for="model in filteredModels" :key="model.id" class="model-card">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <h5>{{ model.name }}</h5>
+                                <span class="badge bg-secondary">{{ model.category }}</span>
+                                <span class="badge bg-primary">{{ model.abilities.length }}项能力</span>
+                            </div>
+                            <p class="mb-2 text-muted">{{ model.description }}</p>
+                            <div class="d-flex gap-3">
+                                <small><i class="bi bi-calendar"></i> 创建时间: {{ model.createTime }}</small>
+                                <small><i class="bi bi-people"></i> 适用人数: {{ model.applicableCount }}人</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <button class="btn btn-sm btn-outline-primary me-2" @click="viewModel(model)">
+                                <i class="bi bi-eye"></i> 查看
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary me-2" @click="editModel(model)">
+                                <i class="bi bi-pencil"></i> 编辑
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" @click="deleteModel(model)">
+                                <i class="bi bi-trash"></i> 删除
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 新建/编辑岗位能力模型弹窗 -->
+        <div class="modal" :class="{ show: showModal }">
+            <div class="modal-content">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4>{{ isEditing ? '编辑' : '新建' }}岗位能力模型</h4>
+                    <button class="btn btn-link" @click="closeModal">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+
+                <div class="mb-3">
+                    <label>岗位名称</label>
+                    <input type="text" class="form-control" v-model="currentModel.name" placeholder="请输入岗位名称">
+                </div>
+
+                <div class="mb-3">
+                    <label>岗位类别</label>
+                    <select class="form-select" v-model="currentModel.category">
+                        <option value="">请选择类别</option>
+                        <option value="操作岗">操作岗</option>
+                        <option value="维护岗">维护岗</option>
+                        <option value="管理岗">管理岗</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label>岗位描述</label>
+                    <textarea class="form-control" rows="3" v-model="currentModel.description" placeholder="请输入岗位描述"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label>能力维度</label>
+                    <div v-for="(ability, index) in currentModel.abilities" :key="index" class="mb-2">
+                        <div class="d-flex gap-2">
+                            <input type="text" class="form-control" v-model="ability.name" placeholder="能力名称">
+                            <input type="number" class="form-control" style="width: 100px;" v-model="ability.weight" placeholder="权重">
+                            <button class="btn btn-outline-danger" @click="removeAbility(index)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary" @click="addAbility">
+                        <i class="bi bi-plus-circle"></i> 添加能力维度
+                    </button>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button class="btn btn-outline-secondary" @click="closeModal">取消</button>
+                    <button class="btn btn-primary" @click="saveModel">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    searchQuery: '',
+                    filterCategory: '',
+                    showModal: false,
+                    isEditing: false,
+                    currentModel: {
+                        name: '',
+                        category: '',
+                        description: '',
+                        abilities: []
+                    },
+                    models: [
+                        {
+                            id: 1,
+                            name: '重介操作工',
+                            category: '操作岗',
+                            description: '负责重介旋流器的操作和维护，确保选煤工艺稳定运行',
+                            createTime: '2025-01-15',
+                            applicableCount: 45,
+                            abilities: [
+                                { name: '设备操作能力', weight: 30 },
+                                { name: '安全操作能力', weight: 25 },
+                                { name: '故障处理能力', weight: 20 },
+                                { name: '双述能力', weight: 15 },
+                                { name: '应急处置能力', weight: 10 }
+                            ]
+                        },
+                        {
+                            id: 2,
+                            name: '破碎机维护工',
+                            category: '维护岗',
+                            description: '负责破碎机的日常维护和故障处理',
+                            createTime: '2025-01-10',
+                            applicableCount: 32,
+                            abilities: [
+                                { name: '设备维护能力', weight: 35 },
+                                { name: '安全操作能力', weight: 25 },
+                                { name: '故障诊断能力', weight: 20 },
+                                { name: '双述能力', weight: 10 },
+                                { name: '应急处置能力', weight: 10 }
+                            ]
+                        },
+                        {
+                            id: 3,
+                            name: '班组长',
+                            category: '管理岗',
+                            description: '负责班组日常管理和安全监督',
+                            createTime: '2025-01-05',
+                            applicableCount: 12,
+                            abilities: [
+                                { name: '管理能力', weight: 30 },
+                                { name: '安全管理能力', weight: 25 },
+                                { name: '应急处置能力', weight: 20 },
+                                { name: '沟通协调能力', weight: 15 },
+                                { name: '双述能力', weight: 10 }
+                            ]
+                        }
+                    ]
+                };
+            },
+            computed: {
+                filteredModels() {
+                    let filtered = this.models;
+                    if (this.searchQuery) {
+                        const query = this.searchQuery.toLowerCase();
+                        filtered = filtered.filter(m => 
+                            m.name.toLowerCase().includes(query) || 
+                            m.description.toLowerCase().includes(query)
+                        );
+                    }
+                    if (this.filterCategory) {
+                        filtered = filtered.filter(m => m.category === this.filterCategory);
+                    }
+                    return filtered;
+                }
+            },
+            methods: {
+                showAddModal() {
+                    this.isEditing = false;
+                    this.currentModel = {
+                        name: '',
+                        category: '',
+                        description: '',
+                        abilities: []
+                    };
+                    this.showModal = true;
+                },
+                editModel(model) {
+                    this.isEditing = true;
+                    this.currentModel = JSON.parse(JSON.stringify(model));
+                    this.showModal = true;
+                },
+                viewModel(model) {
+                    alert('查看岗位能力模型：' + model.name);
+                },
+                deleteModel(model) {
+                    if (confirm('确定要删除该岗位能力模型吗？')) {
+                        const index = this.models.findIndex(m => m.id === model.id);
+                        if (index > -1) {
+                            this.models.splice(index, 1);
+                        }
+                    }
+                },
+                closeModal() {
+                    this.showModal = false;
+                },
+                addAbility() {
+                    this.currentModel.abilities.push({ name: '', weight: 10 });
+                },
+                removeAbility(index) {
+                    this.currentModel.abilities.splice(index, 1);
+                },
+                saveModel() {
+                    if (!this.currentModel.name || !this.currentModel.category) {
+                        alert('请填写岗位名称和类别');
+                        return;
+                    }
+                    if (this.isEditing) {
+                        const index = this.models.findIndex(m => m.id === this.currentModel.id);
+                        if (index > -1) {
+                            this.models[index] = { ...this.currentModel };
+                        }
+                    } else {
+                        this.models.push({
+                            id: Date.now(),
+                            ...this.currentModel,
+                            createTime: new Date().toISOString().split('T')[0],
+                            applicableCount: 0
+                        });
+                    }
+                    this.closeModal();
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

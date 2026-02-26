@@ -1,0 +1,511 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>制度阅读 - AI知识库</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .doc-content {
+            line-height: 1.8;
+            font-size: 15px;
+        }
+
+        .doc-content h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            color: var(--text-color);
+        }
+
+        .doc-content p {
+            margin-bottom: 12px;
+            color: var(--text-color);
+        }
+
+        .doc-content ul {
+            margin-bottom: 12px;
+            padding-left: 24px;
+        }
+
+        .doc-content li {
+            margin-bottom: 8px;
+        }
+
+        .reading-progress {
+            height: 4px;
+            background: var(--bg-color);
+            border-radius: 2px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .reading-progress-bar {
+            height: 100%;
+            background: var(--primary-color);
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        .related-item {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .related-item:hover {
+            border-color: var(--primary-color);
+            background: #DBEAFE;
+        }
+
+        .related-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .related-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="01-主界面.html">
+                    <i class="bi bi-book me-2"></i>班组AI知识库管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">知识库首页</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                制度管理
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="03-制度列表界面.html">制度列表</a></li>
+                                <li><a class="dropdown-item" href="06-审核管理界面.html">审核管理</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                制度学习
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="12-制度学习界面.html">学习任务</a></li>
+                                <li><a class="dropdown-item" href="14-学习统计与分析界面.html">学习统计与分析</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="15-AI问答界面.html">AI问答</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-制度分类管理（管理员）.html">制度分类管理</a></li>
+                                <li><a class="dropdown-item" href="基础设置-审核流程配置（管理员）.html">审核流程配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-推送规则配置（管理员）.html">推送规则配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            管理员
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">制度阅读</h1>
+                <p class="page-subtitle">阅读制度文档</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="main-content">
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h2 style="font-size: 20px; font-weight: 600;">重介旋流器安全操作规程</h2>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-outline-primary" @click="goToLearning">
+                                    <i class="bi bi-book me-1"></i>开始学习
+                                </button>
+                                <button class="btn btn-outline-primary" @click="downloadDoc">
+                                    <i class="bi bi-download me-1"></i>下载
+                                </button>
+                            </div>
+                        </div>
+                        <div class="reading-progress">
+                            <div class="reading-progress-bar" style="width: 0%;"></div>
+                        </div>
+                        <div class="doc-content">
+                            <h3>1. 总则</h3>
+                            <p>为确保重介旋流器安全、稳定运行，保障操作人员人身安全，特制定本操作规程。本规程适用于XX选煤分公司所有重介旋流器的操作与维护。</p>
+                            
+                            <h3>2. 操作前准备</h3>
+                            <p>2.1 操作人员必须经过专业培训，取得相应操作资格证书后方可上岗。</p>
+                            <p>2.2 操作前必须穿戴好劳动防护用品，包括安全帽、防护眼镜、防护手套等。</p>
+                            <p>2.3 检查设备各部位是否正常，发现问题及时上报处理。</p>
+                            <p>2.4 确认重介液浓度符合要求，记录初始参数。</p>
+                            
+                            <h3>3. 操作规程</h3>
+                            <p>3.1 启动设备前，必须确认设备周围无人员和障碍物。</p>
+                            <p>3.2 严格按照操作顺序启动设备，观察设备运行状态。</p>
+                            <p>3.3 运行过程中，严禁将手或其他物品伸入设备内部。</p>
+                            <p>3.4 发现异常情况，立即停机检查，严禁带病运行。</p>
+                            <p>3.5 定期检查重介液浓度，保持在规定范围内。</p>
+                            <p>3.6 注意观察旋流器压力变化，及时调整参数。</p>
+                            
+                            <h3>4. 应急处理</h3>
+                            <p>4.1 发生设备故障时，立即按下紧急停止按钮。</p>
+                            <p>4.2 发生人员伤害事故时，立即启动应急预案，组织救援。</p>
+                            <p>4.3 事故发生后，立即上报，配合调查处理。</p>
+                            <p>4.4 熟悉应急预案，掌握应急处理流程。</p>
+                            
+                            <h3>5. 维护保养</h3>
+                            <p>5.1 定期检查设备各部件，确保完好无损。</p>
+                            <p>5.2 定期清理旋流器内部，防止堵塞。</p>
+                            <p>5.3 定期更换易损件，确保设备正常运行。</p>
+                            <p>5.4 做好维护保养记录，建立设备档案。</p>
+                            
+                            <h3>6. 安全注意事项</h3>
+                            <p>6.1 严禁违章操作，严格遵守本规程。</p>
+                            <p>6.2 操作过程中注意观察设备运行状态，发现问题及时处理。</p>
+                            <p>6.3 保持工作场所清洁，防止滑倒摔伤。</p>
+                            <p>6.4 加强安全意识，提高自我保护能力。</p>
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+                            <button class="btn btn-outline-primary" @click="markAsRead">
+                                <i class="bi bi-check-lg me-1"></i>标记已读
+                            </button>
+                            <button class="btn btn-primary" @click="goToLearning">
+                                <i class="bi bi-play-circle me-1"></i>开始学习
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="card">
+                        <h3 class="card-title">快速操作</h3>
+                        <div style="display: grid; gap: 8px;">
+                            <button class="btn btn-outline-primary" @click="goToLearning">
+                                <i class="bi bi-book me-1"></i>开始学习
+                            </button>
+                            <button class="btn btn-outline-primary" @click="takeTest">
+                                <i class="bi bi-pencil-square me-1"></i>参加测试
+                            </button>
+                            <button class="btn btn-outline-primary" @click="downloadDoc">
+                                <i class="bi bi-download me-1"></i>下载文档
+                            </button>
+                            <button class="btn btn-outline-primary" @click="goToSearch">
+                                <i class="bi bi-search me-1"></i>制度检索
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">制度信息</h3>
+                        <div class="info-row">
+                            <span class="info-label">制度类型</span>
+                            <span class="info-value">操作规程</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">发布部门</span>
+                            <span class="info-value">安全部</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">发布日期</span>
+                            <span class="info-value">2026-01-23</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">生效日期</span>
+                            <span class="info-value">2026-01-25</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">阅读时长</span>
+                            <span class="info-value">15分钟</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">学习人数</span>
+                            <span class="info-value">45人</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">相关制度</h3>
+                        <div class="related-item" @click="viewRelated(0)">
+                            <div class="related-title">重介选煤工艺规程</div>
+                            <div class="related-desc">工艺规程 · 技术部</div>
+                        </div>
+                        <div class="related-item" @click="viewRelated(1)">
+                            <div class="related-title">破碎机安全操作规程</div>
+                            <div class="related-desc">操作规程 · 安全部</div>
+                        </div>
+                        <div class="related-item" @click="viewRelated(2)">
+                            <div class="related-title">筛分车间安全管理制度</div>
+                            <div class="related-desc">安全制度 · 安全部</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    isLearning: false,
+                    isPaused: false,
+                    elapsedSeconds: 0,
+                    totalSeconds: 900, // 15分钟
+                    timer: null,
+                    requiredTime: 15, // 要求阅读时长（分钟）
+                    docTitle: '重介旋流器安全操作规程',
+                    docType: '操作规程',
+                    docDepartment: '安全部',
+                    docPublishDate: '2026-01-23',
+                    docEffectiveDate: '2026-01-25',
+                    docReadTime: 15
+                }
+            },
+            mounted() {
+                // 页面加载时恢复之前的学习进度（如果有）
+                const savedProgress = localStorage.getItem('readingProgress');
+                if (savedProgress) {
+                    const progress = JSON.parse(savedProgress);
+                    if (progress.docTitle === this.docTitle) {
+                        this.elapsedSeconds = progress.elapsedSeconds;
+                    }
+                }
+            },
+            beforeUnmount() {
+                if (this.timer) {
+                    clearInterval(this.timer);
+                }
+            },
+            methods: {
+                goToLearning() {
+                    window.location.href = '12-制度学习界面.html';
+                },
+                takeTest() {
+                    window.location.href = '13-在线测试界面.html';
+                },
+                downloadDoc() {
+                    alert('下载文档');
+                },
+                markAsRead() {
+                    alert('已标记为已读');
+                },
+                goToSearch() {
+                    window.location.href = '08-制度检索界面.html';
+                },
+                viewRelated(index) {
+                    alert('查看相关制度: ' + index);
+                },
+                startLearning() {
+                    if (!this.isLearning) {
+                        this.isLearning = true;
+                        this.isPaused = false;
+                        this.timer = setInterval(() => {
+                            if (!this.isPaused) {
+                                this.elapsedSeconds++;
+                                this.saveProgress();
+                            }
+                        }, 1000);
+                    }
+                },
+                stopLearning() {
+                    if (this.isLearning) {
+                        this.isPaused = true;
+                    }
+                },
+                continueLearning() {
+                    if (this.isLearning && this.isPaused) {
+                        this.isPaused = false;
+                    }
+                },
+                saveProgress() {
+                    const progress = {
+                        docTitle: this.docTitle,
+                        elapsedSeconds: this.elapsedSeconds
+                    };
+                    localStorage.setItem('readingProgress', JSON.stringify(progress));
+                },
+                formatTime(seconds) {
+                    const minutes = Math.floor(seconds / 60);
+                    const secs = seconds % 60;
+                    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                },
+                get progressPercentage() {
+                    return Math.min((this.elapsedSeconds / this.totalSeconds) * 100, 100);
+                },
+                get canConfirm() {
+                    return this.elapsedSeconds >= (this.requiredTime * 60);
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

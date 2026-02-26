@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>结果应用 - 责任制考核</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid var(--border-color);
+            padding: 12px;
+            font-weight: 600;
+            color: var(--text-color);
+            background: var(--bg-color);
+        }
+
+        .table tbody td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background: var(--bg-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-danger {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .badge-info {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            color: var(--text-color);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 4px;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .form-control {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+        }
+
+        .form-select {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .form-check-input {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .form-check-label {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="01-主界面.html">
+                    <i class="bi bi-clipboard-check me-2"></i>
+                    安全生产责任制考核管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">考核首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="02-清单配置界面.html">清单配置</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="05-考核实施界面.html">考核实施</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="06-考核结果界面.html">考核结果</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="09-申诉处理界面.html">申诉处理</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="11-结果应用界面.html">结果应用</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-考核规则配置（管理员）.html">考核规则配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-联动规则配置（管理员）.html">联动规则配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-申诉流程配置（管理员）.html">申诉流程配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            管理员
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">结果应用</h1>
+                <p class="page-subtitle">配置考核结果联动应用</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="main-content">
+                    <div class="card">
+                        <h3 class="card-title">联动规则配置</h3>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="salaryLinkage" v-model="linkageRules.salary">
+                            <label class="form-check-label" for="salaryLinkage">
+                                <div style="font-weight: 600;">薪酬联动</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">考核结果与薪资奖金挂钩</div>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="trainingLinkage" v-model="linkageRules.training">
+                            <label class="form-check-label" for="trainingLinkage">
+                                <div style="font-weight: 600;">培训联动</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">考核不合格人员强制参加培训</div>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="honorLinkage" v-model="linkageRules.honor">
+                            <label class="form-check-label" for="honorLinkage">
+                                <div style="font-weight: 600;">荣誉联动</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">考核优秀人员优先推荐评优</div>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="positionLinkage" v-model="linkageRules.position">
+                            <label class="form-check-label" for="positionLinkage">
+                                <div style="font-weight: 600;">岗位联动</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">考核结果作为岗位调整依据</div>
+                            </label>
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;">
+                            <button class="btn btn-outline-secondary" @click="resetRules">重置</button>
+                            <button class="btn btn-primary" @click="saveRules">
+                                <i class="bi bi-check-lg me-1"></i>保存配置
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">应用记录</h3>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>姓名</th>
+                                    <th>岗位</th>
+                                    <th>考核结果</th>
+                                    <th>应用类型</th>
+                                    <th>应用内容</th>
+                                    <th>应用时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(record, index) in applicationRecords" :key="index">
+                                    <td>{{ record.name }}</td>
+                                    <td>{{ record.position }}</td>
+                                    <td>
+                                        <span class="badge" :class="getLevelBadgeClass(record.level)">{{ record.level }}</span>
+                                    </td>
+                                    <td>{{ record.type }}</td>
+                                    <td>{{ record.content }}</td>
+                                    <td>{{ record.applyTime }}</td>
+                                    <td>
+                                        <button class="action-btn" @click="viewRecord(index)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="card">
+                        <h3 class="card-title">快速操作</h3>
+                        <div style="display: grid; gap: 8px;">
+                            <button class="btn btn-outline-primary" @click="goToResults">
+                                <i class="bi bi-bar-chart me-1"></i>考核结果
+                            </button>
+                            <button class="btn btn-outline-primary" @click="batchApply">
+                                <i class="bi bi-check-all me-1"></i>批量应用
+                            </button>
+                            <button class="btn btn-outline-primary" @click="exportData">
+                                <i class="bi bi-download me-1"></i>导出数据
+                            </button>
+                            <button class="btn btn-outline-primary" @click="viewRules">
+                                <i class="bi bi-file-earmark-text me-1"></i>查看规则
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">应用统计</h3>
+                        <div class="info-row">
+                            <span class="info-label">本月应用</span>
+                            <span class="info-value">31次</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">薪酬联动</span>
+                            <span class="info-value">15次</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">培训联动</span>
+                            <span class="info-value">8次</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">荣誉联动</span>
+                            <span class="info-value">5次</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">岗位联动</span>
+                            <span class="info-value">3次</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">待应用事项</h3>
+                        <div style="margin-bottom: 12px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">张三 - 优秀</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">待应用薪酬联动</div>
+                            <div style="font-size: 12px; color: var(--warning-color); margin-top: 4px;">待处理</div>
+                        </div>
+                        <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">李四 - 优秀</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">待应用荣誉联动</div>
+                            <div style="font-size: 12px; color: var(--warning-color); margin-top: 4px;">待处理</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    linkageRules: {
+                        salary: true,
+                        training: true,
+                        honor: true,
+                        position: true
+                    },
+                    applicationRecords: [
+                        { name: '张三', position: '重介操作工', level: '优秀', type: '薪酬联动', content: '发放奖金500元', applyTime: '2026-01-23' },
+                        { name: '李四', position: '破碎机维护工', level: '优秀', type: '荣誉联动', content: '推荐为月度优秀员工', applyTime: '2026-01-23' },
+                        { name: '王五', position: '筛分操作工', level: '良好', type: '薪酬联动', content: '发放奖金300元', applyTime: '2026-01-22' },
+                        { name: '赵六', position: '压滤操作工', level: '不合格', type: '培训联动', content: '强制参加安全培训', applyTime: '2026-01-22' },
+                        { name: '孙七', position: '重介操作工', level: '优秀', type: '岗位联动', content: '推荐为班组长候选人', applyTime: '2026-01-21' },
+                        { name: '周八', position: '破碎机维护工', level: '不合格', type: '岗位联动', content: '调整岗位至辅助工', applyTime: '2026-01-21' }
+                    ]
+                }
+            },
+            methods: {
+                getLevelBadgeClass(level) {
+                    switch (level) {
+                        case '优秀':
+                            return 'badge-success';
+                        case '良好':
+                            return 'badge-info';
+                        case '合格':
+                            return 'badge-warning';
+                        case '不合格':
+                            return 'badge-danger';
+                        default:
+                            return 'badge-info';
+                    }
+                },
+                viewRecord(index) {
+                    alert('查看应用记录: ' + index);
+                },
+                saveRules() {
+                    alert('保存配置成功');
+                },
+                resetRules() {
+                    if (confirm('确定重置所有配置吗？')) {
+                        this.linkageRules = {
+                            salary: false,
+                            training: false,
+                            honor: false,
+                            position: false
+                        };
+                        alert('已重置配置');
+                    }
+                },
+                batchApply() {
+                    alert('批量应用');
+                },
+                exportData() {
+                    alert('导出数据');
+                },
+                viewRules() {
+                    alert('查看规则');
+                },
+                goToResults() {
+                    window.location.href = '06-考核结果界面.html';
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>清单配置 - 责任制考核</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid var(--border-color);
+            padding: 12px;
+            font-weight: 600;
+            color: var(--text-color);
+            background: var(--bg-color);
+        }
+
+        .table tbody td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background: var(--bg-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-danger {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .badge-info {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            color: var(--text-color);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 4px;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .form-control {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+        }
+
+        .form-select {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        .clause-item {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .clause-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .clause-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .clause-score {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .clause-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="01-主界面.html">
+                    <i class="bi bi-clipboard-check me-2"></i>
+                    安全生产责任制考核管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">考核首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="02-清单配置界面.html">清单配置</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="05-考核实施界面.html">考核实施</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="06-考核结果界面.html">考核结果</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="09-申诉处理界面.html">申诉处理</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="11-结果应用界面.html">结果应用</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-考核规则配置（管理员）.html">考核规则配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-联动规则配置（管理员）.html">联动规则配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-申诉流程配置（管理员）.html">申诉流程配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            管理员
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">清单配置</h1>
+                <p class="page-subtitle">配置安全生产责任制清单</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="main-content">
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 class="card-title" style="margin-bottom: 0;">责任制清单</h3>
+                            <button class="btn btn-primary" @click="addList">
+                                <i class="bi bi-plus-lg me-1"></i>新增清单
+                            </button>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>清单名称</th>
+                                    <th>适用岗位</th>
+                                    <th>条款数量</th>
+                                    <th>总分</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(list, index) in lists" :key="index">
+                                    <td>{{ list.name }}</td>
+                                    <td>{{ list.position }}</td>
+                                    <td>{{ list.clauseCount }}</td>
+                                    <td>{{ list.totalScore }}</td>
+                                    <td>
+                                        <span class="badge" :class="getStatusBadgeClass(list.status)">{{ list.status }}</span>
+                                    </td>
+                                    <td>
+                                        <button class="action-btn" @click="viewList(index)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="action-btn" @click="editList(index)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="action-btn" @click="deleteList(index)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card" v-if="selectedList">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 class="card-title" style="margin-bottom: 0;">{{ selectedList.name }} - 条款管理</h3>
+                            <button class="btn btn-outline-primary" @click="addClause">
+                                <i class="bi bi-plus-lg me-1"></i>添加条款
+                            </button>
+                        </div>
+                        <div class="clause-item" v-for="(clause, index) in selectedList.clauses" :key="index">
+                            <div class="clause-header">
+                                <div class="clause-title">{{ index + 1 }}. {{ clause.title }}</div>
+                                <div class="clause-score">{{ clause.score }}分</div>
+                            </div>
+                            <div class="clause-desc">{{ clause.description }}</div>
+                            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px;">
+                                <button class="btn btn-outline-secondary btn-sm" @click="editClause(index)">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm" @click="deleteClause(index)">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="card">
+                        <h3 class="card-title">快速操作</h3>
+                        <div style="display: grid; gap: 8px;">
+                            <button class="btn btn-outline-primary" @click="addList">
+                                <i class="bi bi-plus-lg me-1"></i>新增清单
+                            </button>
+                            <button class="btn btn-outline-primary" @click="addClause" v-if="selectedList">
+                                <i class="bi bi-plus-circle me-1"></i>添加条款
+                            </button>
+                            <button class="btn btn-outline-primary" @click="exportData">
+                                <i class="bi bi-download me-1"></i>导出数据
+                            </button>
+                            <button class="btn btn-outline-primary" @click="importData">
+                                <i class="bi bi-upload me-1"></i>导入数据
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">清单统计</h3>
+                        <div class="info-row">
+                            <span class="info-label">清单总数</span>
+                            <span class="info-value">4份</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">已启用</span>
+                            <span class="info-value" style="color: var(--success-color);">4份</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">条款总数</span>
+                            <span class="info-value">45条</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">覆盖岗位</span>
+                            <span class="info-value">12个</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">配置说明</h3>
+                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                            <p>1. 责任制清单是考核的基础，需准确配置。</p>
+                            <p>2. 每个岗位应有对应的责任制清单。</p>
+                            <p>3. 条款分值应根据重要性合理分配。</p>
+                            <p>4. 清单启用后不得随意修改。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    selectedList: null,
+                    lists: [
+                        { 
+                            name: '重介操作工责任制清单', 
+                            position: '重介操作工', 
+                            clauseCount: 12, 
+                            totalScore: 100, 
+                            status: '已启用',
+                            clauses: [
+                                { title: '每日检查重介浓度', description: '每日上班前检查重介浓度是否符合要求', score: 10 },
+                                { title: '及时上报设备异常', description: '发现设备异常及时上报并记录', score: 15 },
+                                { title: '严格遵守操作规程', description: '严格按照操作规程进行作业', score: 20 },
+                                { title: '参加安全培训', description: '按时参加各类安全培训', score: 10 }
+                            ]
+                        },
+                        { 
+                            name: '破碎机维护工责任制清单', 
+                            position: '破碎机维护工', 
+                            clauseCount: 15, 
+                            totalScore: 100, 
+                            status: '已启用',
+                            clauses: [
+                                { title: '定期检查设备', description: '定期检查破碎机运行状态', score: 15 },
+                                { title: '及时处理故障', description: '发现故障及时处理并记录', score: 20 },
+                                { title: '做好维护记录', description: '准确记录设备维护情况', score: 10 }
+                            ]
+                        },
+                        { 
+                            name: '筛分操作工责任制清单', 
+                            position: '筛分操作工', 
+                            clauseCount: 10, 
+                            totalScore: 100, 
+                            status: '已启用',
+                            clauses: [
+                                { title: '检查筛分效果', description: '定期检查筛分效果是否达标', score: 15 },
+                                { title: '清理筛面', description: '及时清理筛面堵塞物', score: 10 },
+                                { title: '记录运行数据', description: '准确记录设备运行数据', score: 10 }
+                            ]
+                        },
+                        { 
+                            name: '压滤操作工责任制清单', 
+                            position: '压滤操作工', 
+                            clauseCount: 8, 
+                            totalScore: 100, 
+                            status: '已启用',
+                            clauses: [
+                                { title: '检查滤布状态', description: '定期检查滤布是否完好', score: 15 },
+                                { title: '控制压滤时间', description: '严格按照标准控制压滤时间', score: 15 },
+                                { title: '清理压滤机', description: '定期清理压滤机内部', score: 10 }
+                            ]
+                        }
+                    ]
+                }
+            },
+            methods: {
+                getStatusBadgeClass(status) {
+                    switch (status) {
+                        case '已启用':
+                            return 'badge-success';
+                        case '草稿':
+                            return 'badge-warning';
+                        default:
+                            return 'badge-info';
+                    }
+                },
+                viewList(index) {
+                    this.selectedList = this.lists[index];
+                },
+                addList() {
+                    alert('新增清单');
+                },
+                editList(index) {
+                    alert('编辑清单: ' + index);
+                },
+                deleteList(index) {
+                    if (confirm('确定删除此清单吗？')) {
+                        alert('删除清单: ' + index);
+                    }
+                },
+                addClause() {
+                    alert('添加条款');
+                },
+                editClause(index) {
+                    alert('编辑条款: ' + index);
+                },
+                deleteClause(index) {
+                    if (confirm('确定删除此条款吗？')) {
+                        alert('删除条款: ' + index);
+                    }
+                },
+                exportData() {
+                    alert('导出数据');
+                },
+                importData() {
+                    alert('导入数据');
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

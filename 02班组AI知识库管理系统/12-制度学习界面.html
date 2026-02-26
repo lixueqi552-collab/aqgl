@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>制度学习 - AI知识库</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .learning-progress {
+            margin-bottom: 24px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .progress-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: var(--bg-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            border-radius: 6px;
+            transition: width 0.3s;
+        }
+
+        .learning-tasks {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .task-item:hover {
+            border-color: var(--primary-color);
+            background: #DBEAFE;
+        }
+
+        .task-item.completed {
+            border-color: var(--success-color);
+            background: #D1FAE5;
+        }
+
+        .task-icon {
+            font-size: 24px;
+            margin-right: 16px;
+            color: var(--primary-color);
+        }
+
+        .task-item.completed .task-icon {
+            color: var(--success-color);
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .task-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .task-status {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .task-progress {
+            margin-top: 8px;
+        }
+
+        .task-progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+
+        .task-progress-bar {
+            height: 6px;
+            background: var(--bg-color);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .task-progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-info {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="01-主界面.html">
+                    <i class="bi bi-book me-2"></i>班组AI知识库管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">知识库首页</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                制度管理
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="03-制度列表界面.html">制度列表</a></li>
+                                <li><a class="dropdown-item" href="06-审核管理界面.html">审核管理</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown">
+                                制度学习
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item active" href="12-制度学习界面.html">学习任务</a></li>
+                                <li><a class="dropdown-item" href="14-学习统计与分析界面.html">学习统计与分析</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="15-AI问答界面.html">AI问答</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-制度分类管理（管理员）.html">制度分类管理</a></li>
+                                <li><a class="dropdown-item" href="基础设置-审核流程配置（管理员）.html">审核流程配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-推送规则配置（管理员）.html">推送规则配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            管理员
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">制度学习</h1>
+                <p class="page-subtitle">学习安全制度和规程</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="main-content">
+                    <div class="card">
+                        <h3 class="card-title">学习进度</h3>
+                        <div class="learning-progress">
+                            <div class="progress-header">
+                                <div class="progress-title">本月学习进度</div>
+                                <div style="font-size: 18px; font-weight: 700; color: var(--primary-color);">75%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 75%;"></div>
+                            </div>
+                            <div style="font-size: 13px; color: var(--text-secondary); margin-top: 8px;">
+                                已完成 3/4 项学习任务
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">学习任务</h3>
+                        <div class="learning-tasks">
+                            <div class="task-item" :class="{ 'completed': task.status === 'completed', 'inprogress': task.status === 'inprogress' }" v-for="(task, index) in tasks" :key="index" @click="viewTask(index)">
+                                <i class="bi task-icon" :class="task.status === 'completed' ? 'bi-check-circle' : 'bi-book'"></i>
+                                <div class="task-info">
+                                    <div class="task-title">{{ task.title }}</div>
+                                    <div class="task-desc">{{ task.desc }}</div>
+                                    <div class="task-status">
+                                        {{ task.status === 'completed' ? '已完成' : (task.isLearning ? '学习中' : '进行中') }}
+                                    </div>
+                                    <!-- 时间进度条 -->
+                                    <div class="task-progress" v-if="task.status === 'inprogress'">
+                                        <div class="task-progress-header">
+                                            <span>学习进度</span>
+                                            <span>{{ formatTime(task.elapsedSeconds) }} / {{ formatTime(task.totalSeconds) }} ({{ Math.floor(task.elapsedSeconds / 60) }}分钟)</span>
+                                        </div>
+                                        <div class="task-progress-bar">
+                                            <div class="task-progress-fill" :style="{ width: task.progressPercentage + '%' }"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
+                                    <button class="btn btn-outline-primary btn-sm" @click.stop="continueLearning(index)" v-if="task.status === 'completed'" style="min-width: 36px;">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <template v-else>
+                                        <button class="btn btn-outline-primary btn-sm" @click.stop="stopLearning(index)" v-if="task.isLearning" style="min-width: 36px;" :disabled="!task.isLearning">
+                                            <i class="bi bi-pause"></i>
+                                        </button>
+                                        <button class="btn btn-primary btn-sm" @click.stop="continueLearning(index)" v-else style="min-width: 36px;">
+                                            <i class="bi bi-play"></i>
+                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm" @click.stop="goToReading(index)" v-if="task.isLearning" style="min-width: 36px;">
+                                            <i class="bi bi-book"></i>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="card">
+                        <h3 class="card-title">快速操作</h3>
+                        <div style="display: grid; gap: 8px;">
+                            <button class="btn btn-outline-primary" @click="goToList">
+                                <i class="bi bi-list me-1"></i>制度列表
+                            </button>
+                            <button class="btn btn-outline-primary" @click="goToSearch">
+                                <i class="bi bi-search me-1"></i>制度检索
+                            </button>
+                            <button class="btn btn-outline-primary" @click="goToAIChat">
+                                <i class="bi bi-robot me-1"></i>AI问答
+                            </button>
+                            <button class="btn btn-outline-primary" @click="viewHistory">
+                                <i class="bi bi-clock-history me-1"></i>学习历史
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">学习统计</h3>
+                        <div class="info-row">
+                            <span class="info-label">本月学习</span>
+                            <span class="info-value">3项</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">学习时长</span>
+                            <span class="info-value">53分钟</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">测试通过</span>
+                            <span class="info-value" style="color: var(--success-color);">2项</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">待测试</span>
+                            <span class="info-value" style="color: var(--warning-color);">1项</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">学习提醒</h3>
+                        <div style="padding: 12px; border: 1px solid var(--warning-color); border-radius: 8px; background: #FEF3C7;">
+                            <div style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">重介旋流器安全操作规程</div>
+                            <div style="font-size: 12px; color: #92400E;">截止日期：2026-01-25</div>
+                            <div style="font-size: 12px; color: #92400E; margin-top: 4px;">剩余2天</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    tasks: [
+                        { title: '破碎机维护保养制度', desc: '20分钟 · 2026-01-20 截止', status: 'completed', progress: 100, elapsedSeconds: 0, totalSeconds: 0, isLearning: false },
+                        { title: '筛分车间安全管理制度', desc: '18分钟 · 2026-01-18 截止', status: 'completed', progress: 100, elapsedSeconds: 0, totalSeconds: 0, isLearning: false },
+                        { title: '压滤机安全操作规程', desc: '15分钟 · 2026-01-22 截止', status: 'completed', progress: 100, elapsedSeconds: 0, totalSeconds: 0, isLearning: false },
+                        { title: '重介旋流器安全操作规程', desc: '15分钟 · 2026-01-25 截止', status: 'inprogress', progress: 75, elapsedSeconds: 675, totalSeconds: 900, isLearning: false, requiredTime: 15 }
+                    ],
+                    timers: {}
+                }
+            },
+            mounted() {
+                // 从localStorage恢复学习进度
+                const savedProgress = localStorage.getItem('learningTasksProgress');
+                if (savedProgress) {
+                    const progress = JSON.parse(savedProgress);
+                    this.tasks.forEach((task, index) => {
+                        if (progress[index] && progress[index].elapsedSeconds) {
+                            task.elapsedSeconds = progress[index].elapsedSeconds;
+                            task.totalSeconds = progress[index].totalSeconds || task.totalSeconds;
+                            task.isLearning = progress[index].isLearning || false;
+                        }
+                    });
+                }
+            },
+            beforeUnmount() {
+                // 清除所有定时器
+                Object.values(this.timers).forEach(timer => {
+                    if (timer) clearInterval(timer);
+                });
+            },
+            methods: {
+                viewTask(index) {
+                    alert('查看学习任务: ' + index);
+                },
+                takeTest(index) {
+                    window.location.href = '13-在线测试界面.html';
+                },
+                continueLearning(index) {
+                    const task = this.tasks[index];
+                    if (task.status === 'completed') {
+                        // 已完成的任务跳转到在线测试
+                        window.location.href = '13-在线测试界面.html';
+                    } else {
+                        // 未完成的任务开始学习或跳转到制度阅读
+                        if (!task.isLearning) {
+                            task.isLearning = true;
+                            this.startTimer(index);
+                        }
+                        window.location.href = '09-制度阅读界面.html';
+                    }
+                },
+                stopLearning(index) {
+                    const task = this.tasks[index];
+                    if (task.isLearning && this.timers[index]) {
+                        clearInterval(this.timers[index]);
+                        delete this.timers[index];
+                        task.isLearning = false;
+                        this.saveProgress();
+                    }
+                },
+                startTimer(index) {
+                    const task = this.tasks[index];
+                    if (this.timers[index]) {
+                        clearInterval(this.timers[index]);
+                    }
+
+                    this.timers[index] = setInterval(() => {
+                        task.elapsedSeconds++;
+                        this.saveProgress();
+
+                        // 计算进度百分比
+                        task.progressPercentage = Math.min((task.elapsedSeconds / task.totalSeconds) * 100, 100);
+
+                        // 如果达到要求时间，更新进度
+                        if (task.elapsedSeconds >= task.totalSeconds) {
+                            clearInterval(this.timers[index]);
+                            delete this.timers[index];
+                            task.isLearning = false;
+                            task.progress = 100;
+                            this.saveProgress();
+                        }
+                    }, 1000);
+                },
+                saveProgress() {
+                    const progress = this.tasks.map(task => ({
+                        elapsedSeconds: task.elapsedSeconds,
+                        totalSeconds: task.totalSeconds,
+                        isLearning: task.isLearning
+                    }));
+                    localStorage.setItem('learningTasksProgress', JSON.stringify(progress));
+                },
+                formatTime(seconds) {
+                    const minutes = Math.floor(seconds / 60);
+                    const secs = seconds % 60;
+                    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                },
+                goToReading(index) {
+                    window.location.href = '09-制度阅读界面.html';
+                },
+                goToList() {
+                    window.location.href = '03-制度列表界面.html';
+                },
+                goToSearch() {
+                    window.location.href = '08-制度检索界面.html';
+                },
+                goToAIChat() {
+                    window.location.href = '15-AI问答界面.html';
+                },
+                viewHistory() {
+                    alert('查看学习历史');
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

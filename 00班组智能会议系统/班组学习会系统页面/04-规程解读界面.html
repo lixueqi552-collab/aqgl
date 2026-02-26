@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>规程解读 - 班组智能会议管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #EFF6FF;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+            --bg-color: #F3F4F6;
+            --card-bg: #FFFFFF;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+            --info-color: #06B6D4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .navbar {
+            background: var(--card-bg);
+            border-bottom: 2px solid var(--primary-color);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-brand i {
+            font-size: 24px;
+        }
+
+        .container {
+            height: calc(100vh - 60px);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .content-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 20px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-menu {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .menu-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .step-list {
+            list-style: none;
+        }
+
+        .step-item {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .step-item:hover {
+            background: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .step-item.step-completed {
+            color: var(--success-color);
+            background: #ECFDF5;
+        }
+
+        .step-item.step-current {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 500;
+        }
+
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .step-item.step-completed .step-number {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .step-item.step-current .step-number {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .step-item.step-pending .step-number {
+            background: var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .main-panel {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .panel-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-title i {
+            color: var(--primary-color);
+        }
+
+        .panel-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .regulation-section {
+            margin-bottom: 25px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        .regulation-card {
+            background: var(--primary-light);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .regulation-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .regulation-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .regulation-tag {
+            background: var(--info-color);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .regulation-tag.important {
+            background: var(--danger-color);
+        }
+
+        .regulation-content {
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+        }
+
+        .regulation-content p {
+            margin-bottom: 10px;
+        }
+
+        .key-clause {
+            background: #FFFBEB;
+            border-left: 3px solid var(--warning-color);
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .key-clause-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--warning-color);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .key-clause-content {
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .clause-examples {
+            background: #ECFDF5;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        .example-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--success-color);
+            margin-bottom: 6px;
+        }
+
+        .example-content {
+            font-size: 13px;
+            color: #065F46;
+            line-height: 1.5;
+        }
+
+        .interpretation-points {
+            background: #EFF6FF;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 3px solid var(--info-color);
+        }
+
+        .interpretation-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--info-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .interpretation-item {
+            background: white;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .interpretation-header {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--info-color);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .interpretation-content {
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .application-guide {
+            background: #FDF2F8;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 3px solid #EC4899;
+        }
+
+        .guide-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #EC4899;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .guide-item {
+            background: white;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .guide-item i {
+            color: #EC4899;
+            margin-top: 2px;
+        }
+
+        .guide-text {
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .knowledge-check {
+            background: #FEF3C7;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 3px solid var(--warning-color);
+        }
+
+        .check-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--warning-color);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .check-question {
+            background: white;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .question-options {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .question-option {
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid var(--border-color);
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .question-option:hover {
+            background: var(--primary-light);
+            border-color: var(--primary-color);
+        }
+
+        .question-option.selected {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .question-option.correct {
+            background: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+
+        .question-option.wrong {
+            background: var(--danger-color);
+            color: white;
+            border-color: var(--danger-color);
+        }
+
+        .question-explanation {
+            background: #F3F4F6;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: none;
+        }
+
+        .question-explanation.show {
+            display: block;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding-top: 20px;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 10px 30px;
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            background: var(--bg-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: #E5E7EB;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1D4ED8;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .info-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .highlight-box {
+            background: #F0F9FF;
+            border: 2px solid #7DD3FC;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .highlight-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0369A1;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .highlight-content {
+            font-size: 14px;
+            color: #0C4A6E;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 1200px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar-menu {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 16px;
+            }
+
+            .panel-title {
+                font-size: 20px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        .btn:focus-visible {
+            outline: 3px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .question-option:focus-visible {
+            outline: 3px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <i class="bi bi-shield-check"></i>
+            班组智能会议管理系统
+        </div>
+        <div class="ms-auto">
+            <span class="info-badge">学习会进行中</span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="content-grid">
+            <div class="sidebar-menu">
+                <div class="menu-title">学习会议程</div>
+                <ul class="step-list">
+                    <li class="step-item step-completed">
+                        <span class="step-number">1</span>
+                        <span>学习内容导入</span>
+                        <i class="bi bi-check2 ms-auto"></i>
+                    </li>
+                    <li class="step-item step-completed">
+                        <span class="step-number">2</span>
+                        <span>案例研讨</span>
+                        <i class="bi bi-check2 ms-auto"></i>
+                    </li>
+                    <li class="step-item step-current">
+                        <span class="step-number">3</span>
+                        <span>规程解读</span>
+                        <i class="bi bi-play-circle ms-auto"></i>
+                    </li>
+                    <li class="step-item step-pending">
+                        <span class="step-number">4</span>
+                        <span>互动交流</span>
+                    </li>
+                    <li class="step-item step-pending">
+                        <span class="step-number">5</span>
+                        <span>心得记录</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="main-panel">
+                <h1 class="panel-title">
+                    <i class="bi bi-book"></i>
+                    规程解读
+                </h1>
+                <p class="panel-subtitle">深入解读安全规程，理解条文内涵，掌握执行要点</p>
+
+                <div class="regulation-section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="bi bi-file-text"></i>
+                            核心规程条款
+                        </div>
+                    </div>
+
+                    <div class="regulation-card">
+                        <div class="regulation-header">
+                            <div class="regulation-title">
+                                <i class="bi bi-exclamation-circle-fill"></i>
+                                《煤矿安全规程》第一百一十五条
+                            </div>
+                            <span class="regulation-tag important">重点条款</span>
+                        </div>
+
+                        <div class="regulation-content">
+                            <p>井下所有机电设备必须采用防爆型，严禁使用非防爆设备。防爆设备必须具有防爆合格证，并定期进行防爆性能检查，确保设备完好。</p>
+                        </div>
+
+                        <div class="key-clause">
+                            <div class="key-clause-title">
+                                <i class="bi bi-lightbulb"></i>
+                                关键条款解读
+                            </div>
+                            <div class="key-clause-content">
+                                <strong>1. 防爆型设备定义：</strong>指在规定的条件下不会引起周围爆炸性混合物爆炸的电气设备，包括隔爆型、增安型、本质安全型等类型。
+                            </div>
+                            <div class="key-clause-content" style="margin-top: 8px;">
+                                <strong>2. 防爆合格证要求：</strong>设备必须经过国家授权的防爆检验机构检验合格，取得防爆合格证后方可使用。
+                            </div>
+                            <div class="key-clause-content" style="margin-top: 8px;">
+                                <strong>3. 定期检查要求：</strong>防爆设备应每季度至少进行一次防爆性能检查，发现问题及时处理。
+                            </div>
+
+                            <div class="clause-examples">
+                                <div class="example-title">
+                                    <i class="bi bi-check-circle"></i>
+                                    实际应用示例
+                                </div>
+                                <div class="example-content">
+                                    选煤厂使用的电机、开关、照明灯具等电气设备，如果布置在井下或可能产生可燃粉尘的环境中，必须选用防爆型设备。例如：隔爆型电机（Ex d I Mb）、本质安全型控制设备（Ex ia I Ma）等。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="regulation-card">
+                        <div class="regulation-header">
+                            <div class="regulation-title">
+                                <i class="bi bi-info-circle-fill"></i>
+                                《煤矿安全规程》第二百零八条
+                            </div>
+                            <span class="regulation-tag">操作规程</span>
+                        </div>
+
+                        <div class="regulation-content">
+                            <p>在进行动火作业前，必须制定专项安全技术措施，经审批后方可实施。动火作业时，必须严格执行"一监二保"制度，现场必须配备灭火器材和消防设施。</p>
+                        </div>
+
+                        <div class="key-clause">
+                            <div class="key-clause-title">
+                                <i class="bi bi-lightbulb"></i>
+                                关键条款解读
+                            </div>
+                            <div class="key-clause-content">
+                                <strong>1. 动火作业定义：</strong>指在禁火区进行焊接、切割、打磨等产生明火或高温的作业活动。
+                            </div>
+                            <div class="key-clause-content" style="margin-top: 8px;">
+                                <strong>2. "一监二保"制度：</strong>一人监护，两人保障。监护人负责全程监督动火作业，保障人员负责现场安全和应急处置。
+                            </div>
+                            <div class="key-clause-content" style="margin-top: 8px;">
+                                <strong>3. 专项措施要求：</strong>包括作业环境评估、安全防护措施、应急处置方案、人员职责分工等内容。
+                            </div>
+
+                            <div class="clause-examples">
+                                <div class="example-title">
+                                    <i class="bi bi-check-circle"></i>
+                                    实际应用示例
+                                </div>
+                                <div class="example-content">
+                                    选煤厂皮带输送机检修需要焊接时，必须办理动火作业审批手续。清理现场可燃物，配备灭火器，安排专人监护。作业完成后，确认无火种遗留方可离开。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="regulation-section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="bi bi-chat-quote"></i>
+                            规程解读要点
+                        </div>
+                    </div>
+
+                    <div class="interpretation-points">
+                        <div class="interpretation-title">
+                            <i class="bi bi-lightbulb"></i>
+                            重点解读内容
+                        </div>
+
+                        <div class="interpretation-item">
+                            <div class="interpretation-header">
+                                <i class="bi bi-arrow-right-circle"></i>
+                                条款1：防爆设备选型
+                            </div>
+                            <div class="interpretation-content">
+                                根据矿井瓦斯等级、粉尘爆炸性危险程度，选择相应防爆等级的设备。高瓦斯矿井应选用较高防爆等级的设备，确保安全裕度。
+                            </div>
+                        </div>
+
+                        <div class="interpretation-item">
+                            <div class="interpretation-header">
+                                <i class="bi bi-arrow-right-circle"></i>
+                                条款2：设备检查维护
+                            </div>
+                            <div class="interpretation-content">
+                                建立设备台账，记录设备防爆性能检查情况。发现防爆面损伤、密封失效等问题，必须立即更换或修复，严禁带病运行。
+                            </div>
+                        </div>
+
+                        <div class="interpretation-item">
+                            <div class="interpretation-header">
+                                <i class="bi bi-arrow-right-circle"></i>
+                                条款3：动火作业管理
+                            </div>
+                            <div class="interpretation-content">
+                                严格执行动火作业审批制度，分级管理。特级动火作业必须由矿长或总工程师审批，一般动火作业由安全科长审批。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="regulation-section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="bi bi-tools"></i>
+                            操作指南
+                        </div>
+                    </div>
+
+                    <div class="application-guide">
+                        <div class="guide-title">
+                            <i class="bi bi-clipboard-check"></i>
+                            规程执行指南
+                        </div>
+
+                        <div class="guide-item">
+                            <i class="bi bi-1-circle"></i>
+                            <div class="guide-text">
+                                <strong>日常检查：</strong>每班作业前，操作人员应检查所使用设备的防爆标识、完好状况，确认无误后方可开机。
+                            </div>
+                        </div>
+
+                        <div class="guide-item">
+                            <i class="bi bi-2-circle"></i>
+                            <div class="guide-text">
+                                <strong>定期检验：</strong>建立设备定期检验制度，由专业人员对防爆设备进行全面检测，出具检验报告。
+                            </div>
+                        </div>
+
+                        <div class="guide-item">
+                            <i class="bi bi-3-circle"></i>
+                            <div class="guide-text">
+                                <strong>动火作业：</strong>动火前清理可燃物，配备消防器材，安排监护人。动火中严禁离岗，发现异常立即停止作业。
+                            </div>
+                        </div>
+
+                        <div class="guide-item">
+                            <i class="bi bi-4-circle"></i>
+                            <div class="guide-text">
+                                <strong>记录归档：</strong>将防爆设备检查记录、动火作业审批资料等及时归档，保存期限不少于1年。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="regulation-section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="bi bi-check-circle"></i>
+                            知识测试
+                        </div>
+                    </div>
+
+                    <div class="knowledge-check">
+                        <div class="check-title">
+                            <i class="bi bi-question-circle"></i>
+                            规程理解测试
+                        </div>
+
+                        <div class="check-question">
+                            <div class="question-text">
+                                1. 井下使用的防爆电气设备，必须具备什么证件？
+                            </div>
+                            <div class="question-options">
+                                <div class="question-option" data-correct="true" onclick="selectOption(this)">A. 产品合格证</div>
+                                <div class="question-option" data-correct="false" onclick="selectOption(this)">B. 使用说明书</div>
+                                <div class="question-option" data-correct="false" onclick="selectOption(this)">C. 维修记录单</div>
+                                <div class="question-option" data-correct="true" onclick="selectOption(this)">D. 防爆合格证</div>
+                            </div>
+                            <div class="question-explanation">
+                                <strong>正确答案：</strong>A、D<br>
+                                <strong>解析：</strong>防爆电气设备必须具备产品合格证和防爆合格证。产品合格证证明产品符合质量标准，防爆合格证证明设备具备防爆性能。
+                            </div>
+                        </div>
+
+                        <div class="check-question">
+                            <div class="question-text">
+                                2. 防爆电气设备的防爆性能检查周期是多久？
+                            </div>
+                            <div class="question-options">
+                                <div class="question-option" data-correct="false" onclick="selectOption(this)">A. 每月一次</div>
+                                <div class="question-option" data-correct="true" onclick="selectOption(this)">B. 每季度至少一次</div>
+                                <div class="question-option" data-correct="false" onclick="selectOption(this)">C. 每半年一次</div>
+                                <div class="question-option" data-correct="false" onclick="selectOption(this)">D. 每年一次</div>
+                            </div>
+                            <div class="question-explanation">
+                                <strong>正确答案：</strong>B<br>
+                                <strong>解析：</strong>根据规程要求，防爆设备应每季度至少进行一次防爆性能检查，确保设备始终处于完好状态。
+                            </div>
+                        </div>
+
+                        <div class="check-question">
+                            <div class="question-text">
+                                3. 动火作业的"一监二保"制度中，监护人的主要职责是什么？
+                            </div>
+                            <div class="question-options">
+                                <div class="question-option" data-correct="false" onclick="selectOption(this)">A. 进行动火作业</div>
+                                <div class="question-option" data-correct="false" onclick="selectOption(this)">B. 配备灭火器材</div>
+                                <div class="question-option" data-correct="true" onclick="selectOption(this)">C. 全程监督动火作业</div>
+                                <div class="question-option" data-correct="false" onclick="selectOption(this)">D. 清理现场可燃物</div>
+                            </div>
+                            <div class="question-explanation">
+                                <strong>正确答案：</strong>C<br>
+                                <strong>解析：</strong>监护人的主要职责是全程监督动火作业，确保安全技术措施得到落实，发现危险情况及时制止和处置。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="goBack()">
+                <i class="bi bi-arrow-left"></i>
+                返回上一步
+            </button>
+            <button class="btn btn-primary" onclick="goNext()">
+                下一步：互动交流
+                <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function selectOption(element) {
+            const question = element.parentElement;
+            const options = question.querySelectorAll('.question-option');
+            const explanation = question.querySelector('.question-explanation');
+
+            options.forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'wrong');
+            });
+
+            element.classList.add('selected');
+
+            if (element.dataset.correct === 'true') {
+                element.classList.add('correct');
+            } else {
+                element.classList.add('wrong');
+            }
+
+            explanation.classList.add('show');
+        }
+
+        function goBack() {
+            window.location.href = '03-案例研讨界面.html';
+        }
+
+        function goNext() {
+            window.location.href = '05-互动交流界面.html';
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                const focusedElement = document.activeElement;
+                if (focusedElement.classList.contains('btn')) {
+                    focusedElement.click();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

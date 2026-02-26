@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自主上报 - 职工动态</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+
+        .form-control {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+        }
+
+        .form-select {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-outline-secondary {
+            background: white;
+            border-color: var(--border-color);
+            color: var(--text-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-secondary:hover {
+            background: var(--bg-color);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        .report-type-card {
+            padding: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 12px;
+        }
+
+        .report-type-card:hover {
+            border-color: var(--primary-color);
+            background: #DBEAFE;
+        }
+
+        .report-type-card.selected {
+            border-color: var(--primary-color);
+            background: #DBEAFE;
+        }
+
+        .report-type-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+        }
+
+        .report-type-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .report-type-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .privacy-notice {
+            padding: 12px;
+            background: #FEF3C7;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .privacy-notice-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #92400E;
+        }
+
+        .privacy-notice-text {
+            font-size: 12px;
+            color: #92400E;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="01-主界面.html">
+                    <i class="bi bi-activity me-2"></i>
+                    班组职工安全动态信息管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">动态首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="02-自主上报界面.html">自主上报</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="05-评估结果界面.html">评估结果</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="08-措施制定界面.html">措施制定</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="11-效果跟踪界面.html">效果跟踪</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-评估模型配置（管理员）.html">评估模型配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-措施库管理（管理员）.html">措施库管理</a></li>
+                                <li><a class="dropdown-item" href="基础设置-通知规则配置（管理员）.html">通知规则配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            管理员
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">自主上报</h1>
+                <p class="page-subtitle">上报个人动态信息</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="main-content">
+                    <div class="card">
+                        <h3 class="card-title">选择上报类型</h3>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                            <div class="report-type-card" :class="{ selected: form.type === '工作压力' }" @click="selectType('工作压力')">
+                                <i class="bi bi-briefcase report-type-icon"></i>
+                                <div class="report-type-title">工作压力</div>
+                                <div class="report-type-desc">上报工作压力情况</div>
+                            </div>
+                            <div class="report-type-card" :class="{ selected: form.type === '身体健康' }" @click="selectType('身体健康')">
+                                <i class="bi bi-heart-pulse report-type-icon"></i>
+                                <div class="report-type-title">身体健康</div>
+                                <div class="report-type-desc">上报身体健康状况</div>
+                            </div>
+                            <div class="report-type-card" :class="{ selected: form.type === '家庭情况' }" @click="selectType('家庭情况')">
+                                <i class="bi bi-house report-type-icon"></i>
+                                <div class="report-type-title">家庭情况</div>
+                                <div class="report-type-desc">上报家庭情况变化</div>
+                            </div>
+                            <div class="report-type-card" :class="{ selected: form.type === '其他' }" @click="selectType('其他')">
+                                <i class="bi bi-three-dots report-type-icon"></i>
+                                <div class="report-type-title">其他</div>
+                                <div class="report-type-desc">上报其他情况</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">上报详情</h3>
+                        <div class="form-group">
+                            <label class="form-label">上报类型</label>
+                            <select class="form-select" v-model="form.type">
+                                <option value="">请选择上报类型</option>
+                                <option value="工作压力">工作压力</option>
+                                <option value="身体健康">身体健康</option>
+                                <option value="家庭情况">家庭情况</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">详细描述</label>
+                            <textarea class="form-control" v-model="form.description" rows="4" placeholder="请详细描述您的情况"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">影响程度</label>
+                            <select class="form-select" v-model="form.impact">
+                                <option value="">请选择影响程度</option>
+                                <option value="轻微">轻微</option>
+                                <option value="一般">一般</option>
+                                <option value="严重">严重</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">期望帮助</label>
+                            <textarea class="form-control" v-model="form.helpNeeded" rows="2" placeholder="请描述您希望获得什么样的帮助"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">是否需要保密</label>
+                            <select class="form-select" v-model="form.privacy">
+                                <option value="公开">公开（管理人员可见）</option>
+                                <option value="保密">保密（仅安全员可见）</option>
+                            </select>
+                        </div>
+                        <div class="privacy-notice" v-if="form.privacy === '保密'">
+                            <div class="privacy-notice-title">
+                                <i class="bi bi-shield-lock me-1"></i>保密声明
+                            </div>
+                            <div class="privacy-notice-text">
+                                您选择的信息将严格保密，仅安全员可以查看。我们将尊重您的隐私，不会向其他人员透露您的个人信息。
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                            <button class="btn btn-outline-secondary" @click="resetForm">重置</button>
+                            <button class="btn btn-primary" @click="submitReport">
+                                <i class="bi bi-send me-1"></i>提交上报
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="card">
+                        <h3 class="card-title">快速操作</h3>
+                        <div style="display: grid; gap: 8px;">
+                            <button class="btn btn-outline-primary" @click="goToHome">
+                                <i class="bi bi-house me-1"></i>返回首页
+                            </button>
+                            <button class="btn btn-outline-primary" @click="goToAssessment">
+                                <i class="bi bi-file-earmark-text me-1"></i>评估结果
+                            </button>
+                            <button class="btn btn-outline-primary" @click="viewHistory">
+                                <i class="bi bi-clock-history me-1"></i>上报历史
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">上报统计</h3>
+                        <div class="info-row">
+                            <span class="info-label">本月上报</span>
+                            <span class="info-value">12次</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">工作压力</span>
+                            <span class="info-value">5次</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">身体健康</span>
+                            <span class="info-value">4次</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">家庭情况</span>
+                            <span class="info-value">2次</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">其他</span>
+                            <span class="info-value">1次</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">上报说明</h3>
+                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                            <p>1. 请如实填写您的情况，我们将为您提供必要的帮助。</p>
+                            <p>2. 您可以选择是否保密，保密信息仅安全员可见。</p>
+                            <p>3. 上报后，系统会自动进行风险评估，并制定相应的关怀措施。</p>
+                            <p>4. 我们承诺保护您的隐私，不会向无关人员透露您的信息。</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">联系方式</h3>
+                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                            <p><i class="bi bi-telephone me-1"></i>安全员：138****5678</p>
+                            <p><i class="bi bi-envelope me-1"></i>邮箱：safety@yubei.com</p>
+                            <p><i class="bi bi-clock me-1"></i>工作时间：8:00-18:00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    form: {
+                        type: '',
+                        description: '',
+                        impact: '',
+                        helpNeeded: '',
+                        privacy: '公开'
+                    }
+                }
+            },
+            methods: {
+                selectType(type) {
+                    this.form.type = type;
+                },
+                submitReport() {
+                    if (!this.form.type) {
+                        alert('请选择上报类型');
+                        return;
+                    }
+                    if (!this.form.description) {
+                        alert('请填写详细描述');
+                        return;
+                    }
+                    if (!this.form.impact) {
+                        alert('请选择影响程度');
+                        return;
+                    }
+                    alert('上报成功');
+                },
+                resetForm() {
+                    this.form = {
+                        type: '',
+                        description: '',
+                        impact: '',
+                        helpNeeded: '',
+                        privacy: '公开'
+                    };
+                },
+                goToHome() {
+                    window.location.href = '01-主界面.html';
+                },
+                goToAssessment() {
+                    window.location.href = '05-评估结果界面.html';
+                },
+                viewHistory() {
+                    alert('查看上报历史');
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

@@ -1,0 +1,611 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>问题分析 - XX选煤班组安全平台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --cta-color: #F97316;
+            --cta-hover: #EA580C;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 0 32px;
+            height: 64px;
+            flex-shrink: 0;
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .navbar-brand i {
+            font-size: 24px;
+        }
+
+        .navbar-nav {
+            gap: 8px;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(37, 99, 235, 0.05);
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .main-content {
+            padding: 24px 32px;
+            height: calc(100vh - 64px);
+            overflow: hidden;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--text-color);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            height: calc(100% - 80px);
+        }
+
+        .content-column {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .column-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .column-header i {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .column-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-color);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-control {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 14px;
+            transition: all 0.2s;
+            background-color: var(--bg-color);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-control:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        textarea.form-control {
+            resize: none;
+            min-height: 100px;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .category-item {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .category-item:hover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .category-item.active {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .category-icon {
+            font-size: 32px;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .category-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .analysis-list {
+            max-height: calc(100% - 150px);
+            overflow-y: auto;
+        }
+
+        .analysis-card {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .analysis-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .analysis-category {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .analysis-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .btn-delete {
+            background: transparent;
+            border: none;
+            color: var(--danger-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-delete:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-primary:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-success:focus-visible {
+            outline: 2px solid var(--success-color);
+            outline-offset: 2px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+
+        .btn-outline:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .footer-actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            padding: 16px 32px;
+            box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 16px;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .category-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-actions {
+                padding: 12px 16px;
+            }
+
+            .btn-primary, .btn-success, .btn-outline {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="01-主界面.html">
+                <i class="bi bi-shield-check"></i>
+                <span>XX选煤班组安全平台</span>
+            </a>
+            <div class="navbar-nav">
+                <a class="nav-link" href="../../index.html">班前会</a>
+                <a class="nav-link active" href="../../index.html">班后会</a>
+                <a class="nav-link" href="../../index.html">学习会</a>
+            </div>
+            <div class="user-info">
+                <img src="https://via.placeholder.com/36" alt="张班长的头像" class="user-avatar">
+                <span class="user-name">张班长</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <h1 class="page-title">问题分析</h1>
+
+        <div class="content-grid">
+            <div class="content-column">
+                <div class="column-header">
+                    <i class="bi bi-tags"></i>
+                    <span class="column-title">问题分类</span>
+                </div>
+
+                <div class="category-grid">
+                    <div class="category-item active" onclick="selectCategory('process')">
+                        <div class="category-icon">
+                            <i class="bi bi-gear"></i>
+                        </div>
+                        <div class="category-name">流程执行</div>
+                    </div>
+
+                    <div class="category-item" onclick="selectCategory('risk')">
+                        <div class="category-icon">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                        <div class="category-name">风险预判</div>
+                    </div>
+
+                    <div class="category-item" onclick="selectCategory('operation')">
+                        <div class="category-icon">
+                            <i class="bi bi-tools"></i>
+                        </div>
+                        <div class="category-name">操作规范</div>
+                    </div>
+
+                    <div class="category-item" onclick="selectCategory('maintenance')">
+                        <div class="category-icon">
+                            <i class="bi bi-wrench"></i>
+                        </div>
+                        <div class="category-name">设备维护</div>
+                    </div>
+
+                    <div class="category-item" onclick="selectCategory('coordination')">
+                        <div class="category-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div class="category-name">人员配合</div>
+                    </div>
+
+                    <div class="category-item" onclick="selectCategory('other')">
+                        <div class="category-icon">
+                            <i class="bi bi-three-dots"></i>
+                        </div>
+                        <div class="category-name">其他</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-column">
+                <div class="column-header">
+                    <i class="bi bi-search"></i>
+                    <span class="column-title">问题分析</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="problem-description">问题描述</label>
+                    <textarea class="form-control" id="problem-description" placeholder="请输入问题描述...">3号筛分机运行时发现异响，经检查确认为轴承磨损导致</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="problem-cause">问题原因分析</label>
+                    <textarea class="form-control" id="problem-cause" placeholder="请输入问题原因分析...">1. 轴承长期使用未及时更换
+2. 日常巡检不到位，未及时发现异常
+3. 缺乏设备定期维护制度</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="analysis-conclusion">分析结论</label>
+                    <textarea class="form-control" id="analysis-conclusion" placeholder="请输入分析结论...">需建立设备定期维护制度，明确轴承更换周期
+责任人：王技术员
+完成时限：2026年1月20日</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="analyzer">分析人</label>
+                    <select class="form-control" id="analyzer">
+                        <option value="">请选择分析人</option>
+                        <option value="zhang">张班长</option>
+                        <option value="li">李安全员</option>
+                        <option value="wang">王技术员</option>
+                        <option value="zhao">赵维修工</option>
+                    </select>
+                </div>
+
+                <div style="margin-top: auto;">
+                    <button class="btn-primary" onclick="addAnalysis()">
+                        <i class="bi bi-plus-circle"></i>
+                        添加分析结果
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-actions">
+        <button class="btn-outline" onclick="window.location.href='04-违规行为通报界面.html'">
+            <i class="bi bi-arrow-left"></i>
+            返回
+        </button>
+        <button class="btn-success" onclick="nextStep()">
+            <i class="bi bi-arrow-right"></i>
+            下一步
+        </button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let selectedCategory = 'process';
+
+        function selectCategory(category) {
+            selectedCategory = category;
+            
+            const items = document.querySelectorAll('.category-item');
+            items.forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            event.currentTarget.classList.add('active');
+        }
+
+        function addAnalysis() {
+            const problemDescription = document.getElementById('problem-description').value;
+            const problemCause = document.getElementById('problem-cause').value;
+            const analysisConclusion = document.getElementById('analysis-conclusion').value;
+            const analyzer = document.getElementById('analyzer').value;
+
+            if (!problemDescription.trim()) {
+                alert('请输入问题描述');
+                return;
+            }
+
+            if (!problemCause.trim()) {
+                alert('请输入问题原因分析');
+                return;
+            }
+
+            if (!analysisConclusion.trim()) {
+                alert('请输入分析结论');
+                return;
+            }
+
+            if (!analyzer) {
+                alert('请选择分析人');
+                return;
+            }
+
+            alert('分析结果已添加！');
+        }
+
+        function nextStep() {
+            alert('问题分析完成！');
+            window.location.href = '06-改进措施制定界面.html';
+        }
+    </script>
+</body>
+</html>

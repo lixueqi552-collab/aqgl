@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习效果评估 - 智能学习地图</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        /* 顶部导航栏 */
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 20px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        /* 主容器 */
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 页面标题 */
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* 卡片样式 */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        /* 统计卡片 */
+        .stat-card {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* 评估类型切换 */
+        .assessment-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .assessment-tab {
+            padding: 10px 24px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .assessment-tab:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .assessment-tab.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* 评估记录列表 */
+        .assessment-item {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+
+        .assessment-item:hover {
+            border-color: var(--primary-color);
+        }
+
+        .assessment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .assessment-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .assessment-date {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .assessment-score {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .assessment-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        /* 标签 */
+        .badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #ECFDF5;
+            color: var(--success-color);
+        }
+
+        .badge-warning {
+            background: #FFFBEB;
+            color: var(--warning-color);
+        }
+
+        .badge-danger {
+            background: #FEF2F2;
+            color: var(--danger-color);
+        }
+
+        .badge-primary {
+            background: #EFF6FF;
+            color: var(--primary-color);
+        }
+
+        /* 按钮 */
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 20px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* 进度条 */
+        .progress-container {
+            margin-bottom: 24px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #E2E8F0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.3s;
+        }
+
+        .progress-fill.success {
+            background: var(--success-color);
+        }
+
+        .progress-fill.warning {
+            background: var(--warning-color);
+        }
+
+        /* 合规性检查 */
+        .compliance-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .compliance-icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+
+        .compliance-content {
+            flex: 1;
+        }
+
+        .compliance-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .compliance-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .compliance-status {
+            font-size: 20px;
+        }
+
+        /* 图表容器 */
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 22px;
+            }
+            .assessment-tabs {
+                flex-direction: column;
+            }
+            .chart-container {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 顶部导航栏 -->
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../index.html">
+                    <i class="bi bi-book"></i> 智能学习地图
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="../index.html">学习首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../index.html">岗位能力</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../index.html">学习资源</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../index.html">考试中心</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="../index.html">学习评估</a>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="text-muted">张明 | 重介操作工</span>
+                        <button class="btn btn-primary">个人中心</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主容器 -->
+        <div class="main-container">
+            <!-- 页面标题 -->
+            <div class="page-header">
+                <h1 class="page-title">学习效果评估</h1>
+                <p class="page-subtitle">全面评估学习效果，确保培训质量</p>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-value">{{ stats.totalAssessments }}</div>
+                        <div class="stat-label">评估次数</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-value">{{ stats.passRate }}%</div>
+                        <div class="stat-label">通过率</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-value">{{ stats.avgScore }}</div>
+                        <div class="stat-label">平均分</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-value">{{ stats.dualPractice }}%</div>
+                        <div class="stat-label">双述达标率</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- 左侧：评估记录 -->
+                <div class="col-lg-8">
+                    <!-- 评估类型切换 -->
+                    <div class="assessment-tabs">
+                        <button class="assessment-tab" 
+                                v-for="tab in assessmentTabs" 
+                                :key="tab.id"
+                                :class="{ active: selectedTab === tab.id }"
+                                @click="selectedTab = tab.id">
+                            <i :class="tab.icon"></i>
+                            {{ tab.name }}
+                        </button>
+                    </div>
+
+                    <!-- 评估记录列表 -->
+                    <div class="card">
+                        <div class="card-title">
+                            <i class="bi bi-list-check"></i>
+                            {{ currentTabName }}记录
+                        </div>
+                        <div v-for="assessment in filteredAssessments" :key="assessment.id" class="assessment-item">
+                            <div class="assessment-header">
+                                <div>
+                                    <div class="assessment-title">{{ assessment.title }}</div>
+                                    <div class="assessment-date">
+                                        <i class="bi bi-calendar"></i> {{ assessment.date }}
+                                    </div>
+                                </div>
+                                <div class="assessment-score">{{ assessment.score }}</div>
+                            </div>
+                            <div class="assessment-desc">{{ assessment.description }}</div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge" :class="getScoreBadge(assessment.score)">
+                                    {{ getScoreLevel(assessment.score) }}
+                                </span>
+                                <button class="btn btn-primary" @click="viewDetail(assessment)">
+                                    <i class="bi bi-eye"></i> 查看详情
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧：合规性检查和成绩趋势 -->
+                <div class="col-lg-4">
+                    <!-- 合规性检查 -->
+                    <div class="card">
+                        <div class="card-title">
+                            <i class="bi bi-shield-check"></i>
+                            合规性检查
+                        </div>
+                        <div v-for="item in compliance" :key="item.id" class="compliance-item">
+                            <div class="compliance-icon">
+                                <i :class="item.icon" :style="{ color: item.color }"></i>
+                            </div>
+                            <div class="compliance-content">
+                                <div class="compliance-title">{{ item.title }}</div>
+                                <div class="compliance-desc">{{ item.description }}</div>
+                            </div>
+                            <div class="compliance-status">
+                                <i :class="item.statusIcon" :style="{ color: item.statusColor }"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 成绩趋势 -->
+                    <div class="card">
+                        <div class="card-title">
+                            <i class="bi bi-graph-up"></i>
+                            成绩趋势
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="scoreChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 学习进度 -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="bi bi-activity"></i>
+                    本月学习进度
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>双述演练</span>
+                                <span class="text-success">5/5 天</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill success" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>在线考试</span>
+                                <span class="text-warning">3/4 次</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill warning" style="width: 75%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>应急演练</span>
+                                <span class="text-success">1/1 次</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill success" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    selectedTab: 'all',
+                    stats: {
+                        totalAssessments: 48,
+                        passRate: 95,
+                        avgScore: 87,
+                        dualPractice: 92
+                    },
+                    assessmentTabs: [
+                        { id: 'all', name: '全部评估', icon: 'bi bi-collection' },
+                        { id: 'dual', name: '双述演练', icon: 'bi bi-mic' },
+                        { id: 'exam', name: '在线考试', icon: 'bi bi-pencil-square' },
+                        { id: 'emergency', name: '应急演练', icon: 'bi bi-shield-exclamation' }
+                    ],
+                    assessments: [
+                        {
+                            id: 1,
+                            title: '岗位描述 - 重介操作工',
+                            description: '岗位描述标准话术，表述清晰准确',
+                            date: '2026-01-21',
+                            score: 95,
+                            type: 'dual'
+                        },
+                        {
+                            id: 2,
+                            title: '手指口述 - 重介旋流器操作',
+                            description: '手指口述动作规范，配合流畅',
+                            date: '2026-01-21',
+                            score: 88,
+                            type: 'dual'
+                        },
+                        {
+                            id: 3,
+                            title: '重介旋流器操作规程考试',
+                            description: '涵盖操作流程、安全注意事项等内容',
+                            date: '2026-01-20',
+                            score: 92,
+                            type: 'exam'
+                        },
+                        {
+                            id: 4,
+                            title: '有限空间作业安全考试',
+                            description: '有限空间作业安全规程、防护措施',
+                            date: '2026-01-18',
+                            score: 85,
+                            type: 'exam'
+                        },
+                        {
+                            id: 5,
+                            title: '火灾应急处置演练',
+                            description: '火灾发生时的应急处置流程和逃生方法',
+                            date: '2026-01-15',
+                            score: 90,
+                            type: 'emergency'
+                        },
+                        {
+                            id: 6,
+                            title: '粉尘超标应急处置演练',
+                            description: '粉尘超标情况下的应急处置流程',
+                            date: '2026-01-12',
+                            score: 87,
+                            type: 'emergency'
+                        },
+                        {
+                            id: 7,
+                            title: '设备故障应急处置演练',
+                            description: '重介旋流器压力异常等设备故障的应急处置',
+                            date: '2026-01-10',
+                            score: 82,
+                            type: 'emergency'
+                        },
+                        {
+                            id: 8,
+                            title: '职业健康防护考试',
+                            description: '粉尘治理、劳动防护用品正确佩戴',
+                            date: '2026-01-08',
+                            score: 89,
+                            type: 'exam'
+                        }
+                    ],
+                    compliance: [
+                        {
+                            id: 1,
+                            title: '双述每日演练',
+                            description: '每日至少1次双述演练',
+                            icon: 'bi bi-mic',
+                            color: '#10B981',
+                            statusIcon: 'bi bi-check-circle-fill',
+                            statusColor: '#10B981'
+                        },
+                        {
+                            id: 2,
+                            title: '班组学习会',
+                            description: '每月至少2次班组学习会',
+                            icon: 'bi bi-people',
+                            color: '#10B981',
+                            statusIcon: 'bi bi-check-circle-fill',
+                            statusColor: '#10B981'
+                        },
+                        {
+                            id: 3,
+                            title: '应急演练',
+                            description: '每年至少1次应急演练',
+                            icon: 'bi bi-shield-exclamation',
+                            color: '#10B981',
+                            statusIcon: 'bi bi-check-circle-fill',
+                            statusColor: '#10B981'
+                        },
+                        {
+                            id: 4,
+                            title: '年度轮训',
+                            description: '每年完成100%轮训',
+                            icon: 'bi bi-calendar-check',
+                            color: '#F59E0B',
+                            statusIcon: 'bi bi-clock-fill',
+                            statusColor: '#F59E0B'
+                        }
+                    ]
+                };
+            },
+            computed: {
+                currentTabName() {
+                    const tab = this.assessmentTabs.find(t => t.id === this.selectedTab);
+                    return tab ? tab.name : '全部评估';
+                },
+                filteredAssessments() {
+                    if (this.selectedTab === 'all') {
+                        return this.assessments;
+                    }
+                    return this.assessments.filter(a => a.type === this.selectedTab);
+                }
+            },
+            methods: {
+                getScoreBadge(score) {
+                    if (score >= 90) return 'badge-success';
+                    if (score >= 80) return 'badge-primary';
+                    if (score >= 70) return 'badge-warning';
+                    return 'badge-danger';
+                },
+                getScoreLevel(score) {
+                    if (score >= 90) return '优秀';
+                    if (score >= 80) return '良好';
+                    if (score >= 70) return '合格';
+                    return '需改进';
+                },
+                viewDetail(assessment) {
+                    alert('查看详情：' + assessment.title);
+                }
+            },
+            mounted() {
+                // 初始化成绩趋势图
+                const ctx = document.getElementById('scoreChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                        datasets: [{
+                            label: '平均分',
+                            data: [82, 85, 84, 87, 89, 87],
+                            borderColor: 'rgba(37, 99, 235, 1)',
+                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                min: 70,
+                                max: 100,
+                                ticks: {
+                                    stepSize: 10
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习资源库 - 智能学习地图</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --border-color: #E2E8F0;
+        }
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .resource-card {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .resource-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        .category-btn {
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .category-btn:hover, .category-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../index.html"><i class="bi bi-book"></i> 智能学习地图</a>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-muted">张明 | 重介操作工</span>
+                    <button class="btn btn-primary">个人中心</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <h2>学习资源库</h2>
+            <p class="text-muted">浏览岗位题库、双述实操、应急演练等多元化学习资源</p>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <h3 class="text-primary">48</h3>
+                        <p class="mb-0">总资源数</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <h3 class="text-success">32</h3>
+                        <p class="mb-0">已完成</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <h3 class="text-warning">8</h3>
+                        <p class="mb-0">学习中</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <h3>156h</h3>
+                        <p class="mb-0">学习时长</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="d-flex gap-2 flex-wrap mb-4">
+                    <button class="category-btn" 
+                            v-for="category in categories" 
+                            :key="category.id"
+                            :class="{ active: selectedCategory === category.id }"
+                            @click="selectedCategory = category.id">
+                        <i :class="category.icon"></i> {{ category.name }}
+                        <span class="badge bg-light text-dark ms-1">{{ category.count }}</span>
+                    </button>
+                </div>
+
+                <div class="mb-3">
+                    <input type="text" class="form-control" 
+                           placeholder="搜索学习资源..." 
+                           v-model="searchQuery">
+                </div>
+
+                <div v-for="resource in filteredResources" :key="resource.id" class="resource-card">
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <div class="rounded bg-primary text-white d-flex align-items-center justify-content-center" 
+                                 style="width: 60px; height: 60px; font-size: 24px;">
+                                <i :class="resource.icon"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between">
+                                <h5>{{ resource.title }}</h5>
+                                <span class="badge bg-secondary">{{ resource.type }}</span>
+                            </div>
+                            <p class="mb-2 text-muted">{{ resource.description }}</p>
+                            <div class="d-flex gap-3 mb-2">
+                                <small><i class="bi bi-clock"></i> {{ resource.duration }}</small>
+                                <small><i class="bi bi-eye"></i> {{ resource.views }}次浏览</small>
+                            </div>
+                            <div v-if="resource.progress > 0" class="progress" style="height: 4px;">
+                                <div class="progress-bar bg-primary" :style="{ width: resource.progress + '%' }"></div>
+                            </div>
+                        </div>
+                        <div class="ms-3">
+                            <button class="btn btn-sm btn-primary" @click="startLearning(resource)">
+                                {{ resource.progress > 0 ? '继续' : '开始' }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    searchQuery: '',
+                    selectedCategory: 'all',
+                    categories: [
+                        { id: 'all', name: '全部', icon: 'bi bi-collection', count: 48 },
+                        { id: 'question', name: '岗位题库', icon: 'bi bi-question-square', count: 15 },
+                        { id: 'dual', name: '双述实操', icon: 'bi bi-mic', count: 8 },
+                        { id: 'emergency', name: '应急演练', icon: 'bi bi-shield-exclamation', count: 10 },
+                        { id: 'health', name: '职业健康', icon: 'bi bi-heart-pulse', count: 8 },
+                        { id: 'case', name: '事故案例', icon: 'bi bi-exclamation-triangle', count: 7 }
+                    ],
+                    resources: [
+                        {
+                            id: 1,
+                            title: '重介旋流器操作规程',
+                            description: '掌握重介旋流器的基本原理、操作流程和注意事项',
+                            type: '在线课程',
+                            duration: '45分钟',
+                            views: 234,
+                            progress: 100,
+                            category: 'question',
+                            icon: 'bi bi-book'
+                        },
+                        {
+                            id: 2,
+                            title: '岗位描述标准话术',
+                            description: '学习重介操作工岗位描述的标准话术和表达要点',
+                            type: '双述实操',
+                            duration: '15分钟',
+                            views: 189,
+                            progress: 100,
+                            category: 'dual',
+                            icon: 'bi bi-mic'
+                        },
+                        {
+                            id: 3,
+                            title: '火灾应急处置演练',
+                            description: '学习火灾发生时的应急处置流程和逃生方法',
+                            type: '应急演练',
+                            duration: '30分钟',
+                            views: 267,
+                            progress: 60,
+                            category: 'emergency',
+                            icon: 'bi bi-fire'
+                        },
+                        {
+                            id: 4,
+                            title: '粉尘治理与防护',
+                            description: '了解选煤作业中的粉尘危害及防护措施',
+                            type: '职业健康',
+                            duration: '25分钟',
+                            views: 145,
+                            progress: 0,
+                            category: 'health',
+                            icon: 'bi bi-mask'
+                        },
+                        {
+                            id: 5,
+                            title: '皮带机绞伤事故案例',
+                            description: '分析皮带机绞伤事故的原因和防范措施',
+                            type: '事故案例',
+                            duration: '28分钟',
+                            views: 223,
+                            progress: 0,
+                            category: 'case',
+                            icon: 'bi bi-exclamation-triangle'
+                        }
+                    ]
+                };
+            },
+            computed: {
+                filteredResources() {
+                    let filtered = this.resources;
+                    if (this.selectedCategory !== 'all') {
+                        filtered = filtered.filter(r => r.category === this.selectedCategory);
+                    }
+                    if (this.searchQuery) {
+                        const query = this.searchQuery.toLowerCase();
+                        filtered = filtered.filter(r => 
+                            r.title.toLowerCase().includes(query) || 
+                            r.description.toLowerCase().includes(query)
+                        );
+                    }
+                    return filtered;
+                }
+            },
+            methods: {
+                startLearning(resource) {
+                    alert('开始学习：' + resource.title);
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

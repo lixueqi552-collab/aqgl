@@ -1,0 +1,580 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>积分公示 - 安全积分</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .announcement-banner {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            border-radius: 12px;
+            padding: 24px;
+            color: white;
+            margin-bottom: 24px;
+        }
+
+        .announcement-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .announcement-content {
+            font-size: 14px;
+            line-height: 1.8;
+            opacity: 0.95;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid var(--border-color);
+            padding: 12px;
+            font-weight: 600;
+            color: var(--text-color);
+            background: var(--bg-color);
+        }
+
+        .table tbody td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background: var(--bg-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-danger {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .badge-info {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .badge-primary {
+            background: #E0E7FF;
+            color: #3730A3;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .points-change {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .points-change.add {
+            color: var(--success-color);
+        }
+
+        .points-change.subtract {
+            color: var(--danger-color);
+        }
+
+        .公示期-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .公示期-badge.active {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        @media (max-width: 768px) {
+            .filter-bar {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../00班组智能会议系统/原型页面/交互平台首页.html">
+                    <i class="bi bi-star me-2"></i>
+                    班组安全账户积分管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">积分首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分规则界面.html">积分规则</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分明细界面.html">积分明细</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分兑换界面.html">积分兑换</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分排名界面.html">积分排名</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-积分规则配置（管理员）.html">积分规则配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-兑换规则配置（管理员）.html">兑换规则配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-排名规则配置（管理员）.html">排名规则配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            张三
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">积分公示</h1>
+                <p class="page-subtitle">查看月度积分公示情况</p>
+            </div>
+
+            <div class="announcement-banner">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="announcement-title">
+                            <i class="bi bi-megaphone me-2"></i>
+                            2026年1月积分公示
+                        </div>
+                        <div class="announcement-content">
+                            <p>公示时间：2026年1月1日 - 2026年1月3日（公示期3个工作日）</p>
+                            <p>公示范围：XX选煤分公司及四大选煤中心全体职工</p>
+                            <p>公示内容：2025年12月积分明细及排名情况</p>
+                            <p>申诉渠道：公示期内如有异议，请通过系统提交申诉或联系安全管理部</p>
+                        </div>
+                    </div>
+                    <div class="公示期-badge active">
+                        <i class="bi bi-clock"></i>
+                        公示中
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div style="display: flex; gap: 16px; align-items: center;">
+                        <div>
+                            <span style="font-size: 14px; color: var(--text-secondary);">我的排名：</span>
+                            <span style="font-size: 24px; font-weight: 700; color: var(--primary-color);">23</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 14px; color: var(--text-secondary);">我的积分：</span>
+                            <span style="font-size: 24px; font-weight: 700; color: var(--primary-color);">1250</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 14px; color: var(--text-secondary);">本月变化：</span>
+                            <span style="font-size: 20px; font-weight: 600; color: var(--success-color);">+380</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-outline-primary" @click="goToRanking">
+                            <i class="bi bi-trophy me-1"></i>查看排名
+                        </button>
+                        <button class="btn btn-outline-primary" @click="goToAppeal">
+                            <i class="bi bi-question-circle me-1"></i>提交申诉
+                        </button>
+                    </div>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="filter-item">
+                        <label class="form-label">选煤中心</label>
+                        <select class="form-select" v-model="filters.center">
+                            <option value="all">全部中心</option>
+                            <option value="A选煤中心">A选煤中心</option>
+                            <option value="B选煤中心">B选煤中心</option>
+                            <option value="C选煤中心">C选煤中心</option>
+                            <option value="D选煤中心">D选煤中心</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="form-label">工种</label>
+                        <select class="form-select" v-model="filters.jobType">
+                            <option value="all">全部工种</option>
+                            <option value="检修工">检修工</option>
+                            <option value="电工">电工</option>
+                            <option value="巡检工">巡检工</option>
+                            <option value="煤质检测工">煤质检测工</option>
+                            <option value="重介操作工">重介操作工</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="form-label">公示月份</label>
+                        <select class="form-select" v-model="filters.month">
+                            <option value="2026-01">2026年1月</option>
+                            <option value="2025-12">2025年12月</option>
+                            <option value="2025-11">2025年11月</option>
+                            <option value="2025-10">2025年10月</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>排名</th>
+                                <th>姓名</th>
+                                <th>工种</th>
+                                <th>所属中心</th>
+                                <th>上月积分</th>
+                                <th>本月获得</th>
+                                <th>本月扣除</th>
+                                <th>本月变化</th>
+                                <th>当前积分</th>
+                                <th>积分等级</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(person, index) in filteredAnnouncement" :key="index">
+                                <td style="font-weight: 600;">{{ index + 1 }}</td>
+                                <td>
+                                    <div style="font-weight: 500;">{{ person.name }}</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);">{{ person.employeeId }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge badge-info">{{ person.jobType }}</span>
+                                </td>
+                                <td>{{ person.center }}</td>
+                                <td>{{ person.lastMonthPoints }}</td>
+                                <td style="color: var(--success-color); font-weight: 600;">+{{ person.monthAdd }}</td>
+                                <td style="color: var(--danger-color); font-weight: 600;">-{{ person.monthSubtract }}</td>
+                                <td>
+                                    <span class="points-change" :class="person.monthChange >= 0 ? 'add' : 'subtract'">
+                                        {{ person.monthChange >= 0 ? '+' : '' }}{{ person.monthChange }}
+                                    </span>
+                                </td>
+                                <td style="font-weight: 600; color: var(--primary-color);">{{ person.currentPoints }}</td>
+                                <td>
+                                    <span class="badge" :class="getLevelBadgeClass(person.level)">
+                                        {{ person.level }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="../index.html">上一页</a>
+                        </li>
+                        <li class="page-item active">
+                            <a class="page-link" href="../index.html">1</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="../index.html">2</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="../index.html">3</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="../index.html">下一页</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">公示说明</h3>
+                <div style="font-size: 14px; color: var(--text-secondary); line-height: 1.8;">
+                    <p><strong>公示时间：</strong>每月1日-3日（公示期不少于3个工作日）</p>
+                    <p><strong>公示内容：</strong>姓名、工种、积分增减明细、总积分、排名</p>
+                    <p><strong>申诉渠道：</strong>公示期内如有异议，可通过系统提交申诉，或联系安全管理部</p>
+                    <p><strong>申诉处理：</strong>收到申诉后5个工作日内出具处理意见（情况复杂的可延长3个工作日）</p>
+                    <p><strong>结果公示：</strong>申诉处理结果公示3天，接受全员监督</p>
+                    <p><strong>异议反馈：</strong>公示期内如有异议，请及时反馈，逾期不再受理</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">历史公示</h3>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>公示月份</th>
+                                <th>公示时间</th>
+                                <th>公示状态</th>
+                                <th>申诉数量</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(history, index) in announcementHistory" :key="index">
+                                <td>{{ history.month }}</td>
+                                <td>{{ history.time }}</td>
+                                <td>
+                                    <span class="badge" :class="getAnnouncementStatusBadgeClass(history.status)">
+                                        {{ history.status }}
+                                    </span>
+                                </td>
+                                <td>{{ history.appealCount }}</td>
+                                <td>
+                                    <button class="btn btn-outline-primary btn-sm" @click="viewHistory(history)">
+                                        <i class="bi bi-eye me-1"></i>查看详情
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    filters: {
+                        center: 'all',
+                        jobType: 'all',
+                        month: '2026-01'
+                    },
+                    announcement: [
+                        { name: '王五', employeeId: 'XBB001', jobType: '电工', center: 'A选煤中心', lastMonthPoints: 1460, monthAdd: 120, monthSubtract: 0, monthChange: 120, currentPoints: 1580, level: '优秀' },
+                        { name: '李四', employeeId: 'CJT002', jobType: '检修工', center: 'B选煤中心', lastMonthPoints: 1370, monthAdd: 80, monthSubtract: 0, monthChange: 80, currentPoints: 1450, level: '优秀' },
+                        { name: '赵六', employeeId: 'YXAS003', jobType: '巡检工', center: 'C选煤中心', lastMonthPoints: 1320, monthAdd: 60, monthSubtract: 0, monthChange: 60, currentPoints: 1380, level: '良好' },
+                        { name: '孙七', employeeId: 'YXSL004', jobType: '重介操作工', center: 'D选煤中心', lastMonthPoints: 1280, monthAdd: 70, monthSubtract: 0, monthChange: 70, currentPoints: 1350, level: '良好' },
+                        { name: '周八', employeeId: 'XBB005', jobType: '检修工', center: 'A选煤中心', lastMonthPoints: 1270, monthAdd: 50, monthSubtract: 0, monthChange: 50, currentPoints: 1320, level: '良好' },
+                        { name: '吴九', employeeId: 'CJT006', jobType: '电工', center: 'B选煤中心', lastMonthPoints: 1260, monthAdd: 40, monthSubtract: 0, monthChange: 40, currentPoints: 1300, level: '良好' },
+                        { name: '郑十', employeeId: 'YXAS007', jobType: '煤质检测工', center: 'C选煤中心', lastMonthPoints: 1250, monthAdd: 30, monthSubtract: 0, monthChange: 30, currentPoints: 1280, level: '良好' },
+                        { name: '钱十一', employeeId: 'YXSL008', jobType: '巡检工', center: 'D选煤中心', lastMonthPoints: 1240, monthAdd: 20, monthSubtract: 0, monthChange: 20, currentPoints: 1260, level: '良好' },
+                        { name: '张三', employeeId: 'XBB009', jobType: '检修工', center: 'A选煤中心', lastMonthPoints: 870, monthAdd: 400, monthSubtract: 20, monthChange: 380, currentPoints: 1250, level: '优秀' },
+                        { name: '刘十二', employeeId: 'CJT010', jobType: '重介操作工', center: 'B选煤中心', lastMonthPoints: 1220, monthAdd: 10, monthSubtract: 0, monthChange: 10, currentPoints: 1230, level: '良好' },
+                        { name: '陈十三', employeeId: 'YXAS011', jobType: '电工', center: 'C选煤中心', lastMonthPoints: 1210, monthAdd: 0, monthSubtract: 10, monthChange: -10, currentPoints: 1200, level: '良好' },
+                        { name: '杨十四', employeeId: 'YXSL012', jobType: '检修工', center: 'D选煤中心', lastMonthPoints: 1130, monthAdd: 0, monthSubtract: 50, monthChange: -50, currentPoints: 1180, level: '一般' },
+                        { name: '黄十五', employeeId: 'XBB013', jobType: '煤质检测工', center: 'A选煤中心', lastMonthPoints: 1120, monthAdd: 0, monthSubtract: 30, monthChange: -30, currentPoints: 1150, level: '一般' },
+                        { name: '朱十六', employeeId: 'CJT014', jobType: '巡检工', center: 'B选煤中心', lastMonthPoints: 1110, monthAdd: 0, monthSubtract: 40, monthChange: -40, currentPoints: 1120, level: '一般' },
+                        { name: '林十七', employeeId: 'YXAS015', jobType: '重介操作工', center: 'C选煤中心', lastMonthPoints: 1100, monthAdd: 0, monthSubtract: 50, monthChange: -50, currentPoints: 1100, level: '一般' }
+                    ],
+                    announcementHistory: [
+                        { month: '2025年12月', time: '2025-12-01 至 2025-12-03', status: '已结束', appealCount: 5 },
+                        { month: '2025年11月', time: '2025-11-01 至 2025-11-03', status: '已结束', appealCount: 3 },
+                        { month: '2025年10月', time: '2025-10-01 至 2025-10-03', status: '已结束', appealCount: 7 },
+                        { month: '2025年9月', time: '2025-09-01 至 2025-09-03', status: '已结束', appealCount: 4 },
+                        { month: '2025年8月', time: '2025-08-01 至 2025-08-03', status: '已结束', appealCount: 6 }
+                    ]
+                }
+            },
+            computed: {
+                filteredAnnouncement() {
+                    return this.announcement.filter(person => {
+                        let match = true;
+                        if (this.filters.center !== 'all' && person.center !== this.filters.center) {
+                            match = false;
+                        }
+                        if (this.filters.jobType !== 'all' && person.jobType !== this.filters.jobType) {
+                            match = false;
+                        }
+                        return match;
+                    });
+                }
+            },
+            methods: {
+                getLevelBadgeClass(level) {
+                    switch (level) {
+                        case '优秀':
+                            return 'badge-success';
+                        case '良好':
+                            return 'badge-info';
+                        case '一般':
+                            return 'badge-warning';
+                        default:
+                            return 'badge-danger';
+                    }
+                },
+                getAnnouncementStatusBadgeClass(status) {
+                    switch (status) {
+                        case '公示中':
+                            return 'badge-success';
+                        case '已结束':
+                            return 'badge-info';
+                        default:
+                            return 'badge-warning';
+                    }
+                },
+                goToRanking() {
+                    window.location.href = '积分排名界面.html';
+                },
+                goToAppeal() {
+                    window.location.href = '申诉管理界面.html';
+                },
+                viewHistory(history) {
+                    alert('查看 ' + history.month + ' 的公示详情');
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>岗位题库 - 智能学习地图</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --border-color: #E2E8F0;
+        }
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .question-card {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 12px;
+        }
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../index.html"><i class="bi bi-book"></i> 智能学习地图</a>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-muted">张明 | 重介操作工</span>
+                    <button class="btn btn-primary">个人中心</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <h2>岗位题库</h2>
+            <p class="text-muted">设备安全操作规程、有限空间作业安全、粉尘治理等专项题库</p>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <h3 class="text-primary">150</h3>
+                        <p class="mb-0">题目总数</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <h3 class="text-success">120</h3>
+                        <p class="mb-0">已掌握</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <h3 class="text-warning">30</h3>
+                        <p class="mb-0">需加强</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <h3>92%</h3>
+                        <p class="mb-0">正确率</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>题目分类</h4>
+                <div class="row g-3">
+                    <div class="col-md-4" v-for="category in categories" :key="category.id">
+                        <div class="p-3 border rounded cursor-pointer" 
+                             @click="selectCategory(category)"
+                             :style="{ borderColor: selectedCategory === category.id ? 'var(--primary-color)' : 'var(--border-color)' }">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5>{{ category.name }}</h5>
+                                    <small class="text-muted">{{ category.count }}道题</small>
+                                </div>
+                                <i :class="category.icon" style="font-size: 24px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4>题目列表</h4>
+                    <button class="btn btn-primary" @click="startPractice">
+                        <i class="bi bi-play-circle"></i> 开始练习
+                    </button>
+                </div>
+
+                <div v-for="question in questions" :key="question.id" class="question-card">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="mb-2">
+                                <span class="badge bg-secondary">{{ question.type }}</span>
+                                <span class="badge bg-primary ms-2">{{ question.category }}</span>
+                            </div>
+                            <h5>{{ question.content }}</h5>
+                            <div class="mt-2">
+                                <div v-for="(option, index) in question.options" :key="index" class="form-check">
+                                    <input class="form-check-input" type="radio" :name="'q' + question.id" :id="'q' + question.id + '_' + index">
+                                    <label class="form-check-label" :for="'q' + question.id + '_' + index">
+                                        {{ option }}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="mb-2">
+                                <span class="badge" :class="getScoreBadge(question.accuracy)">
+                                    正确率: {{ question.accuracy }}%
+                                </span>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary" @click="viewAnalysis(question)">
+                                <i class="bi bi-graph-up"></i> 查看解析
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>错题本</h4>
+                <div v-for="wrong in wrongQuestions" :key="wrong.id" class="question-card" style="border-left: 4px solid #EF4444;">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5>{{ wrong.content }}</h5>
+                            <p class="mb-2 text-muted">正确答案：{{ wrong.correctAnswer }}</p>
+                            <p class="mb-0"><strong>解析：</strong>{{ wrong.explanation }}</p>
+                        </div>
+                        <div class="text-end">
+                            <button class="btn btn-sm btn-primary" @click="retryQuestion(wrong)">
+                                <i class="bi bi-arrow-repeat"></i> 重做
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    selectedCategory: 'all',
+                    categories: [
+                        { id: 'equipment', name: '设备安全操作', count: 50, icon: 'bi bi-gear' },
+                        { id: 'space', name: '有限空间作业', count: 35, icon: 'bi bi-door-closed' },
+                        { id: 'dust', name: '粉尘治理', count: 30, icon: 'bi bi-wind' },
+                        { id: 'health', name: '职业健康', count: 25, icon: 'bi bi-heart-pulse' },
+                        { id: 'emergency', name: '应急处置', count: 10, icon: 'bi bi-shield-exclamation' }
+                    ],
+                    questions: [
+                        {
+                            id: 1,
+                            type: '单选题',
+                            category: '设备安全操作',
+                            content: '重介旋流器压力异常时，首先应该采取的措施是？',
+                            options: ['立即停机', '调整给料量', '检查压力表', '通知班组长'],
+                            accuracy: 95
+                        },
+                        {
+                            id: 2,
+                            type: '多选题',
+                            category: '有限空间作业',
+                            content: '有限空间作业前必须进行哪些检查？',
+                            options: ['气体检测', '通风', '照明检查', '人员清点'],
+                            accuracy: 88
+                        },
+                        {
+                            id: 3,
+                            type: '判断题',
+                            category: '粉尘治理',
+                            content: '粉尘浓度超过标准时，可以继续作业',
+                            options: ['正确', '错误'],
+                            accuracy: 92
+                        }
+                    ],
+                    wrongQuestions: [
+                        {
+                            id: 1,
+                            content: '重介旋流器压力异常时，首先应该采取的措施是？',
+                            correctAnswer: '立即停机',
+                            explanation: '压力异常可能导致设备损坏或安全事故，应首先停机确保安全，然后再进行故障排查。'
+                        }
+                    ]
+                };
+            },
+            methods: {
+                selectCategory(category) {
+                    this.selectedCategory = category.id;
+                },
+                getScoreBadge(accuracy) {
+                    if (accuracy >= 90) return 'bg-success';
+                    if (accuracy >= 80) return 'bg-primary';
+                    if (accuracy >= 70) return 'bg-warning';
+                    return 'bg-danger';
+                },
+                startPractice() {
+                    alert('开始练习模式');
+                },
+                viewAnalysis(question) {
+                    alert('查看题目解析');
+                },
+                retryQuestion(wrong) {
+                    alert('重做题目：' + wrong.content);
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

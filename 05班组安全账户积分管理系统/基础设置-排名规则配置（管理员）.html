@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排名规则配置 - 安全积分</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .rule-section {
+            margin-bottom: 32px;
+        }
+
+        .rule-section h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-color);
+        }
+
+        .rule-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .rule-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .rule-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .rule-content {
+            flex: 1;
+        }
+
+        .rule-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .rule-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .level-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .level-excellent {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .level-good {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .level-average {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .level-poor {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../00班组智能会议系统/原型页面/交互平台首页.html">
+                    <i class="bi bi-star me-2"></i>
+                    班组安全账户积分管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">积分首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分规则界面.html">积分规则</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分明细界面.html">积分明细</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分兑换界面.html">积分兑换</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分排名界面.html">积分排名</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-积分规则配置（管理员）.html">积分规则配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-兑换规则配置（管理员）.html">兑换规则配置</a></li>
+                                <li><a class="dropdown-item active" href="基础设置-排名规则配置（管理员）.html">排名规则配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            管理员
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">排名规则配置</h1>
+                <p class="page-subtitle">配置积分排名和积分等级规则</p>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">排名规则配置</h3>
+                
+                <div class="rule-section">
+                    <h4>排名维度</h4>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">排名时间范围</label>
+                            <select class="form-select" v-model="rankingRules.timeRange">
+                                <option value="month">按月排名</option>
+                                <option value="quarter">按季度排名</option>
+                                <option value="year">按年排名</option>
+                                <option value="all">累计排名</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">排名范围</label>
+                            <select class="form-select" v-model="rankingRules.scope">
+                                <option value="all">全员排名</option>
+                                <option value="center">按选煤中心排名</option>
+                                <option value="jobType">按工种排名</option>
+                                <option value="team">按班组排名</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rule-section">
+                    <h4>排名计算规则</h4>
+                    <div class="rule-item">
+                        <div class="rule-number">1</div>
+                        <div class="rule-content">
+                            <div class="rule-title">积分优先原则</div>
+                            <div class="rule-description">按总积分从高到低排序，积分相同则按本月获得积分排序</div>
+                        </div>
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-number">2</div>
+                        <div class="rule-content">
+                            <div class="rule-title">违规扣分影响</div>
+                            <div class="rule-description">有"三违"记录的员工，排名自动降至后50%</div>
+                        </div>
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-number">3</div>
+                        <div class="rule-content">
+                            <div class="rule-title">连续无违规奖励</div>
+                            <div class="rule-description">连续3个月无违规记录，排名提升10%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rule-section">
+                    <h4>公示规则</h4>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">公示时间</label>
+                            <select class="form-select" v-model="rankingRules.publicationTime">
+                                <option value="monthly">每月1-3日</option>
+                                <option value="quarterly">每季度首月1-5日</option>
+                                <option value="yearly">每年1月1-7日</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">公示期（工作日）</label>
+                            <input type="number" class="form-control" v-model="rankingRules.publicationDays" min="1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">积分等级配置</h3>
+                
+                <div class="rule-section">
+                    <h4>等级划分标准</h4>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>等级</th>
+                                    <th>积分范围</th>
+                                    <th>排名范围</th>
+                                    <th>违规要求</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(level, index) in levelRules" :key="index">
+                                    <td>
+                                        <span class="level-badge" :class="getLevelClass(level.name)">
+                                            {{ level.name }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm" v-model="level.minPoints" style="width: 100px; display: inline-block;">
+                                        <span style="margin: 0 8px;">-</span>
+                                        <input type="number" class="form-control form-control-sm" v-model="level.maxPoints" style="width: 100px; display: inline-block;">
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm" v-model="level.minRank" style="width: 100px; display: inline-block;">
+                                        <span style="margin: 0 8px;">-</span>
+                                        <input type="number" class="form-control form-control-sm" v-model="level.maxRank" style="width: 100px; display: inline-block;">
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm" v-model="level.violationLimit">
+                                            <option value="none">无违规</option>
+                                            <option value="minor">无较重及以上违规</option>
+                                            <option value="serious">无严重违规</option>
+                                            <option value="all">不限</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-outline-primary btn-sm" @click="editLevel(level)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="rule-section">
+                    <h4>等级权益</h4>
+                    <div class="rule-item">
+                        <div class="rule-number">1</div>
+                        <div class="rule-content">
+                            <div class="rule-title">优秀等级权益</div>
+                            <div class="rule-description">优先获得培训机会、安全之星评选资格、年度评优推荐</div>
+                        </div>
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-number">2</div>
+                        <div class="rule-content">
+                            <div class="rule-title">良好等级权益</div>
+                            <div class="rule-description">正常培训机会、积分兑换优先权</div>
+                        </div>
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-number">3</div>
+                        <div class="rule-content">
+                            <div class="rule-title">一般等级权益</div>
+                            <div class="rule-description">正常培训机会、积分兑换</div>
+                        </div>
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-number">4</div>
+                        <div class="rule-content">
+                            <div class="rule-title">较差等级权益</div>
+                            <div class="rule-description">限制培训机会、重点帮扶、岗位调整提醒</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">特殊规则配置</h3>
+                
+                <div class="rule-section">
+                    <h4>特殊人员处理</h4>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">新员工保护期（月）</label>
+                            <input type="number" class="form-control" v-model="specialRules.newbieProtection" min="0">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">长期病假人员处理</label>
+                            <select class="form-select" v-model="specialRules.longTermSick">
+                                <option value="exclude">排除排名</option>
+                                <option value="include">正常排名</option>
+                                <option value="freeze">积分冻结</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rule-section">
+                    <h4>排名调整规则</h4>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">严重违规处罚</label>
+                            <select class="form-select" v-model="specialRules.seriousViolation">
+                                <option value="drop50">排名降至后50%</option>
+                                <option value="drop100">排名降至最后</option>
+                                <option value="exclude">排除当月排名</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">连续末位处理</label>
+                            <select class="form-select" v-model="specialRules.consecutiveLast">
+                                <option value="warning">连续3个月末位预警</option>
+                                <option value="adjust">连续6个月末位岗位调整</option>
+                                <option value="training">连续3个月末位强制培训</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button class="btn btn-primary" @click="saveRules">
+                        <i class="bi bi-check-lg me-1"></i>保存规则
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    rankingRules: {
+                        timeRange: 'month',
+                        scope: 'all',
+                        publicationTime: 'monthly',
+                        publicationDays: 3
+                    },
+                    levelRules: [
+                        { name: '优秀', minPoints: 1500, maxPoints: 9999, minRank: 1, maxRank: 10, violationLimit: 'none' },
+                        { name: '良好', minPoints: 1200, maxPoints: 1499, minRank: 11, maxRank: 30, violationLimit: 'minor' },
+                        { name: '一般', minPoints: 1000, maxPoints: 1199, minRank: 31, maxRank: 60, violationLimit: 'serious' },
+                        { name: '较差', minPoints: 0, maxPoints: 999, minRank: 61, maxRank: 999, violationLimit: 'all' }
+                    ],
+                    specialRules: {
+                        newbieProtection: 3,
+                        longTermSick: 'exclude',
+                        seriousViolation: 'drop50',
+                        consecutiveLast: 'warning'
+                    }
+                }
+            },
+            methods: {
+                getLevelClass(levelName) {
+                    switch (levelName) {
+                        case '优秀':
+                            return 'level-excellent';
+                        case '良好':
+                            return 'level-good';
+                        case '一般':
+                            return 'level-average';
+                        case '较差':
+                            return 'level-poor';
+                        default:
+                            return '';
+                    }
+                },
+                editLevel(level) {
+                    alert('编辑等级：' + level.name);
+                },
+                saveRules() {
+                    alert('排名规则已保存');
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

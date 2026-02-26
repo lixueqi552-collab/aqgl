@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>积分明细 - 安全积分</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid var(--border-color);
+            padding: 12px;
+            font-weight: 600;
+            color: var(--text-color);
+            background: var(--bg-color);
+        }
+
+        .table tbody td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background: var(--bg-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-danger {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .badge-info {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            color: var(--text-color);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 4px;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .points-change {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .points-change.add {
+            color: var(--success-color);
+        }
+
+        .points-change.subtract {
+            color: var(--danger-color);
+        }
+
+        .detail-info {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .filter-bar {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../00班组智能会议系统/原型页面/交互平台首页.html">
+                    <i class="bi bi-star me-2"></i>
+                    班组安全账户积分管理系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="01-主界面.html">积分首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分规则界面.html">积分规则</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="积分明细界面.html">积分明细</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分兑换界面.html">积分兑换</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="积分排名界面.html">积分排名</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                基础设置
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="基础设置-积分规则配置（管理员）.html">积分规则配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-兑换规则配置（管理员）.html">兑换规则配置</a></li>
+                                <li><a class="dropdown-item" href="基础设置-排名规则配置（管理员）.html">排名规则配置</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-secondary me-3">
+                            <i class="bi bi-person-circle me-1"></i>
+                            张三
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-gear me-1"></i>设置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">积分明细</h1>
+                <p class="page-subtitle">查看详细的积分变动记录</p>
+            </div>
+
+            <div class="card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div style="display: flex; gap: 16px; align-items: center;">
+                        <div>
+                            <span style="font-size: 14px; color: var(--text-secondary);">当前积分：</span>
+                            <span style="font-size: 24px; font-weight: 700; color: var(--primary-color);">1250</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 14px; color: var(--text-secondary);">本月获得：</span>
+                            <span style="font-size: 18px; font-weight: 600; color: var(--success-color);">+380</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 14px; color: var(--text-secondary);">本月扣除：</span>
+                            <span style="font-size: 18px; font-weight: 600; color: var(--danger-color);">-20</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-primary" @click="exportData">
+                        <i class="bi bi-download me-1"></i>导出数据
+                    </button>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="filter-item">
+                        <label class="form-label">时间范围</label>
+                        <select class="form-select" v-model="filters.timeRange">
+                            <option value="all">全部时间</option>
+                            <option value="today">今天</option>
+                            <option value="week">本周</option>
+                            <option value="month">本月</option>
+                            <option value="quarter">本季度</option>
+                            <option value="year">本年</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="form-label">变动类型</label>
+                        <select class="form-select" v-model="filters.type">
+                            <option value="all">全部类型</option>
+                            <option value="add">加分</option>
+                            <option value="subtract">扣分</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="form-label">来源模块</label>
+                        <select class="form-select" v-model="filters.source">
+                            <option value="all">全部来源</option>
+                            <option value="作业行为">作业行为</option>
+                            <option value="学习培训">学习培训</option>
+                            <option value="隐患管理">隐患管理</option>
+                            <option value="安全活动">安全活动</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="form-label">关键词</label>
+                        <input type="text" class="form-control" placeholder="搜索说明" v-model="filters.keyword">
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>类型</th>
+                                <th>说明</th>
+                                <th>来源模块</th>
+                                <th>积分变化</th>
+                                <th>变动后积分</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(record, index) in filteredRecords" :key="index">
+                                <td>
+                                    <div>{{ record.time }}</div>
+                                    <div class="detail-info">{{ record.date }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge" :class="record.type === 'add' ? 'badge-success' : 'badge-danger'">
+                                        {{ record.type === 'add' ? '奖励' : '扣分' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 500;">{{ record.description }}</div>
+                                    <div class="detail-info">{{ record.detail }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge badge-info">{{ record.source }}</span>
+                                </td>
+                                <td>
+                                    <span class="points-change" :class="record.type">
+                                        {{ record.type === 'add' ? '+' : '-' }}{{ record.points }}
+                                    </span>
+                                </td>
+                                <td style="font-weight: 600;">{{ record.afterPoints }}</td>
+                                <td>
+                                    <button class="action-btn" @click="viewDetail(record)" title="查看详情">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="action-btn" v-if="record.type === 'subtract'" @click="appeal(record)" title="申诉">
+                                        <i class="bi bi-question-circle"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="../index.html">上一页</a>
+                        </li>
+                        <li class="page-item active">
+                            <a class="page-link" href="../index.html">1</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="../index.html">2</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="../index.html">3</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="../index.html">下一页</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- 详情弹窗 -->
+        <div class="modal fade" :class="{ show: showDetailModal }" tabindex="-1" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">积分变动详情</h5>
+                        <button type="button" class="btn-close" @click="closeDetailModal"></button>
+                    </div>
+                    <div class="modal-body" v-if="selectedRecord">
+                        <div class="mb-3">
+                            <label class="form-label">变动时间</label>
+                            <div style="padding: 8px 12px; background: var(--bg-color); border-radius: 6px;">
+                                {{ selectedRecord.time }} {{ selectedRecord.date }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">变动类型</label>
+                            <div>
+                                <span class="badge" :class="selectedRecord.type === 'add' ? 'badge-success' : 'badge-danger'">
+                                    {{ selectedRecord.type === 'add' ? '奖励' : '扣分' }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">说明</label>
+                            <div style="padding: 8px 12px; background: var(--bg-color); border-radius: 6px;">
+                                {{ selectedRecord.description }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">详细说明</label>
+                            <div style="padding: 8px 12px; background: var(--bg-color); border-radius: 6px;">
+                                {{ selectedRecord.detail }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">来源模块</label>
+                            <div>
+                                <span class="badge badge-info">{{ selectedRecord.source }}</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">积分变化</label>
+                            <div style="font-size: 18px; font-weight: 600;" :style="{ color: selectedRecord.type === 'add' ? 'var(--success-color)' : 'var(--danger-color)' }">
+                                {{ selectedRecord.type === 'add' ? '+' : '-' }}{{ selectedRecord.points }} 分
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">变动后积分</label>
+                            <div style="font-size: 18px; font-weight: 600; color: var(--primary-color);">
+                                {{ selectedRecord.afterPoints }} 分
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="closeDetailModal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 申诉弹窗 -->
+        <div class="modal fade" :class="{ show: showAppealModal }" tabindex="-1" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">提交申诉</h5>
+                        <button type="button" class="btn-close" @click="closeAppealModal"></button>
+                    </div>
+                    <div class="modal-body" v-if="selectedRecord">
+                        <div class="mb-3">
+                            <label class="form-label">申诉事项</label>
+                            <div style="padding: 8px 12px; background: var(--bg-color); border-radius: 6px;">
+                                {{ selectedRecord.description }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">申诉理由</label>
+                            <textarea class="form-control" rows="4" v-model="appealForm.reason" placeholder="请详细说明申诉理由"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">佐证材料</label>
+                            <input type="file" class="form-control" multiple>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                                支持上传图片、视频等佐证材料
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="closeAppealModal">取消</button>
+                        <button type="button" class="btn btn-primary" @click="submitAppeal">提交申诉</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    filters: {
+                        timeRange: 'month',
+                        type: 'all',
+                        source: 'all',
+                        keyword: ''
+                    },
+                    showDetailModal: false,
+                    showAppealModal: false,
+                    selectedRecord: null,
+                    appealForm: {
+                        reason: ''
+                    },
+                    records: [
+                        { time: '10:30', date: '2026-01-23', type: 'add', description: '发现重介浓度异常并及时上报', detail: '在巡检过程中发现重介旋流器浓度超标，及时上报并协助处理', source: '隐患管理', points: 50, afterPoints: 1250 },
+                        { time: '14:20', date: '2026-01-22', type: 'add', description: '参加安全知识竞赛获奖', detail: '参加公司组织的安全知识竞赛，获得三等奖', source: '安全活动', points: 30, afterPoints: 1200 },
+                        { time: '09:15', date: '2026-01-20', type: 'subtract', description: '未按规定佩戴安全帽', detail: '作业时未按规定佩戴安全帽', source: '作业行为', points: 20, afterPoints: 1170 },
+                        { time: '16:45', date: '2026-01-18', type: 'add', description: '双述演练优秀', detail: '岗位描述和手指口述演练获得优秀评级', source: '学习培训', points: 40, afterPoints: 1190 },
+                        { time: '11:30', date: '2026-01-15', type: 'add', description: '提出安全改进建议', detail: '提出关于设备安全防护的改进建议，被采纳', source: '安全活动', points: 20, afterPoints: 1150 },
+                        { time: '08:00', date: '2026-01-10', type: 'add', description: '完成安全培训并考核合格', detail: '完成有限空间作业安全培训并通过考核', source: '学习培训', points: 30, afterPoints: 1130 },
+                        { time: '13:20', date: '2026-01-08', type: 'add', description: '应急演练达标', detail: '参与火灾应急演练并达标', source: '学习培训', points: 35, afterPoints: 1100 },
+                        { time: '15:40', date: '2026-01-05', type: 'add', description: '发现设备隐患', detail: '发现皮带输送机托辊损坏隐患', source: '隐患管理', points: 40, afterPoints: 1065 },
+                        { time: '10:15', date: '2026-01-03', type: 'add', description: '参加安全培训', detail: '完成职业健康防护培训', source: '学习培训', points: 25, afterPoints: 1025 },
+                        { time: '09:30', date: '2026-01-01', type: 'add', description: '年度积分清零奖励', detail: '上一年度无严重违规，获得年度奖励', source: '安全活动', points: 100, afterPoints: 1000 }
+                    ]
+                }
+            },
+            computed: {
+                filteredRecords() {
+                    return this.records.filter(record => {
+                        let match = true;
+                        if (this.filters.type !== 'all' && record.type !== this.filters.type) {
+                            match = false;
+                        }
+                        if (this.filters.source !== 'all' && record.source !== this.filters.source) {
+                            match = false;
+                        }
+                        if (this.filters.keyword && !record.description.includes(this.filters.keyword)) {
+                            match = false;
+                        }
+                        return match;
+                    });
+                }
+            },
+            methods: {
+                viewDetail(record) {
+                    this.selectedRecord = record;
+                    this.showDetailModal = true;
+                },
+                closeDetailModal() {
+                    this.showDetailModal = false;
+                    this.selectedRecord = null;
+                },
+                appeal(record) {
+                    this.selectedRecord = record;
+                    this.showAppealModal = true;
+                },
+                closeAppealModal() {
+                    this.showAppealModal = false;
+                    this.selectedRecord = null;
+                    this.appealForm.reason = '';
+                },
+                submitAppeal() {
+                    if (!this.appealForm.reason.trim()) {
+                        alert('请填写申诉理由');
+                        return;
+                    }
+                    alert('申诉已提交，将在5个工作日内处理');
+                    this.closeAppealModal();
+                },
+                exportData() {
+                    alert('导出积分明细数据');
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
