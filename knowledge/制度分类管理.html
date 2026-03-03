@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>制度分类管理 - 榆北选煤班组人员安全信息智能交互平台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root { --primary-color: #2563EB; --primary-light: #3B82F6; --primary-dark: #1E40AF; --bg-color: #F1F5F9; --sidebar-bg: #1E293B; --sidebar-hover: #334155; --sidebar-active: #2563EB; --card-bg: #FFFFFF; --text-color: #1E293B; --text-secondary: #64748B; --border-color: #E2E8F0; --success-color: #10B981; --warning-color: #F59E0B; --danger-color: #EF4444; --info-color: #0EA5E9; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
+        .sidebar { position: fixed; left: 0; top: 0; width: 260px; height: 100vh; background: var(--sidebar-bg); color: #fff; z-index: 1000; overflow-y: auto; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; gap: 12px; }
+        .sidebar-logo { width: 40px; height: 40px; background: var(--primary-color); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .sidebar-title { font-size: 16px; font-weight: 600; }
+        .sidebar-subtitle { font-size: 12px; color: #94A3B8; }
+        .sidebar-menu { padding: 16px 0; }
+        .menu-category { padding: 8px 20px; font-size: 11px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 1px; }
+        .menu-item { display: flex; align-items: center; padding: 12px 20px; color: #CBD5E1; text-decoration: none; transition: all 0.2s ease; gap: 12px; cursor: pointer; }
+        .menu-item:hover { background: var(--sidebar-hover); color: #fff; }
+        .menu-item.active { background: var(--sidebar-active); color: #fff; }
+        .menu-item i { font-size: 18px; width: 24px; text-align: center; }
+        .submenu { background: rgba(0, 0, 0, 0.2); }
+        .submenu .menu-item { padding-left: 44px; font-size: 13px; }
+        .main-content { margin-left: 260px; min-height: 100vh; }
+        .top-navbar { background: var(--card-bg); padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
+        .user-profile { display: flex; align-items: center; gap: 12px; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 10px; background: var(--primary-color); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+        .content-wrapper { padding: 24px; }
+        .page-header { margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; }
+        .page-title { font-size: 24px; font-weight: 600; margin-bottom: 4px; }
+        .page-subtitle { font-size: 14px; color: var(--text-secondary); }
+        .content-grid { display: grid; grid-template-columns: 300px 1fr; gap: 24px; }
+        .tree-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); height: fit-content; }
+        .tree-header { padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+        .tree-title { font-size: 15px; font-weight: 600; }
+        .tree-body { padding: 16px; max-height: 500px; overflow-y: auto; }
+        .tree-item { padding: 10px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; margin-bottom: 4px; transition: all 0.2s; }
+        .tree-item:hover { background: var(--bg-color); }
+        .tree-item.active { background: rgba(37, 99, 235, 0.1); color: var(--primary-color); }
+        .tree-item i { font-size: 16px; }
+        .tree-item-children { margin-left: 24px; }
+        .btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; border: none; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background: var(--primary-color); color: #fff; }
+        .btn-secondary { background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); }
+        .detail-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); }
+        .detail-header { padding: 16px 24px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+        .detail-title { font-size: 16px; font-weight: 600; }
+        .detail-body { padding: 24px; }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--text-secondary); }
+        .form-control { width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; }
+        .form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .stat-item { background: var(--bg-color); border-radius: 8px; padding: 16px; text-align: center; }
+        .stat-value { font-size: 24px; font-weight: 700; color: var(--primary-color); }
+        .stat-label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+        .btn-group { display: flex; gap: 12px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <aside class="sidebar">
+            <div class="sidebar-header"><div class="sidebar-logo"><i class="bi bi-shield-check"></i></div><div><div class="sidebar-title">榆北选煤</div><div class="sidebar-subtitle">安全管理平台</div></div></div>
+            <nav class="sidebar-menu">
+                <div class="menu-category">平台管理</div>
+                <a href="../01-管理员首页.html" class="menu-item"><i class="bi bi-house-door"></i><span>管理首页</span></a>
+                <a href="../02-组织架构管理.html" class="menu-item"><i class="bi bi-diagram-3"></i><span>组织架构管理</span></a>
+                <div class="menu-category">业务系统管理</div>
+                <a href="../meeting/会议模板管理.html" class="menu-item"><i class="bi bi-calendar-check"></i><span>会议系统</span></a>
+                <a href="../learning/岗位能力建模管理.html" class="menu-item"><i class="bi bi-mortarboard"></i><span>学习地图</span></a>
+                <div class="menu-item active"><i class="bi bi-database"></i><span>AI知识库</span></div>
+                <div class="submenu">
+                    <a href="制度分类管理.html" class="menu-item active"><span>制度分类管理</span></a>
+                    <a href="制度审核管理.html" class="menu-item"><span>制度审核管理</span></a>
+                    <a href="AI问答记录.html" class="menu-item"><span>AI问答记录</span></a>
+                </div>
+                <a href="../points/积分规则配置.html" class="menu-item"><i class="bi bi-trophy"></i><span>积分管理</span></a>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <header class="top-navbar">
+                <div class="navbar-left"><nav aria-label="breadcrumb"><ol class="breadcrumb" style="margin:0;padding:0;background:none;"><li class="breadcrumb-item"><a href="../01-管理员首页.html" style="color:var(--text-secondary);text-decoration:none;">管理后台</a></li><li class="breadcrumb-item">AI知识库</li><li class="breadcrumb-item active" style="color:var(--text-color);font-weight:500;">制度分类管理</li></ol></nav></div>
+                <div class="navbar-right"><div class="user-profile"><div class="user-avatar">管</div><div style="text-align:right;"><div style="font-size:14px;font-weight:600;">系统管理员</div><div style="font-size:12px;color:var(--text-secondary);">超级管理员</div></div></div></div>
+            </header>
+            <div class="content-wrapper">
+                <div class="page-header"><div><h1 class="page-title">制度分类管理</h1><p class="page-subtitle">管理安全制度、操作规程的分类目录结构</p></div></div>
+                <div class="content-grid">
+                    <div class="tree-card">
+                        <div class="tree-header"><span class="tree-title">分类目录</span><button class="btn btn-primary" @click="addCategory"><i class="bi bi-plus"></i>新增</button></div>
+                        <div class="tree-body">
+                            <div v-for="cat in categories" :key="cat.id">
+                                <div class="tree-item" :class="{ active: selectedCategory && selectedCategory.id === cat.id }" @click="selectCategory(cat)">
+                                    <i :class="cat.icon"></i><span>{{ cat.name }}</span><span style="margin-left:auto;font-size:12px;color:var(--text-secondary);">({{ cat.count }})</span>
+                                </div>
+                                <div class="tree-item-children" v-if="cat.children">
+                                    <div class="tree-item" v-for="child in cat.children" :key="child.id" :class="{ active: selectedCategory && selectedCategory.id === child.id }" @click="selectCategory(child)">
+                                        <i :class="child.icon"></i><span>{{ child.name }}</span><span style="margin-left:auto;font-size:12px;color:var(--text-secondary);">({{ child.count }})</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-header"><span class="detail-title">{{ selectedCategory ? selectedCategory.name : '请选择分类' }}</span><div v-if="selectedCategory"><button class="btn btn-secondary" @click="editCategory"><i class="bi bi-pencil"></i>编辑</button></div></div>
+                        <div class="detail-body" v-if="selectedCategory">
+                            <div class="stats-row">
+                                <div class="stat-item"><div class="stat-value">{{ selectedCategory.count }}</div><div class="stat-label">制度数量</div></div>
+                                <div class="stat-item"><div class="stat-value">{{ selectedCategory.views || 0 }}</div><div class="stat-label">本月浏览</div></div>
+                                <div class="stat-item"><div class="stat-value">{{ selectedCategory.downloads || 0 }}</div><div class="stat-label">本月下载</div></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label class="form-label">分类名称</label><input type="text" class="form-control" :value="selectedCategory.name" readonly></div>
+                                <div class="form-group"><label class="form-label">上级分类</label><input type="text" class="form-control" :value="selectedCategory.parent || '无'" readonly></div>
+                            </div>
+                            <div class="form-group"><label class="form-label">分类描述</label><textarea class="form-control" rows="3" :value="selectedCategory.description" readonly></textarea></div>
+                            <div class="form-group"><label class="form-label">排序权重</label><input type="number" class="form-control" :value="selectedCategory.sort" readonly></div>
+                        </div>
+                        <div class="detail-body" v-else style="text-align:center;padding:60px;color:var(--text-secondary);"><i class="bi bi-folder" style="font-size:48px;margin-bottom:16px;"></i><p>请从左侧选择一个分类查看详情</p></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    selectedCategory: null,
+                    categories: [
+                        { id: 1, name: '安全管理制度', icon: 'bi bi-shield-check', count: 45, views: 1280, downloads: 256, description: '包含安全生产责任制、安全检查制度等', sort: 1, children: [
+                            { id: 11, name: '安全生产责任制', icon: 'bi bi-file-text', count: 12, views: 450, downloads: 89, parent: '安全管理制度', description: '各级人员安全生产责任制度', sort: 1 },
+                            { id: 12, name: '安全检查制度', icon: 'bi bi-file-text', count: 8, views: 320, downloads: 56, parent: '安全管理制度', description: '日常安全检查与隐患排查制度', sort: 2 },
+                        ]},
+                        { id: 2, name: '操作规程', icon: 'bi bi-gear', count: 38, views: 890, downloads: 178, description: '各岗位标准操作规程', sort: 2, children: [
+                            { id: 21, name: '设备操作规程', icon: 'bi bi-file-text', count: 22, views: 520, downloads: 98, parent: '操作规程', description: '各类设备安全操作规程', sort: 1 },
+                            { id: 22, name: '作业规程', icon: 'bi bi-file-text', count: 16, views: 370, downloads: 80, parent: '操作规程', description: '特种作业安全规程', sort: 2 },
+                        ]},
+                        { id: 3, name: '应急预案', icon: 'bi bi-exclamation-triangle', count: 15, views: 650, downloads: 145, description: '各类突发事件应急预案', sort: 3 },
+                        { id: 4, name: '培训资料', icon: 'bi bi-book', count: 28, views: 420, downloads: 86, description: '安全培训相关资料', sort: 4 },
+                        { id: 5, name: '法律法规', icon: 'bi bi-bank', count: 32, views: 380, downloads: 92, description: '国家及行业相关法规标准', sort: 5 },
+                    ]
+                }
+            },
+            methods: {
+                selectCategory(cat) { this.selectedCategory = cat; },
+                addCategory() { alert('新增分类'); },
+                editCategory() { alert('编辑分类: ' + this.selectedCategory.name); }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会议模板管理 - 榆北选煤班组人员安全信息智能交互平台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F1F5F9;
+            --sidebar-bg: #1E293B;
+            --sidebar-hover: #334155;
+            --sidebar-active: #2563EB;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+            --info-color: #0EA5E9;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
+        .sidebar { position: fixed; left: 0; top: 0; width: 260px; height: 100vh; background: var(--sidebar-bg); color: #fff; z-index: 1000; overflow-y: auto; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; gap: 12px; }
+        .sidebar-logo { width: 40px; height: 40px; background: var(--primary-color); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .sidebar-title { font-size: 16px; font-weight: 600; }
+        .sidebar-subtitle { font-size: 12px; color: #94A3B8; }
+        .sidebar-menu { padding: 16px 0; }
+        .menu-category { padding: 8px 20px; font-size: 11px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 1px; }
+        .menu-item { display: flex; align-items: center; padding: 12px 20px; color: #CBD5E1; text-decoration: none; transition: all 0.2s ease; gap: 12px; cursor: pointer; }
+        .menu-item:hover { background: var(--sidebar-hover); color: #fff; }
+        .menu-item.active { background: var(--sidebar-active); color: #fff; }
+        .menu-item i { font-size: 18px; width: 24px; text-align: center; }
+        .menu-item span { font-size: 14px; }
+        .submenu { background: rgba(0, 0, 0, 0.2); }
+        .submenu .menu-item { padding-left: 44px; font-size: 13px; }
+        .main-content { margin-left: 260px; min-height: 100vh; }
+        .top-navbar { background: var(--card-bg); padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
+        .user-profile { display: flex; align-items: center; gap: 12px; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 10px; background: var(--primary-color); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+        .content-wrapper { padding: 24px; }
+        .page-header { margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; }
+        .page-title { font-size: 24px; font-weight: 600; margin-bottom: 4px; }
+        .page-subtitle { font-size: 14px; color: var(--text-secondary); }
+        .toolbar { background: var(--card-bg); border-radius: 12px; padding: 20px 24px; border: 1px solid var(--border-color); margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+        .toolbar-left { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+        .search-box { display: flex; align-items: center; gap: 8px; background: var(--bg-color); border-radius: 8px; padding: 8px 16px; width: 280px; }
+        .search-box input { border: none; background: none; outline: none; font-size: 14px; flex: 1; }
+        .filter-select { padding: 10px 16px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; background: var(--card-bg); cursor: pointer; min-width: 140px; }
+        .btn { padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; border: none; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: var(--primary-color); color: #fff; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); }
+        .table-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); }
+        .table-container { overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table thead th { background: var(--bg-color); padding: 14px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); }
+        .data-table tbody td { padding: 14px 16px; border-bottom: 1px solid var(--border-color); font-size: 14px; vertical-align: middle; }
+        .data-table tbody tr:hover { background: var(--bg-color); }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .badge-success { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+        .badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
+        .badge-info { background: rgba(14, 165, 233, 0.1); color: var(--info-color); }
+        .action-btns { display: flex; gap: 8px; }
+        .action-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; }
+        .action-btn:hover { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: var(--card-bg); border-radius: 16px; width: 700px; max-width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+        .modal-title { font-size: 18px; font-weight: 600; }
+        .modal-close { width: 32px; height: 32px; border-radius: 8px; border: none; background: var(--bg-color); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .modal-body { padding: 24px; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+        .form-label .required { color: var(--danger-color); }
+        .form-control { width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; }
+        .form-control:focus { outline: none; border-color: var(--primary-color); }
+        .form-select { width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; background: var(--card-bg); }
+        .form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 12px; }
+        .module-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .module-item { display: flex; align-items: center; padding: 12px 16px; background: var(--bg-color); border-radius: 8px; gap: 12px; }
+        .module-item .drag-handle { color: var(--text-secondary); cursor: move; }
+        .module-item .module-name { flex: 1; font-size: 14px; }
+        .module-item .module-duration { font-size: 13px; color: var(--text-secondary); }
+        .module-item .remove-btn { color: var(--danger-color); cursor: pointer; }
+        .pagination-wrapper { padding: 20px 24px; border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+        .pagination-info { font-size: 14px; color: var(--text-secondary); }
+        .pagination { display: flex; align-items: center; gap: 8px; }
+        .page-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; }
+        .page-btn:hover, .page-btn.active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo"><i class="bi bi-shield-check"></i></div>
+                <div><div class="sidebar-title">榆北选煤</div><div class="sidebar-subtitle">安全管理平台</div></div>
+            </div>
+            <nav class="sidebar-menu">
+                <div class="menu-category">平台管理</div>
+                <a href="../01-管理员首页.html" class="menu-item"><i class="bi bi-house-door"></i><span>管理首页</span></a>
+                <a href="../02-组织架构管理.html" class="menu-item"><i class="bi bi-diagram-3"></i><span>组织架构管理</span></a>
+                <a href="../03-职工管理.html" class="menu-item"><i class="bi bi-people"></i><span>职工管理</span></a>
+                <a href="../04-岗位管理.html" class="menu-item"><i class="bi bi-briefcase"></i><span>岗位管理</span></a>
+                <div class="menu-category">业务系统管理</div>
+                <div class="menu-item active"><i class="bi bi-calendar-check"></i><span>会议系统</span></div>
+                <div class="submenu">
+                    <a href="会议模板管理.html" class="menu-item active"><span>会议模板管理</span></a>
+                    <a href="事故案例库管理.html" class="menu-item"><span>事故案例库管理</span></a>
+                    <a href="会议合规监控.html" class="menu-item"><span>会议合规监控</span></a>
+                </div>
+                <a href="../learning/岗位能力建模管理.html" class="menu-item"><i class="bi bi-mortarboard"></i><span>学习地图</span></a>
+                <a href="../knowledge/制度分类管理.html" class="menu-item"><i class="bi bi-database"></i><span>AI知识库</span></a>
+                <a href="../points/积分规则配置.html" class="menu-item"><i class="bi bi-trophy"></i><span>积分管理</span></a>
+                <div class="menu-category">系统管理</div>
+                <a href="../07-系统日志.html" class="menu-item"><i class="bi bi-journal-text"></i><span>系统日志</span></a>
+                <a href="../08-系统配置.html" class="menu-item"><i class="bi bi-gear"></i><span>系统配置</span></a>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <header class="top-navbar">
+                <div class="navbar-left">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb" style="margin:0;padding:0;background:none;">
+                            <li class="breadcrumb-item"><a href="../01-管理员首页.html" style="color:var(--text-secondary);text-decoration:none;">管理后台</a></li>
+                            <li class="breadcrumb-item">会议系统</li>
+                            <li class="breadcrumb-item active" style="color:var(--text-color);font-weight:500;">会议模板管理</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="navbar-right">
+                    <div class="user-profile">
+                        <div class="user-avatar">管</div>
+                        <div style="text-align:right;"><div style="font-size:14px;font-weight:600;">系统管理员</div><div style="font-size:12px;color:var(--text-secondary);">超级管理员</div></div>
+                    </div>
+                </div>
+            </header>
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <div><h1 class="page-title">会议模板管理</h1><p class="page-subtitle">配置班前会、班后会、学习会的标准流程模板</p></div>
+                    <button class="btn btn-primary" @click="showAddModal = true"><i class="bi bi-plus-lg"></i>新增模板</button>
+                </div>
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <div class="search-box"><i class="bi bi-search"></i><input type="text" placeholder="搜索模板名称..." v-model="searchText"></div>
+                        <select class="filter-select" v-model="filterType"><option value="">全部类型</option><option value="morning">班前会</option><option value="evening">班后会</option><option value="learning">学习会</option></select>
+                    </div>
+                </div>
+                <div class="table-card">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead><tr><th>模板名称</th><th>会议类型</th><th>模块数量</th><th>预计时长</th><th>适用班组</th><th>状态</th><th width="150">操作</th></tr></thead>
+                            <tbody>
+                                <tr v-for="tpl in templates" :key="tpl.id">
+                                    <td><strong>{{ tpl.name }}</strong></td>
+                                    <td><span class="badge" :class="{'badge-info': tpl.type==='morning','badge-success': tpl.type==='evening','badge-warning': tpl.type==='learning'}">{{ getTypeName(tpl.type) }}</span></td>
+                                    <td>{{ tpl.moduleCount }}个模块</td>
+                                    <td>{{ tpl.duration }}分钟</td>
+                                    <td>{{ tpl.scope }}</td>
+                                    <td><span class="badge badge-success">启用</span></td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="action-btn" title="编辑" @click="editTemplate(tpl)"><i class="bi bi-pencil"></i></button>
+                                            <button class="action-btn" title="复制" @click="copyTemplate(tpl)"><i class="bi bi-files"></i></button>
+                                            <button class="action-btn" title="删除" style="color:var(--danger-color);" @click="deleteTemplate(tpl)"><i class="bi bi-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination-wrapper">
+                        <div class="pagination-info">共 <strong>{{ total }}</strong> 条记录</div>
+                        <div class="pagination">
+                            <button class="page-btn"><i class="bi bi-chevron-left"></i></button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn"><i class="bi bi-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <div class="modal-overlay" :class="{ show: showAddModal }">
+            <div class="modal">
+                <div class="modal-header"><h4 class="modal-title">{{ editingTemplate ? '编辑模板' : '新增模板' }}</h4><button class="modal-close" @click="closeModal"><i class="bi bi-x-lg"></i></button></div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group"><label class="form-label">模板名称 <span class="required">*</span></label><input type="text" class="form-control" v-model="formData.name" placeholder="请输入模板名称"></div>
+                        <div class="form-group"><label class="form-label">会议类型 <span class="required">*</span></label><select class="form-select" v-model="formData.type"><option value="">请选择</option><option value="morning">班前会</option><option value="evening">班后会</option><option value="learning">学习会</option></select></div>
+                    </div>
+                    <div class="form-group"><label class="form-label">适用班组</label><select class="form-select" v-model="formData.scope"><option value="all">全部班组</option><option value="center">按选煤中心</option><option value="workshop">按车间</option><option value="team">指定班组</option></select></div>
+                    <div class="form-group">
+                        <label class="form-label">会议模块配置 <span class="required">*</span></label>
+                        <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;">拖拽调整模块顺序，设置每个模块的时长</p>
+                        <div class="module-list">
+                            <div class="module-item" v-for="(m, i) in formData.modules" :key="i">
+                                <i class="bi bi-grip-vertical drag-handle"></i>
+                                <span class="module-name">{{ m.name }}</span>
+                                <input type="number" v-model="m.duration" style="width:60px;padding:4px 8px;border:1px solid var(--border-color);border-radius:4px;font-size:13px;"> 分钟
+                                <i class="bi bi-x-circle remove-btn" @click="formData.modules.splice(i,1)"></i>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" style="margin-top:12px;" @click="addModule"><i class="bi bi-plus"></i>添加模块</button>
+                    </div>
+                </div>
+                <div class="modal-footer"><button class="btn btn-secondary" @click="closeModal">取消</button><button class="btn btn-primary" @click="saveTemplate">保存</button></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    searchText: '',
+                    filterType: '',
+                    total: 12,
+                    showAddModal: false,
+                    editingTemplate: null,
+                    formData: { name: '', type: '', scope: 'all', modules: [] },
+                    templates: [
+                        { id: 1, name: '标准班前会模板', type: 'morning', moduleCount: 8, duration: 30, scope: '全部班组' },
+                        { id: 2, name: '标准班后会模板', type: 'evening', moduleCount: 6, duration: 20, scope: '全部班组' },
+                        { id: 3, name: '周安全学习会模板', type: 'learning', moduleCount: 5, duration: 45, scope: '全部班组' },
+                        { id: 4, name: '重介车间班前会模板', type: 'morning', moduleCount: 9, duration: 35, scope: '重介车间' },
+                        { id: 5, name: '机电维修班学习会模板', type: 'learning', moduleCount: 4, duration: 40, scope: '机电维修班' },
+                    ]
+                }
+            },
+            methods: {
+                getTypeName(type) { const types = { morning: '班前会', evening: '班后会', learning: '学习会' }; return types[type] || '未知'; },
+                closeModal() { this.showAddModal = false; this.editingTemplate = null; this.formData = { name: '', type: '', scope: 'all', modules: [] }; },
+                editTemplate(tpl) { this.editingTemplate = tpl; this.formData = { name: tpl.name, type: tpl.type, scope: 'all', modules: [{ name: '点名签到', duration: 3 }, { name: '安全确认', duration: 5 }] }; this.showAddModal = true; },
+                copyTemplate(tpl) { alert('已复制模板: ' + tpl.name); },
+                deleteTemplate(tpl) { if (confirm('确定要删除该模板吗？')) alert('删除成功'); },
+                addModule() { this.formData.modules.push({ name: '新模块', duration: 5 }); },
+                saveTemplate() { if (!this.formData.name || !this.formData.type) { alert('请填写必填项'); return; } alert(this.editingTemplate ? '编辑成功' : '新增成功'); this.closeModal(); }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

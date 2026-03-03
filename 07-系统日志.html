@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统日志 - 榆北选煤班组人员安全信息智能交互平台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F1F5F9;
+            --sidebar-bg: #1E293B;
+            --sidebar-hover: #334155;
+            --sidebar-active: #2563EB;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+            --info-color: #0EA5E9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: var(--sidebar-bg);
+            color: #fff;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: #94A3B8;
+        }
+
+        .sidebar-menu {
+            padding: 16px 0;
+        }
+
+        .menu-category {
+            padding: 8px 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #CBD5E1;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            background: var(--sidebar-hover);
+            color: #fff;
+        }
+
+        .menu-item.active {
+            background: var(--sidebar-active);
+            color: #fff;
+        }
+
+        .menu-item i {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .menu-item span {
+            font-size: 14px;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航栏 */
+        .top-navbar {
+            background: var(--card-bg);
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--primary-color);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* 内容区 */
+        .content-wrapper {
+            padding: 24px;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* 统计卡片 */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .stat-icon.blue { background: rgba(37, 99, 235, 0.1); color: var(--primary-color); }
+        .stat-icon.green { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+        .stat-icon.orange { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
+        .stat-icon.red { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
+
+        .stat-content {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* 工具栏 */
+        .toolbar {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px 24px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 8px 16px;
+            width: 280px;
+        }
+
+        .search-box input {
+            border: none;
+            background: none;
+            outline: none;
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .filter-select {
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--card-bg);
+            cursor: pointer;
+            min-width: 140px;
+        }
+
+        /* 按钮 */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        /* 表格卡片 */
+        .table-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table thead th {
+            background: var(--bg-color);
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        .data-table tbody td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .data-table tbody tr:hover {
+            background: var(--bg-color);
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* 日志类型标签 */
+        .log-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .log-type.login { background: rgba(37, 99, 235, 0.1); color: var(--primary-color); }
+        .log-type.operation { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+        .log-type.error { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
+        .log-type.warning { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
+
+        /* 详情弹窗 */
+        .detail-link {
+            color: var(--primary-color);
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .detail-link:hover {
+            text-decoration: underline;
+        }
+
+        /* 分页 */
+        .pagination-wrapper {
+            padding: 20px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .pagination-info {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .page-btn:hover {
+            background: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
+
+        .page-btn.active {
+            background: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
+
+        /* 响应式 */
+        @media (max-width: 1200px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-box {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <div>
+                    <div class="sidebar-title">榆北选煤</div>
+                    <div class="sidebar-subtitle">安全管理平台</div>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <div class="menu-category">平台管理</div>
+                <a href="01-管理员首页.html" class="menu-item">
+                    <i class="bi bi-house-door"></i>
+                    <span>管理首页</span>
+                </a>
+                <a href="02-组织架构管理.html" class="menu-item">
+                    <i class="bi bi-diagram-3"></i>
+                    <span>组织架构管理</span>
+                </a>
+                <a href="03-职工管理.html" class="menu-item">
+                    <i class="bi bi-people"></i>
+                    <span>职工管理</span>
+                </a>
+                <a href="04-岗位管理.html" class="menu-item">
+                    <i class="bi bi-briefcase"></i>
+                    <span>岗位管理</span>
+                </a>
+                <a href="05-角色权限管理.html" class="menu-item">
+                    <i class="bi bi-shield-lock"></i>
+                    <span>角色权限管理</span>
+                </a>
+                <a href="06-数据字典管理.html" class="menu-item">
+                    <i class="bi bi-book"></i>
+                    <span>数据字典管理</span>
+                </a>
+
+                <div class="menu-category">系统管理</div>
+                <a href="07-系统日志.html" class="menu-item active">
+                    <i class="bi bi-journal-text"></i>
+                    <span>系统日志</span>
+                </a>
+                <a href="08-系统配置.html" class="menu-item">
+                    <i class="bi bi-gear"></i>
+                    <span>系统配置</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 顶部导航栏 -->
+            <header class="top-navbar">
+                <div class="navbar-left">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb" style="margin: 0; padding: 0; background: none;">
+                            <li class="breadcrumb-item"><a href="01-管理员首页.html" style="color: var(--text-secondary); text-decoration: none;">管理后台</a></li>
+                            <li class="breadcrumb-item active" style="color: var(--text-color); font-weight: 500;">系统日志</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="navbar-right">
+                    <div class="user-profile">
+                        <div class="user-avatar">管</div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 14px; font-weight: 600;">系统管理员</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">超级管理员</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 内容区 -->
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <h1 class="page-title">系统日志</h1>
+                    <p class="page-subtitle">查看系统操作日志、登录日志和异常日志</p>
+                </div>
+
+                <!-- 统计卡片 -->
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="bi bi-activity"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">2,586</div>
+                            <div class="stat-label">今日操作日志</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">856</div>
+                            <div class="stat-label">今日登录次数</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">23</div>
+                            <div class="stat-label">今日异常日志</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red">
+                            <i class="bi bi-shield-exclamation"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">5</div>
+                            <div class="stat-label">安全告警</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 工具栏 -->
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <div class="search-box">
+                            <i class="bi bi-search"></i>
+                            <input type="text" placeholder="搜索操作人、IP地址..." v-model="searchText">
+                        </div>
+                        <select class="filter-select" v-model="filterType">
+                            <option value="">全部类型</option>
+                            <option value="login">登录日志</option>
+                            <option value="operation">操作日志</option>
+                            <option value="error">异常日志</option>
+                            <option value="warning">告警日志</option>
+                        </select>
+                        <input type="date" class="filter-select" v-model="filterDate" style="width: 160px;">
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-secondary">
+                            <i class="bi bi-download"></i>
+                            导出日志
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 表格 -->
+                <div class="table-card">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th width="100">日志类型</th>
+                                    <th>操作内容</th>
+                                    <th width="120">操作人</th>
+                                    <th width="140">IP地址</th>
+                                    <th width="160">操作时间</th>
+                                    <th width="80">状态</th>
+                                    <th width="80">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="log in logs" :key="log.id">
+                                    <td>
+                                        <span class="log-type" :class="log.type">
+                                            <i :class="getTypeIcon(log.type)"></i>
+                                            {{ getTypeName(log.type) }}
+                                        </span>
+                                    </td>
+                                    <td>{{ log.content }}</td>
+                                    <td>{{ log.operator }}</td>
+                                    <td><code style="background: var(--bg-color); padding: 2px 8px; border-radius: 4px; font-size: 12px;">{{ log.ip }}</code></td>
+                                    <td>{{ log.time }}</td>
+                                    <td>
+                                        <span style="color: var(--success-color);" v-if="log.status === 1">成功</span>
+                                        <span style="color: var(--danger-color);" v-else>失败</span>
+                                    </td>
+                                    <td>
+                                        <span class="detail-link" @click="viewDetail(log)">详情</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 分页 -->
+                    <div class="pagination-wrapper">
+                        <div class="pagination-info">
+                            共 <strong>12,586</strong> 条记录，当前显示第 <strong>1</strong> 页
+                        </div>
+                        <div class="pagination">
+                            <button class="page-btn">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                            <button class="page-btn">...</button>
+                            <button class="page-btn">50</button>
+                            <button class="page-btn">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    searchText: '',
+                    filterType: '',
+                    filterDate: '',
+                    logs: [
+                        { id: 1, type: 'login', content: '用户登录系统', operator: '张伟', ip: '192.168.1.105', time: '2026-03-03 14:25:36', status: 1 },
+                        { id: 2, type: 'operation', content: '新增职工：李明（YB002）', operator: '系统管理员', ip: '192.168.1.100', time: '2026-03-03 14:20:15', status: 1 },
+                        { id: 3, type: 'operation', content: '修改积分规则：连续无违规积分由25分调整为30分', operator: '安全管理员', ip: '192.168.1.102', time: '2026-03-03 14:15:28', status: 1 },
+                        { id: 4, type: 'error', content: '数据库连接超时', operator: '系统', ip: '127.0.0.1', time: '2026-03-03 14:10:05', status: 0 },
+                        { id: 5, type: 'warning', content: '连续登录失败3次：用户 test001', operator: '系统', ip: '192.168.2.88', time: '2026-03-03 14:05:12', status: 0 },
+                        { id: 6, type: 'operation', content: '发布制度：《皮带机安全操作规程》V2.0', operator: '安全管理员', ip: '192.168.1.102', time: '2026-03-03 13:55:40', status: 1 },
+                        { id: 7, type: 'login', content: '用户退出系统', operator: '王芳', ip: '192.168.1.108', time: '2026-03-03 13:50:22', status: 1 },
+                        { id: 8, type: 'operation', content: '删除职工：周涛（YB007）', operator: '系统管理员', ip: '192.168.1.100', time: '2026-03-03 13:45:18', status: 1 },
+                        { id: 9, type: 'warning', content: '磁盘空间不足：剩余空间 5%', operator: '系统', ip: '127.0.0.1', time: '2026-03-03 13:40:55', status: 0 },
+                        { id: 10, type: 'operation', content: '安全之星评选确认：2026年2月度', operator: '安全管理员', ip: '192.168.1.102', time: '2026-03-03 13:35:30', status: 1 },
+                    ]
+                }
+            },
+            methods: {
+                getTypeName(type) {
+                    const types = {
+                        login: '登录日志',
+                        operation: '操作日志',
+                        error: '异常日志',
+                        warning: '告警日志'
+                    };
+                    return types[type] || '未知';
+                },
+                getTypeIcon(type) {
+                    const icons = {
+                        login: 'bi bi-box-arrow-in-right',
+                        operation: 'bi bi-pencil-square',
+                        error: 'bi bi-bug',
+                        warning: 'bi bi-exclamation-triangle'
+                    };
+                    return icons[type] || 'bi bi-circle';
+                },
+                viewDetail(log) {
+                    alert('查看日志详情：' + log.content);
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

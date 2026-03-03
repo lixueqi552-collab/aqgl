@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>组织架构管理 - 榆北选煤班组人员安全信息智能交互平台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F1F5F9;
+            --sidebar-bg: #1E293B;
+            --sidebar-hover: #334155;
+            --sidebar-active: #2563EB;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+            --info-color: #0EA5E9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: var(--sidebar-bg);
+            color: #fff;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: #94A3B8;
+        }
+
+        .sidebar-menu {
+            padding: 16px 0;
+        }
+
+        .menu-category {
+            padding: 8px 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #CBD5E1;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            background: var(--sidebar-hover);
+            color: #fff;
+        }
+
+        .menu-item.active {
+            background: var(--sidebar-active);
+            color: #fff;
+        }
+
+        .menu-item i {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .menu-item span {
+            font-size: 14px;
+        }
+
+        /* 主内容区样式 */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航栏 */
+        .top-navbar {
+            background: var(--card-bg);
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .breadcrumb {
+            background: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .breadcrumb-item {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .breadcrumb-item.active {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--primary-color);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* 内容区 */
+        .content-wrapper {
+            padding: 24px;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* 内容布局 */
+        .content-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+        }
+
+        /* 树形结构卡片 */
+        .tree-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            height: calc(100vh - 160px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tree-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .tree-title {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tree-title::before {
+            content: '';
+            width: 4px;
+            height: 18px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .tree-toolbar {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tree-toolbar button {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tree-toolbar button:hover {
+            background: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
+
+        .tree-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        /* 树形节点 */
+        .tree-node {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .tree-node-content {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            gap: 10px;
+        }
+
+        .tree-node-content:hover {
+            background: var(--bg-color);
+        }
+
+        .tree-node-content.active {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary-color);
+        }
+
+        .tree-expand {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease;
+        }
+
+        .tree-expand.expanded {
+            transform: rotate(90deg);
+        }
+
+        .tree-icon {
+            font-size: 18px;
+        }
+
+        .tree-label {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .tree-count {
+            font-size: 12px;
+            color: var(--text-secondary);
+            background: var(--bg-color);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .tree-children {
+            padding-left: 28px;
+            display: none;
+        }
+
+        .tree-children.show {
+            display: block;
+        }
+
+        /* 详情卡片 */
+        .detail-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .detail-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .detail-title {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-title::before {
+            content: '';
+            width: 4px;
+            height: 18px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .detail-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .detail-body {
+            padding: 24px;
+        }
+
+        /* 信息展示 */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .info-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .info-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 24px 0;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 下级列表 */
+        .sub-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sub-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg-color);
+            border-radius: 10px;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sub-item:hover {
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .sub-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .sub-icon.company {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary-color);
+        }
+
+        .sub-icon.center {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .sub-icon.workshop {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .sub-icon.team {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        .sub-content {
+            flex: 1;
+        }
+
+        .sub-name {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .sub-meta {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 16px;
+        }
+
+        .sub-action {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sub-action:hover {
+            background: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
+
+        /* 按钮 */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            opacity: 0.9;
+        }
+
+        /* 徽章 */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        /* 模态框 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            display: none;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: 16px;
+            width: 500px;
+            max-width: 90%;
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: var(--bg-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-label .required {
+            color: var(--danger-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--card-bg);
+            cursor: pointer;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 1200px) {
+            .content-layout {
+                grid-template-columns: 280px 1fr;
+            }
+            .info-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .content-layout {
+                grid-template-columns: 1fr;
+            }
+            .tree-card {
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <div>
+                    <div class="sidebar-title">榆北选煤</div>
+                    <div class="sidebar-subtitle">安全管理平台</div>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <div class="menu-category">平台管理</div>
+                <a href="01-管理员首页.html" class="menu-item">
+                    <i class="bi bi-house-door"></i>
+                    <span>管理首页</span>
+                </a>
+                <a href="02-组织架构管理.html" class="menu-item active">
+                    <i class="bi bi-diagram-3"></i>
+                    <span>组织架构管理</span>
+                </a>
+                <a href="03-职工管理.html" class="menu-item">
+                    <i class="bi bi-people"></i>
+                    <span>职工管理</span>
+                </a>
+                <a href="04-岗位管理.html" class="menu-item">
+                    <i class="bi bi-briefcase"></i>
+                    <span>岗位管理</span>
+                </a>
+                <a href="05-角色权限管理.html" class="menu-item">
+                    <i class="bi bi-shield-lock"></i>
+                    <span>角色权限管理</span>
+                </a>
+                <a href="06-数据字典管理.html" class="menu-item">
+                    <i class="bi bi-book"></i>
+                    <span>数据字典管理</span>
+                </a>
+
+                <div class="menu-category">系统管理</div>
+                <a href="07-系统日志.html" class="menu-item">
+                    <i class="bi bi-journal-text"></i>
+                    <span>系统日志</span>
+                </a>
+                <a href="08-系统配置.html" class="menu-item">
+                    <i class="bi bi-gear"></i>
+                    <span>系统配置</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 顶部导航栏 -->
+            <header class="top-navbar">
+                <div class="navbar-left">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="01-管理员首页.html">管理后台</a></li>
+                            <li class="breadcrumb-item active">组织架构管理</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="navbar-right">
+                    <div class="user-profile">
+                        <div class="user-avatar">管</div>
+                        <div class="user-info">
+                            <div class="user-name">系统管理员</div>
+                            <div class="user-role">超级管理员</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 内容区 -->
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">组织架构管理</h1>
+                        <p class="page-subtitle">管理公司-选煤中心-车间-班组四级架构</p>
+                    </div>
+                    <button class="btn btn-primary" @click="showAddModal = true">
+                        <i class="bi bi-plus-lg"></i>
+                        新增组织
+                    </button>
+                </div>
+
+                <div class="content-layout">
+                    <!-- 左侧树形结构 -->
+                    <div class="tree-card">
+                        <div class="tree-header">
+                            <h3 class="tree-title">组织架构</h3>
+                            <div class="tree-toolbar">
+                                <button title="刷新"><i class="bi bi-arrow-clockwise"></i></button>
+                                <button title="展开全部"><i class="bi bi-arrows-expand"></i></button>
+                            </div>
+                        </div>
+                        <div class="tree-body">
+                            <div class="tree-node" v-for="company in organizations" :key="company.id">
+                                <div class="tree-node-content" :class="{ active: selectedOrg?.id === company.id }" @click="selectOrg(company)" @dblclick="toggleNode(company)">
+                                    <span class="tree-expand" :class="{ expanded: company.expanded }" @click.stop="toggleNode(company)" v-if="company.children?.length">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </span>
+                                    <span class="tree-expand" v-else></span>
+                                    <i class="bi bi-building tree-icon"></i>
+                                    <span class="tree-label">{{ company.name }}</span>
+                                    <span class="tree-count">{{ company.children?.length || 0 }}</span>
+                                </div>
+                                <div class="tree-children" :class="{ show: company.expanded }">
+                                    <div class="tree-node" v-for="center in company.children" :key="center.id">
+                                        <div class="tree-node-content" :class="{ active: selectedOrg?.id === center.id }" @click="selectOrg(center)" @dblclick="toggleNode(center)">
+                                            <span class="tree-expand" :class="{ expanded: center.expanded }" @click.stop="toggleNode(center)" v-if="center.children?.length">
+                                                <i class="bi bi-chevron-right"></i>
+                                            </span>
+                                            <span class="tree-expand" v-else></span>
+                                            <i class="bi bi-building tree-icon" style="color: var(--success-color)"></i>
+                                            <span class="tree-label">{{ center.name }}</span>
+                                            <span class="tree-count">{{ center.children?.length || 0 }}</span>
+                                        </div>
+                                        <div class="tree-children" :class="{ show: center.expanded }">
+                                            <div class="tree-node" v-for="workshop in center.children" :key="workshop.id">
+                                                <div class="tree-node-content" :class="{ active: selectedOrg?.id === workshop.id }" @click="selectOrg(workshop)" @dblclick="toggleNode(workshop)">
+                                                    <span class="tree-expand" :class="{ expanded: workshop.expanded }" @click.stop="toggleNode(workshop)" v-if="workshop.children?.length">
+                                                        <i class="bi bi-chevron-right"></i>
+                                                    </span>
+                                                    <span class="tree-expand" v-else></span>
+                                                    <i class="bi bi-gear tree-icon" style="color: var(--warning-color)"></i>
+                                                    <span class="tree-label">{{ workshop.name }}</span>
+                                                    <span class="tree-count">{{ workshop.children?.length || 0 }}</span>
+                                                </div>
+                                                <div class="tree-children" :class="{ show: workshop.expanded }">
+                                                    <div class="tree-node" v-for="team in workshop.children" :key="team.id">
+                                                        <div class="tree-node-content" :class="{ active: selectedOrg?.id === team.id }" @click="selectOrg(team)">
+                                                            <span class="tree-expand"></span>
+                                                            <i class="bi bi-people tree-icon" style="color: var(--danger-color)"></i>
+                                                            <span class="tree-label">{{ team.name }}</span>
+                                                            <span class="tree-count">{{ team.memberCount || 0 }}人</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右侧详情 -->
+                    <div class="detail-card">
+                        <div class="detail-header">
+                            <h3 class="detail-title">{{ selectedOrg ? selectedOrg.name : '请选择组织' }}</h3>
+                            <div class="detail-actions" v-if="selectedOrg">
+                                <button class="btn btn-secondary" @click="editOrg">
+                                    <i class="bi bi-pencil"></i>
+                                    编辑
+                                </button>
+                                <button class="btn btn-danger" @click="deleteOrg">
+                                    <i class="bi bi-trash"></i>
+                                    删除
+                                </button>
+                            </div>
+                        </div>
+                        <div class="detail-body" v-if="selectedOrg">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="info-label">组织名称</span>
+                                    <span class="info-value">{{ selectedOrg.name }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">组织类型</span>
+                                    <span class="info-value">{{ getOrgTypeName(selectedOrg.type) }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">上级组织</span>
+                                    <span class="info-value">{{ selectedOrg.parentName || '无' }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">负责人</span>
+                                    <span class="info-value">{{ selectedOrg.leader || '未设置' }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">联系电话</span>
+                                    <span class="info-value">{{ selectedOrg.phone || '未设置' }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">状态</span>
+                                    <span class="badge badge-success">正常</span>
+                                </div>
+                            </div>
+
+                            <div class="info-divider"></div>
+
+                            <h4 class="section-title">
+                                <i class="bi bi-list-ul"></i>
+                                下级组织（{{ selectedOrg.children?.length || 0 }}个）
+                            </h4>
+
+                            <div class="sub-list" v-if="selectedOrg.children?.length">
+                                <div class="sub-item" v-for="child in selectedOrg.children" :key="child.id" @click="selectOrg(child)">
+                                    <div class="sub-icon" :class="getOrgIconClass(child.type)">
+                                        <i :class="getOrgIcon(child.type)"></i>
+                                    </div>
+                                    <div class="sub-content">
+                                        <div class="sub-name">{{ child.name }}</div>
+                                        <div class="sub-meta">
+                                            <span><i class="bi bi-people"></i> {{ child.memberCount || 0 }}人</span>
+                                            <span><i class="bi bi-person"></i> 负责人: {{ child.leader || '未设置' }}</span>
+                                        </div>
+                                    </div>
+                                    <button class="sub-action" @click.stop="editOrg(child)">编辑</button>
+                                </div>
+                            </div>
+                            <div v-else style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                                <i class="bi bi-folder2-open" style="font-size: 48px; margin-bottom: 16px; display: block;"></i>
+                                暂无下级组织
+                            </div>
+                        </div>
+                        <div class="detail-body" v-else style="text-align: center; padding: 80px 40px; color: var(--text-secondary);">
+                            <i class="bi bi-diagram-3" style="font-size: 64px; margin-bottom: 16px; display: block; opacity: 0.3;"></i>
+                            请在左侧选择一个组织查看详情
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 新增/编辑模态框 -->
+        <div class="modal-overlay" :class="{ show: showAddModal }">
+            <div class="modal">
+                <div class="modal-header">
+                    <h4 class="modal-title">{{ editingOrg ? '编辑组织' : '新增组织' }}</h4>
+                    <button class="modal-close" @click="closeModal">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">组织类型 <span class="required">*</span></label>
+                        <select class="form-select" v-model="formData.type">
+                            <option value="">请选择组织类型</option>
+                            <option value="company">公司</option>
+                            <option value="center">选煤中心</option>
+                            <option value="workshop">车间</option>
+                            <option value="team">班组</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">组织名称 <span class="required">*</span></label>
+                        <input type="text" class="form-control" v-model="formData.name" placeholder="请输入组织名称">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">上级组织</label>
+                        <select class="form-select" v-model="formData.parentId">
+                            <option value="">无（顶级组织）</option>
+                            <option v-for="org in flatOrganizations" :key="org.id" :value="org.id">{{ org.name }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">负责人</label>
+                        <input type="text" class="form-control" v-model="formData.leader" placeholder="请输入负责人姓名">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">联系电话</label>
+                        <input type="text" class="form-control" v-model="formData.phone" placeholder="请输入联系电话">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">备注</label>
+                        <textarea class="form-control" v-model="formData.remark" rows="3" placeholder="请输入备注信息"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @click="closeModal">取消</button>
+                    <button class="btn btn-primary" @click="saveOrg">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    selectedOrg: null,
+                    showAddModal: false,
+                    editingOrg: null,
+                    formData: {
+                        type: '',
+                        name: '',
+                        parentId: '',
+                        leader: '',
+                        phone: '',
+                        remark: ''
+                    },
+                    organizations: [
+                        {
+                            id: 1,
+                            name: '榆北选煤分公司',
+                            type: 'company',
+                            leader: '张总',
+                            phone: '0912-8888888',
+                            expanded: true,
+                            children: [
+                                {
+                                    id: 11,
+                                    name: '小保当选煤中心',
+                                    type: 'center',
+                                    leader: '王经理',
+                                    phone: '0912-8888881',
+                                    memberCount: 320,
+                                    expanded: true,
+                                    children: [
+                                        { id: 111, name: '重介车间', type: 'workshop', leader: '李主任', memberCount: 80, children: [
+                                            { id: 1111, name: '重介一班', type: 'team', leader: '张班长', memberCount: 20 },
+                                            { id: 1112, name: '重介二班', type: 'team', leader: '王班长', memberCount: 18 },
+                                            { id: 1113, name: '重介三班', type: 'team', leader: '赵班长', memberCount: 22 }
+                                        ]},
+                                        { id: 112, name: '破碎车间', type: 'workshop', leader: '刘主任', memberCount: 60, children: [
+                                            { id: 1121, name: '破碎一班', type: 'team', leader: '孙班长', memberCount: 15 },
+                                            { id: 1122, name: '破碎二班', type: 'team', leader: '周班长', memberCount: 15 }
+                                        ]},
+                                        { id: 113, name: '机电维修车间', type: 'workshop', leader: '陈主任', memberCount: 45, children: [
+                                            { id: 1131, name: '机电班', type: 'team', leader: '吴班长', memberCount: 25 },
+                                            { id: 1132, name: '维修班', type: 'team', leader: '郑班长', memberCount: 20 }
+                                        ]}
+                                    ]
+                                },
+                                {
+                                    id: 12,
+                                    name: '曹家滩选煤中心',
+                                    type: 'center',
+                                    leader: '赵经理',
+                                    phone: '0912-8888882',
+                                    memberCount: 280,
+                                    expanded: false,
+                                    children: []
+                                },
+                                {
+                                    id: 13,
+                                    name: '涌鑫安山选煤中心',
+                                    type: 'center',
+                                    leader: '钱经理',
+                                    phone: '0912-8888883',
+                                    memberCount: 260,
+                                    expanded: false,
+                                    children: []
+                                },
+                                {
+                                    id: 14,
+                                    name: '涌鑫沙梁选煤中心',
+                                    type: 'center',
+                                    leader: '孙经理',
+                                    phone: '0912-8888884',
+                                    memberCount: 240,
+                                    expanded: false,
+                                    children: []
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            computed: {
+                flatOrganizations() {
+                    let result = [];
+                    const flatten = (orgs, parentName = '') => {
+                        orgs.forEach(org => {
+                            result.push({
+                                id: org.id,
+                                name: parentName ? `${parentName} / ${org.name}` : org.name,
+                                type: org.type
+                            });
+                            if (org.children?.length) {
+                                flatten(org.children, parentName ? `${parentName} / ${org.name}` : org.name);
+                            }
+                        });
+                    };
+                    flatten(this.organizations);
+                    return result;
+                }
+            },
+            methods: {
+                selectOrg(org) {
+                    this.selectedOrg = org;
+                },
+                toggleNode(org) {
+                    org.expanded = !org.expanded;
+                },
+                getOrgTypeName(type) {
+                    const types = {
+                        company: '公司',
+                        center: '选煤中心',
+                        workshop: '车间',
+                        team: '班组'
+                    };
+                    return types[type] || '未知';
+                },
+                getOrgIcon(type) {
+                    const icons = {
+                        company: 'bi bi-building',
+                        center: 'bi bi-building',
+                        workshop: 'bi bi-gear',
+                        team: 'bi bi-people'
+                    };
+                    return icons[type] || 'bi bi-folder';
+                },
+                getOrgIconClass(type) {
+                    const classes = {
+                        center: 'center',
+                        workshop: 'workshop',
+                        team: 'team'
+                    };
+                    return classes[type] || 'company';
+                },
+                closeModal() {
+                    this.showAddModal = false;
+                    this.editingOrg = null;
+                    this.formData = {
+                        type: '',
+                        name: '',
+                        parentId: '',
+                        leader: '',
+                        phone: '',
+                        remark: ''
+                    };
+                },
+                editOrg(org) {
+                    if (org) {
+                        this.editingOrg = org;
+                        this.formData = {
+                            type: org.type,
+                            name: org.name,
+                            parentId: '',
+                            leader: org.leader || '',
+                            phone: org.phone || '',
+                            remark: org.remark || ''
+                        };
+                    }
+                    this.showAddModal = true;
+                },
+                deleteOrg() {
+                    if (confirm('确定要删除该组织吗？')) {
+                        alert('删除成功');
+                    }
+                },
+                saveOrg() {
+                    if (!this.formData.type || !this.formData.name) {
+                        alert('请填写必填项');
+                        return;
+                    }
+                    alert(this.editingOrg ? '编辑成功' : '新增成功');
+                    this.closeModal();
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统配置 - 榆北选煤班组人员安全信息智能交互平台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E40AF;
+            --bg-color: #F1F5F9;
+            --sidebar-bg: #1E293B;
+            --sidebar-hover: #334155;
+            --sidebar-active: #2563EB;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+            --info-color: #0EA5E9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: var(--sidebar-bg);
+            color: #fff;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: #94A3B8;
+        }
+
+        .sidebar-menu {
+            padding: 16px 0;
+        }
+
+        .menu-category {
+            padding: 8px 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #CBD5E1;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            background: var(--sidebar-hover);
+            color: #fff;
+        }
+
+        .menu-item.active {
+            background: var(--sidebar-active);
+            color: #fff;
+        }
+
+        .menu-item i {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .menu-item span {
+            font-size: 14px;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航栏 */
+        .top-navbar {
+            background: var(--card-bg);
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--primary-color);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* 内容区 */
+        .content-wrapper {
+            padding: 24px;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* 配置布局 */
+        .config-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 24px;
+        }
+
+        /* 配置菜单 */
+        .config-menu {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            height: fit-content;
+            position: sticky;
+            top: 88px;
+        }
+
+        .config-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .config-menu-item:hover {
+            background: var(--bg-color);
+        }
+
+        .config-menu-item.active {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary-color);
+        }
+
+        .config-menu-item i {
+            font-size: 18px;
+        }
+
+        .config-menu-item span {
+            font-size: 14px;
+        }
+
+        /* 配置卡片 */
+        .config-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .config-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .config-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .config-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .config-body {
+            padding: 24px;
+        }
+
+        /* 表单项 */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-hint {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--card-bg);
+        }
+
+        /* 开关 */
+        .switch-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .switch-wrapper:last-child {
+            border-bottom: none;
+        }
+
+        .switch-label {
+            flex: 1;
+        }
+
+        .switch-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .switch-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .switch {
+            width: 48px;
+            height: 26px;
+            background: var(--border-color);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .switch.active {
+            background: var(--primary-color);
+        }
+
+        .switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.2s ease;
+        }
+
+        .switch.active::after {
+            left: 24px;
+        }
+
+        /* 按钮 */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        /* 分隔线 */
+        .section-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 24px 0;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 配置项网格 */
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 1200px) {
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .config-layout {
+                grid-template-columns: 1fr;
+            }
+            .config-menu {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <div>
+                    <div class="sidebar-title">榆北选煤</div>
+                    <div class="sidebar-subtitle">安全管理平台</div>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <div class="menu-category">平台管理</div>
+                <a href="01-管理员首页.html" class="menu-item">
+                    <i class="bi bi-house-door"></i>
+                    <span>管理首页</span>
+                </a>
+                <a href="02-组织架构管理.html" class="menu-item">
+                    <i class="bi bi-diagram-3"></i>
+                    <span>组织架构管理</span>
+                </a>
+                <a href="03-职工管理.html" class="menu-item">
+                    <i class="bi bi-people"></i>
+                    <span>职工管理</span>
+                </a>
+                <a href="04-岗位管理.html" class="menu-item">
+                    <i class="bi bi-briefcase"></i>
+                    <span>岗位管理</span>
+                </a>
+                <a href="05-角色权限管理.html" class="menu-item">
+                    <i class="bi bi-shield-lock"></i>
+                    <span>角色权限管理</span>
+                </a>
+                <a href="06-数据字典管理.html" class="menu-item">
+                    <i class="bi bi-book"></i>
+                    <span>数据字典管理</span>
+                </a>
+
+                <div class="menu-category">系统管理</div>
+                <a href="07-系统日志.html" class="menu-item">
+                    <i class="bi bi-journal-text"></i>
+                    <span>系统日志</span>
+                </a>
+                <a href="08-系统配置.html" class="menu-item active">
+                    <i class="bi bi-gear"></i>
+                    <span>系统配置</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 顶部导航栏 -->
+            <header class="top-navbar">
+                <div class="navbar-left">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb" style="margin: 0; padding: 0; background: none;">
+                            <li class="breadcrumb-item"><a href="01-管理员首页.html" style="color: var(--text-secondary); text-decoration: none;">管理后台</a></li>
+                            <li class="breadcrumb-item active" style="color: var(--text-color); font-weight: 500;">系统配置</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="navbar-right">
+                    <div class="user-profile">
+                        <div class="user-avatar">管</div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 14px; font-weight: 600;">系统管理员</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">超级管理员</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 内容区 -->
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <h1 class="page-title">系统配置</h1>
+                    <p class="page-subtitle">管理系统基础参数、通知配置、存储配置等</p>
+                </div>
+
+                <div class="config-layout">
+                    <!-- 左侧菜单 -->
+                    <div class="config-menu">
+                        <div class="config-menu-item" :class="{ active: activeTab === 'basic' }" @click="activeTab = 'basic'">
+                            <i class="bi bi-sliders"></i>
+                            <span>基础配置</span>
+                        </div>
+                        <div class="config-menu-item" :class="{ active: activeTab === 'notify' }" @click="activeTab = 'notify'">
+                            <i class="bi bi-bell"></i>
+                            <span>通知配置</span>
+                        </div>
+                        <div class="config-menu-item" :class="{ active: activeTab === 'storage' }" @click="activeTab = 'storage'">
+                            <i class="bi bi-hdd"></i>
+                            <span>存储配置</span>
+                        </div>
+                        <div class="config-menu-item" :class="{ active: activeTab === 'security' }" @click="activeTab = 'security'">
+                            <i class="bi bi-shield-check"></i>
+                            <span>安全配置</span>
+                        </div>
+                        <div class="config-menu-item" :class="{ active: activeTab === 'meeting' }" @click="activeTab = 'meeting'">
+                            <i class="bi bi-calendar-check"></i>
+                            <span>会议配置</span>
+                        </div>
+                        <div class="config-menu-item" :class="{ active: activeTab === 'points' }" @click="activeTab = 'points'">
+                            <i class="bi bi-trophy"></i>
+                            <span>积分配置</span>
+                        </div>
+                    </div>
+
+                    <!-- 右侧配置内容 -->
+                    <div class="config-card">
+                        <!-- 基础配置 -->
+                        <div v-if="activeTab === 'basic'">
+                            <div class="config-header">
+                                <h3 class="config-title">基础配置</h3>
+                                <p class="config-desc">配置系统基础参数信息</p>
+                            </div>
+                            <div class="config-body">
+                                <div class="form-group">
+                                    <label class="form-label">系统名称</label>
+                                    <input type="text" class="form-control" v-model="config.systemName" placeholder="请输入系统名称">
+                                    <p class="form-hint">显示在系统标题和登录页面</p>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">系统Logo</label>
+                                    <div style="display: flex; align-items: center; gap: 16px;">
+                                        <div style="width: 80px; height: 80px; background: var(--bg-color); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="bi bi-image" style="font-size: 32px; color: var(--text-secondary);"></i>
+                                        </div>
+                                        <button class="btn btn-secondary">上传Logo</button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">版权信息</label>
+                                    <input type="text" class="form-control" v-model="config.copyright" placeholder="请输入版权信息">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">备案号</label>
+                                    <input type="text" class="form-control" v-model="config.icp" placeholder="请输入备案号">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 通知配置 -->
+                        <div v-if="activeTab === 'notify'">
+                            <div class="config-header">
+                                <h3 class="config-title">通知配置</h3>
+                                <p class="config-desc">配置系统消息通知方式</p>
+                            </div>
+                            <div class="config-body">
+                                <div class="switch-wrapper">
+                                    <div class="switch-label">
+                                        <div class="switch-title">站内消息</div>
+                                        <div class="switch-desc">系统内部消息通知</div>
+                                    </div>
+                                    <div class="switch" :class="{ active: notify.internal }" @click="notify.internal = !notify.internal"></div>
+                                </div>
+                                <div class="switch-wrapper">
+                                    <div class="switch-label">
+                                        <div class="switch-title">短信通知</div>
+                                        <div class="switch-desc">通过短信发送重要通知</div>
+                                    </div>
+                                    <div class="switch" :class="{ active: notify.sms }" @click="notify.sms = !notify.sms"></div>
+                                </div>
+                                <div class="switch-wrapper">
+                                    <div class="switch-label">
+                                        <div class="switch-title">邮件通知</div>
+                                        <div class="switch-desc">通过邮件发送通知</div>
+                                    </div>
+                                    <div class="switch" :class="{ active: notify.email }" @click="notify.email = !notify.email"></div>
+                                </div>
+                                <div class="switch-wrapper">
+                                    <div class="switch-label">
+                                        <div class="switch-title">APP推送</div>
+                                        <div class="switch-desc">通过移动APP推送消息</div>
+                                    </div>
+                                    <div class="switch" :class="{ active: notify.app }" @click="notify.app = !notify.app"></div>
+                                </div>
+                                <div class="section-divider"></div>
+                                <h4 class="section-title">短信配置</h4>
+                                <div class="config-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">短信服务商</label>
+                                        <select class="form-select" v-model="notify.smsProvider">
+                                            <option value="aliyun">阿里云</option>
+                                            <option value="tencent">腾讯云</option>
+                                            <option value="huawei">华为云</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">短信签名</label>
+                                        <input type="text" class="form-control" v-model="notify.smsSign" placeholder="请输入短信签名">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 存储配置 -->
+                        <div v-if="activeTab === 'storage'">
+                            <div class="config-header">
+                                <h3 class="config-title">存储配置</h3>
+                                <p class="config-desc">配置文件存储方式</p>
+                            </div>
+                            <div class="config-body">
+                                <div class="form-group">
+                                    <label class="form-label">存储方式</label>
+                                    <select class="form-select" v-model="storage.type">
+                                        <option value="local">本地存储</option>
+                                        <option value="oss">阿里云OSS</option>
+                                        <option value="cos">腾讯云COS</option>
+                                        <option value="minio">MinIO</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">上传文件大小限制</label>
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <input type="number" class="form-control" v-model="storage.maxSize" style="width: 150px;">
+                                        <span style="color: var(--text-secondary);">MB</span>
+                                    </div>
+                                    <p class="form-hint">单个文件最大上传大小</p>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">允许上传的文件类型</label>
+                                    <input type="text" class="form-control" v-model="storage.allowTypes" placeholder="如：jpg,png,pdf,doc,docx">
+                                    <p class="form-hint">多个类型用逗号分隔</p>
+                                </div>
+                                <div class="section-divider"></div>
+                                <h4 class="section-title">存储统计</h4>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                                    <div style="text-align: center; padding: 20px; background: var(--bg-color); border-radius: 10px;">
+                                        <div style="font-size: 24px; font-weight: 700; color: var(--primary-color);">128 GB</div>
+                                        <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">总容量</div>
+                                    </div>
+                                    <div style="text-align: center; padding: 20px; background: var(--bg-color); border-radius: 10px;">
+                                        <div style="font-size: 24px; font-weight: 700; color: var(--success-color);">45 GB</div>
+                                        <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">已使用</div>
+                                    </div>
+                                    <div style="text-align: center; padding: 20px; background: var(--bg-color); border-radius: 10px;">
+                                        <div style="font-size: 24px; font-weight: 700; color: var(--warning-color);">83 GB</div>
+                                        <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">剩余空间</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 安全配置 -->
+                        <div v-if="activeTab === 'security'">
+                            <div class="config-header">
+                                <h3 class="config-title">安全配置</h3>
+                                <p class="config-desc">配置系统安全策略</p>
+                            </div>
+                            <div class="config-body">
+                                <div class="form-group">
+                                    <label class="form-label">登录失败锁定次数</label>
+                                    <input type="number" class="form-control" v-model="security.loginFailCount" style="width: 150px;">
+                                    <p class="form-hint">连续登录失败超过此次数将锁定账户</p>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">账户锁定时长</label>
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <input type="number" class="form-control" v-model="security.lockDuration" style="width: 150px;">
+                                        <span style="color: var(--text-secondary);">分钟</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">密码最小长度</label>
+                                    <input type="number" class="form-control" v-model="security.passwordMinLength" style="width: 150px;">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">密码有效期</label>
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <input type="number" class="form-control" v-model="security.passwordExpireDays" style="width: 150px;">
+                                        <span style="color: var(--text-secondary);">天（0表示永不过期）</span>
+                                    </div>
+                                </div>
+                                <div class="switch-wrapper" style="padding-top: 16px;">
+                                    <div class="switch-label">
+                                        <div class="switch-title">强制密码复杂度</div>
+                                        <div class="switch-desc">要求密码包含大小写字母、数字和特殊字符</div>
+                                    </div>
+                                    <div class="switch" :class="{ active: security.passwordComplexity }" @click="security.passwordComplexity = !security.passwordComplexity"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 会议配置 -->
+                        <div v-if="activeTab === 'meeting'">
+                            <div class="config-header">
+                                <h3 class="config-title">会议配置</h3>
+                                <p class="config-desc">配置班组会议相关参数</p>
+                            </div>
+                            <div class="config-body">
+                                <h4 class="section-title">班前会配置</h4>
+                                <div class="form-group">
+                                    <label class="form-label">会议召开时间</label>
+                                    <input type="time" class="form-control" v-model="meeting.morningTime" style="width: 150px;">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">会议时长（分钟）</label>
+                                    <input type="number" class="form-control" v-model="meeting.morningDuration" style="width: 150px;">
+                                </div>
+                                <div class="section-divider"></div>
+                                <h4 class="section-title">班后会配置</h4>
+                                <div class="form-group">
+                                    <label class="form-label">会议召开时间</label>
+                                    <input type="time" class="form-control" v-model="meeting.eveningTime" style="width: 150px;">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">会议时长（分钟）</label>
+                                    <input type="number" class="form-control" v-model="meeting.eveningDuration" style="width: 150px;">
+                                </div>
+                                <div class="section-divider"></div>
+                                <h4 class="section-title">班组学习会配置</h4>
+                                <div class="form-group">
+                                    <label class="form-label">每月最少召开次数</label>
+                                    <input type="number" class="form-control" v-model="meeting.learningMinCount" style="width: 150px;">
+                                    <p class="form-hint">少于此次数将触发督办提醒</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 积分配置 -->
+                        <div v-if="activeTab === 'points'">
+                            <div class="config-header">
+                                <h3 class="config-title">积分配置</h3>
+                                <p class="config-desc">配置安全积分相关参数</p>
+                            </div>
+                            <div class="config-body">
+                                <div class="form-group">
+                                    <label class="form-label">初始积分</label>
+                                    <input type="number" class="form-control" v-model="points.initPoints" style="width: 150px;">
+                                    <p class="form-hint">新职工入职时的初始积分</p>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">年度积分清零时间</label>
+                                    <input type="date" class="form-control" v-model="points.resetDate" style="width: 200px;">
+                                    <p class="form-hint">每年此日期积分清零，历史记录保留</p>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">公示期（天）</label>
+                                    <input type="number" class="form-control" v-model="points.publicDays" style="width: 150px;">
+                                    <p class="form-hint">月度积分公示天数，不少于3天</p>
+                                </div>
+                                <div class="switch-wrapper" style="padding-top: 16px;">
+                                    <div class="switch-label">
+                                        <div class="switch-title">积分兑换功能</div>
+                                        <div class="switch-desc">开启后职工可使用积分兑换奖励</div>
+                                    </div>
+                                    <div class="switch" :class="{ active: points.exchangeEnabled }" @click="points.exchangeEnabled = !points.exchangeEnabled"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 保存按钮 -->
+                        <div style="padding: 16px 24px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 12px;">
+                            <button class="btn btn-secondary">重置</button>
+                            <button class="btn btn-primary" @click="saveConfig">保存配置</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    activeTab: 'basic',
+                    config: {
+                        systemName: '榆北选煤班组人员安全信息智能交互平台',
+                        copyright: '© 2025 榆北选煤分公司 版权所有',
+                        icp: ''
+                    },
+                    notify: {
+                        internal: true,
+                        sms: true,
+                        email: false,
+                        app: true,
+                        smsProvider: 'aliyun',
+                        smsSign: '榆北选煤'
+                    },
+                    storage: {
+                        type: 'local',
+                        maxSize: 100,
+                        allowTypes: 'jpg,png,pdf,doc,docx,xls,xlsx,mp4'
+                    },
+                    security: {
+                        loginFailCount: 5,
+                        lockDuration: 30,
+                        passwordMinLength: 8,
+                        passwordExpireDays: 90,
+                        passwordComplexity: true
+                    },
+                    meeting: {
+                        morningTime: '08:00',
+                        morningDuration: 30,
+                        eveningTime: '17:30',
+                        eveningDuration: 20,
+                        learningMinCount: 2
+                    },
+                    points: {
+                        initPoints: 1000,
+                        resetDate: '2026-01-01',
+                        publicDays: 3,
+                        exchangeEnabled: true
+                    }
+                }
+            },
+            methods: {
+                saveConfig() {
+                    alert('配置保存成功');
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
